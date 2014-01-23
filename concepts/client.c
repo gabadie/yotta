@@ -137,8 +137,11 @@ slave_finish_function(const massive_args_t * args)
  * Client main entry point (like a conventional program)
  */
 int
-main()
+main(int argc, char ** argv)
 {
+    yotta_init(argc, argv);
+
+
     yotta_context_t context;
 
     // connection to the yotta server that is going to run the slaves
@@ -153,7 +156,7 @@ main()
     args.buffer_size = buffer_size;
 
     // alloc a yotta memory buffer with a 16 bytes alignement
-    uint64_t * buffer = sizeof(uint64_t) * yotta_alloc(sizeof(uint64_t) * count, 16);
+    uint64_t * buffer = (uint64_t *) yotta_alloc(sizeof(uint64_t) * count, 16);
 
     {
         /*
