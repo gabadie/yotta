@@ -19,7 +19,7 @@ $(LIB_BINARIES_TARGET): $(call bin_object_files,$(call rwildcard,./srclib/,*.c))
 
 # ------------------------------------------------------------------------------ Yotta library's tests
 
-$(foreach TEST,$(wildcard tests/*.c), \
+$(foreach TEST,$(call filelist,tests/testlib.flist), \
     $(eval TEST_PRODUCT_NAME := $(call product_create,BINEXEC,$(notdir $(TEST:.c=)))) \
     $(eval TEST_PRODUCT_TARGET := $(call product_target,$(TEST_PRODUCT_NAME))) \
     $(eval $(TEST_PRODUCT_TARGET): $(LIB_HEADERS_TARGET)) \
