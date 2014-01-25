@@ -14,7 +14,7 @@ LIB_BINARIES_PRODUCT := $(call product_create,BINLIBSTATIC,static_lib)
 LIB_BINARIES_TARGET := $(call product_target,$(LIB_BINARIES_PRODUCT))
 $(call product_public,$(LIB_BINARIES_PRODUCT))
 
-$(LIB_BINARIES_TARGET): $(call bin_object_files,$(call rwildcard,./src/,*.c))
+$(LIB_BINARIES_TARGET): $(call bin_object_files,$(call filelist,./src/yotta.flist))
 
 
 # ------------------------------------------------------------------------------ Yotta library's tests

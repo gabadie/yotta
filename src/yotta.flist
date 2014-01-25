@@ -1,0 +1,6 @@
+#
+# List of the library's C files
+#
+
+yotta_init.c
+
