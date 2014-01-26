@@ -29,12 +29,14 @@ $(SLAVE_TARGET): $(call bin_object_files,$(call filelist,./src/slave.flist))
 # ------------------------------------------------------------------------------ Yotta library's tests
 
 $(foreach TEST,$(call filelist,tests/testlib.flist), \
-    $(eval TEST_PRODUCT_NAME := $(call product_create,BINEXEC,$(notdir $(TEST:.c=)))) \
-    $(eval TEST_PRODUCT_TARGET := $(call product_target,$(TEST_PRODUCT_NAME))) \
-    $(eval $(TEST_PRODUCT_TARGET): $(LIB_HEADERS_TARGET)) \
-    $(eval $(TEST_PRODUCT_TARGET): $(LIB_BINARIES_TARGET)) \
-    $(eval $(TEST_PRODUCT_TARGET): $(call bin_object_files,$(TEST))) \
-    $(eval $(TEST_PRODUCT_TARGET): C_FLAGS += -I $(LIB_HEADERS_TARGET) -I $(test_apis_dir) -g) \
-    $(eval TEST_PRODUCT := $(call test_product,$(TEST_PRODUCT_NAME))) \
+    $(eval TEST_LIB_NAME := $(call product_create,BINEXEC,$(notdir $(TEST:.c=)))) \
+    $(eval TEST_LIB_TARGET := $(call product_target,$(TEST_LIB_NAME))) \
+    $(eval $(TEST_LIB_TARGET): $(call bin_object_files,$(TEST))) \
+    $(eval TEST_LIB_TARGETS += $(TEST_LIB_TARGET)) \
+    $(eval $($(call test_product,$(TEST_LIB_NAME)))) \
 )
+
+$(TEST_LIB_TARGETS): $(LIB_HEADERS_TARGET)
+$(TEST_LIB_TARGETS): $(LIB_BINARIES_TARGET)
+$(TEST_LIB_TARGETS): C_FLAGS += -I $(LIB_HEADERS_TARGET) -I $(test_apis_dir) -g
 
