@@ -1,7 +1,24 @@
 
+# ------------------------------------------------------------------------------ Yotta library's headers directory
+
+# ------------------------------------------------------------ default configuration
 ifneq ($(config),debug)
     config=release
 endif
+
+PROJECT_CFLAGS := -Wall -Wextra
+PROJECT_LDFLAGS :=
+
+# ------------------------------------------------------------ release configuration
+ifeq ($(config),release)
+    PROJECT_CFLAGS += -O3 -Werror
+endif
+
+# ------------------------------------------------------------ debug configuration
+ifeq ($(config),debug)
+    PROJECT_CFLAGS += -g
+endif
+
 
 # ------------------------------------------------------------------------------ Yotta library's headers directory
 
@@ -20,8 +37,9 @@ $(call product_public,$(LIB_BINARIES_PRODUCT))
 
 LIB_OBJECT_BINARIES := $(call bin_object_files,$(call filelist,./src/yotta.flist))
 
-# ------------------------------------------------------------ link configuration
+# ------------------------------------------------------------ compilation/link configuration
 $(LIB_BINARIES_TARGET): $(LIB_OBJECT_BINARIES)
+$(LIB_BINARIES_TARGET): CFLAGS += $(PROJECT_CFLAGS)
 $(LIB_BINARIES_TARGET): LDFLAGS += $(LIB_OBJECT_BINARIES)
 
 
@@ -33,9 +51,11 @@ $(call product_public,$(SLAVE_PRODUCT))
 
 SLAVE_BINARY_OBJECTS := $(call bin_object_files,$(call filelist,./src/slave.flist))
 
-# ------------------------------------------------------------ link configuration
+# ------------------------------------------------------------ compilation/link configuration
 $(SLAVE_TARGET): $(SLAVE_BINARY_OBJECTS)
+$(SLAVE_TARGET): CFLAGS += $(PROJECT_CFLAGS)
 $(SLAVE_TARGET): LDFLAGS += $(SLAVE_BINARY_OBJECTS)
+$(SLAVE_TARGET): LDFLAGS += $(PROJECT_LDFLAGS)
 
 
 # ------------------------------------------------------------------------------ Yotta library's tests
@@ -53,9 +73,11 @@ $(foreach TEST,$(TEST_LIB_C_FILES), \
 
 # ------------------------------------------------------------ C configuration
 $(TEST_LIB_TARGETS): CDEPS += $(LIB_HEADERS_TARGET)
-$(TEST_LIB_TARGETS): CFLAGS += -I $(LIB_HEADERS_TARGET) -I $(test_apis_dir) -g
+$(TEST_LIB_TARGETS): CFLAGS += $(PROJECT_CFLAGS)
+$(TEST_LIB_TARGETS): CFLAGS += -I $(LIB_HEADERS_TARGET) -I $(test_apis_dir) $(PROJECT_CFLAGS)
 
 # ------------------------------------------------------------ link configuration
 $(TEST_LIB_TARGETS): $(LIB_BINARIES_TARGET)
+$(TEST_LIB_TARGETS): LDFLAGS += $(PROJECT_LDFLAGS)
 $(TEST_LIB_TARGETS): LDFLAGS += $(LIB_BINARIES_TARGET)
 
