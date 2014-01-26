@@ -17,6 +17,15 @@ $(call product_public,$(LIB_BINARIES_PRODUCT))
 $(LIB_BINARIES_TARGET): $(call bin_object_files,$(call filelist,./src/yotta.flist))
 
 
+# ------------------------------------------------------------------------------ Yotta slave application
+
+slave_product := $(call product_create,BINEXEC,yotta_slave)
+slave_target := $(call product_target,$(slave_product))
+$(call product_public,$(slave_product))
+
+$(slave_target): $(call bin_object_files,$(call filelist,./src/slave.flist))
+
+
 # ------------------------------------------------------------------------------ Yotta library's tests
 
 $(foreach TEST,$(call filelist,tests/testlib.flist), \

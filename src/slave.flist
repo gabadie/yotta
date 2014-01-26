@@ -1,0 +1,6 @@
+#
+# List of the slave application's C files
+#
+
+slave_main.c
+
