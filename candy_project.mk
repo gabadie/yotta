@@ -1,4 +1,8 @@
 
+ifneq ($(config),debug)
+    config=release
+endif
+
 # ------------------------------------------------------------------------------ Yotta library's headers directory
 
 LIB_HEADERS_PRODUCT := $(call product_create,BINHEADERS,headers)
