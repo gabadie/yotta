@@ -8,6 +8,8 @@ main(int argc, char ** argv)
 {
     test_assert("hello world", 1);
 
+    yotta_init(argc, argv);
+
     return 0;
 }
 
