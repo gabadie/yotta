@@ -19,11 +19,11 @@ $(LIB_BINARIES_TARGET): $(call bin_object_files,$(call filelist,./src/yotta.flis
 
 # ------------------------------------------------------------------------------ Yotta slave application
 
-slave_product := $(call product_create,BINEXEC,yotta_slave)
-slave_target := $(call product_target,$(slave_product))
-$(call product_public,$(slave_product))
+SLAVE_PRODUCT := $(call product_create,BINEXEC,yotta_slave)
+SLAVE_TARGET := $(call product_target,$(SLAVE_PRODUCT))
+$(call product_public,$(SLAVE_PRODUCT))
 
-$(slave_target): $(call bin_object_files,$(call filelist,./src/slave.flist))
+$(SLAVE_TARGET): $(call bin_object_files,$(call filelist,./src/slave.flist))
 
 
 # ------------------------------------------------------------------------------ Yotta library's tests
