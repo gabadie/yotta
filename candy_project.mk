@@ -45,17 +45,14 @@ $(LIB_BINARIES_TARGET): LDFLAGS += $(LIB_OBJECT_BINARIES)
 
 # ------------------------------------------------------------------------------ Yotta slave application
 
-SLAVE_PRODUCT := $(call product_create,BINEXEC,yotta_slave)
-SLAVE_TARGET := $(call product_target,$(SLAVE_PRODUCT))
+SLAVE_PRODUCT := $(call product_create,PYEXEC,yotta_slave)
+SLAVE_TARGET := $(call product_set_target,$(SLAVE_PRODUCT),src_slave/main.py)
 $(call product_public,$(SLAVE_PRODUCT))
 
-SLAVE_BINARY_OBJECTS := $(call bin_object_files,$(call filelist,./src/slave.flist))
+SLAVE_PYTHON_FILES := $(call rwildcard,src_slave/,*.py)
 
-# ------------------------------------------------------------ compilation/link configuration
-$(SLAVE_TARGET): $(SLAVE_BINARY_OBJECTS)
-$(SLAVE_TARGET): CFLAGS += $(PROJECT_CFLAGS)
-$(SLAVE_TARGET): LDFLAGS += $(SLAVE_BINARY_OBJECTS)
-$(SLAVE_TARGET): LDFLAGS += $(PROJECT_LDFLAGS)
+# ------------------------------------------------------------ dependencies
+$(SLAVE_TARGET): $(filter-out $(SLAVE_TARGET),$(SLAVE_PYTHON_FILES))
 
 
 # ------------------------------------------------------------------------------ Yotta library's tests
