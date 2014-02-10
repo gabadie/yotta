@@ -24,8 +24,8 @@ main(int argc, char const * const * argv)
     printf("func_a absolute address: %" PRIu64 "\n", abs_a);
     printf("func_a relative address: %" PRIu64 "\n", rel_a);
 
-    test_assert("Absolute address of a", abs_a == (uint64_t) &func_a);
-    test_assert("a call", ((char (*)()) abs_a)() == func_a());
+    test_assert2("Absolute address of a", abs_a == (uint64_t) &func_a);
+    test_assert2("a call", ((char (*)()) abs_a)() == func_a());
 
 
     uint64_t rel_b = yotta_address_absolute_to_relative((uint64_t) &func_b);
@@ -33,8 +33,8 @@ main(int argc, char const * const * argv)
     printf("func_b absolute address: %" PRIu64 "\n", abs_b);
     printf("func_b relative address: %" PRIu64 "\n", rel_b);
 
-    test_assert("Absolute address of b", abs_b == (uint64_t) &func_b);
-    test_assert("b call", ((int (*)(int)) abs_b)(42) == func_b(42));
+    test_assert2("Absolute address of b", abs_b == (uint64_t) &func_b);
+    test_assert2("b call", ((int (*)(int)) abs_b)(42) == func_b(42));
 
     return 0;
 }

@@ -15,10 +15,10 @@ test_slave_parse_parameters()
             "127.0.0.1"
         };
 
-        test_assert("", yotta_slave_parse_parameters(&parameters, 2, argv) == 0);
-        test_assert("", strcmp(parameters.client_ip, "127.0.0.1") == 0);
+        test_assert(yotta_slave_parse_parameters(&parameters, 2, argv) == 0);
+        test_assert(strcmp(parameters.client_ip, "127.0.0.1") == 0);
 
-        test_assert("", yotta_slave_parse_parameters(&parameters, 1, argv) == -1ull);
+        test_assert(yotta_slave_parse_parameters(&parameters, 1, argv) == -1ull);
     }
 
     {
@@ -27,10 +27,10 @@ test_slave_parse_parameters()
             "5000"
         };
 
-        test_assert("", yotta_slave_parse_parameters(&parameters, 2, argv) == 0);
-        test_assert("", parameters.client_port == 5000);
+        test_assert(yotta_slave_parse_parameters(&parameters, 2, argv) == 0);
+        test_assert(parameters.client_port == 5000);
 
-        test_assert("", yotta_slave_parse_parameters(&parameters, 1, argv) == -1ull);
+        test_assert(yotta_slave_parse_parameters(&parameters, 1, argv) == -1ull);
     }
 
     {
@@ -39,7 +39,7 @@ test_slave_parse_parameters()
             "70000"
         };
 
-        test_assert("", yotta_slave_parse_parameters(&parameters, 2, argv) == -1ull);
+        test_assert(yotta_slave_parse_parameters(&parameters, 2, argv) == -1ull);
     }
 
     {
@@ -48,8 +48,8 @@ test_slave_parse_parameters()
             "8000"
         };
 
-        test_assert("", yotta_slave_parse_parameters(&parameters, 2, argv) == 0);
-        test_assert("", parameters.massive_function_offset == 8000);
+        test_assert(yotta_slave_parse_parameters(&parameters, 2, argv) == 0);
+        test_assert(parameters.massive_function_offset == 8000);
     }
 
     {
@@ -58,7 +58,7 @@ test_slave_parse_parameters()
             "8000"
         };
 
-        test_assert("", yotta_slave_parse_parameters(&parameters, 2, argv) == -1ull);
+        test_assert(yotta_slave_parse_parameters(&parameters, 2, argv) == -1ull);
     }
 
     {
@@ -67,7 +67,7 @@ test_slave_parse_parameters()
             "8000"
         };
 
-        test_assert("", yotta_slave_parse_parameters(&parameters, 2, argv) == -1ull);
+        test_assert(yotta_slave_parse_parameters(&parameters, 2, argv) == -1ull);
     }
 }
 
