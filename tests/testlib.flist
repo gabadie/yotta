@@ -3,4 +3,5 @@
 #
 
 testlib_01_compilation.c
+testlib_address_translation.c
 
