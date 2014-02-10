@@ -37,5 +37,25 @@ typedef struct sockaddr SOCKADDR;
 #define SOCKET_ERROR -1
 #endif
 
+/*
+ * @infos: inits C socket library
+ *
+ * @returns:
+ *  == <0> if succeed
+ *  != <0> if failed
+ */
+uint64_t
+yotta_init_csocket();
+
+/*
+ * @infos: cleans C socket library
+ *
+ * @returns:
+ *  == <0> if succeed
+ *  != <0> if failed
+ */
+uint64_t
+yotta_clean_csocket();
+
 
 #endif

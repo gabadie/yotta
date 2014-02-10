@@ -18,7 +18,7 @@ yotta_init_csocket()
 }
 
 uint64_t
-yotta_stop_csocket()
+yotta_clean_csocket()
 {
 	if (WSACleanup())
 	{
@@ -38,7 +38,7 @@ yotta_init_csocket()
 }
 
 uint64_t
-yotta_stop_csocket()
+yotta_clean_csocket()
 {
 	return 0;
 }
