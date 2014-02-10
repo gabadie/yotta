@@ -16,7 +16,7 @@ endif
 
 # ------------------------------------------------------------ debug configuration
 ifeq ($(config),debug)
-    PROJECT_CFLAGS += -g
+    PROJECT_CFLAGS += -g -DYOTTA_DEBUG
 endif
 
 
