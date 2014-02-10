@@ -1,0 +1,7 @@
+
+Iteration 1:
+    - Exclave sauvgardant le code client dans un fichier temporraire
+    - The client command to launch a processes on the slave
+    - The slaves launch de subprocess
+    - The slave can pull/push memory blocks from and to the client
+
