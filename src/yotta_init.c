@@ -9,7 +9,7 @@ yotta_executable_path = 0;
 
 
 uint64_t
-yotta_init(uint64_t argc __attribute__((unused)), char * const * const argv)
+yotta_init(uint64_t argc __attribute__((unused)), char const * const * argv)
 {
     yotta_assert(argc > 1);
     yotta_assert(argv != 0);

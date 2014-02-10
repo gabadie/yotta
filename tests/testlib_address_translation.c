@@ -4,7 +4,7 @@
 
 char
 func_a()
-{ 
+{
     return 'a';
 }
 
@@ -15,7 +15,7 @@ func_b(int m)
 }
 
 int
-main(int argc, char ** argv)
+main(int argc, char const * const * argv)
 {
     yotta_init(argc, argv);
 

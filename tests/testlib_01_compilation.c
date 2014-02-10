@@ -4,7 +4,7 @@
 
 
 int
-main(int argc, char ** argv)
+main(int argc, char const * const * argv)
 {
     test_assert("hello world", 1);
 
