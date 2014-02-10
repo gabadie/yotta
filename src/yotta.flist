@@ -4,3 +4,4 @@
 
 yotta_init.c
 yotta_address_translation.c
+socket/yotta_socket_prefix.c
