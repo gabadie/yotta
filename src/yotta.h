@@ -5,5 +5,6 @@
 
 #include "yotta_init.h"
 #include "yotta_context.h"
+#include "yotta_address_translation.h"
 
 #endif
