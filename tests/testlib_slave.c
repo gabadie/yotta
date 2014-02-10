@@ -2,10 +2,10 @@
 
 #include <mk_test.h>
 #include <string.h>
-#include "../src/yotta_init.private.h"
+#include "../src/yotta_slave.private.h"
 
 void
-test_init_slave_parse()
+test_slave_parse_parameters()
 {
     yotta_cmd_parameters_t parameters;
 
@@ -15,10 +15,10 @@ test_init_slave_parse()
             "127.0.0.1"
         };
 
-        test_assert("", yotta_init_slave_parse(&parameters, 2, argv) == 0);
+        test_assert("", yotta_slave_parse_parameters(&parameters, 2, argv) == 0);
         test_assert("", strcmp(parameters.client_ip, "127.0.0.1") == 0);
 
-        test_assert("", yotta_init_slave_parse(&parameters, 1, argv) == -1ull);
+        test_assert("", yotta_slave_parse_parameters(&parameters, 1, argv) == -1ull);
     }
 
     {
@@ -27,10 +27,10 @@ test_init_slave_parse()
             "5000"
         };
 
-        test_assert("", yotta_init_slave_parse(&parameters, 2, argv) == 0);
+        test_assert("", yotta_slave_parse_parameters(&parameters, 2, argv) == 0);
         test_assert("", parameters.client_port == 5000);
 
-        test_assert("", yotta_init_slave_parse(&parameters, 1, argv) == -1ull);
+        test_assert("", yotta_slave_parse_parameters(&parameters, 1, argv) == -1ull);
     }
 
     {
@@ -39,7 +39,7 @@ test_init_slave_parse()
             "70000"
         };
 
-        test_assert("", yotta_init_slave_parse(&parameters, 2, argv) == -1ull);
+        test_assert("", yotta_slave_parse_parameters(&parameters, 2, argv) == -1ull);
     }
 
     {
@@ -48,7 +48,7 @@ test_init_slave_parse()
             "8000"
         };
 
-        test_assert("", yotta_init_slave_parse(&parameters, 2, argv) == 0);
+        test_assert("", yotta_slave_parse_parameters(&parameters, 2, argv) == 0);
         test_assert("", parameters.massive_function_offset == 8000);
     }
 
@@ -58,7 +58,7 @@ test_init_slave_parse()
             "8000"
         };
 
-        test_assert("", yotta_init_slave_parse(&parameters, 2, argv) == -1ull);
+        test_assert("", yotta_slave_parse_parameters(&parameters, 2, argv) == -1ull);
     }
 
     {
@@ -67,14 +67,14 @@ test_init_slave_parse()
             "8000"
         };
 
-        test_assert("", yotta_init_slave_parse(&parameters, 2, argv) == -1ull);
+        test_assert("", yotta_slave_parse_parameters(&parameters, 2, argv) == -1ull);
     }
 }
 
 int
 main()
 {
-    test_init_slave_parse();
+    test_slave_parse_parameters();
 
     return 0;
 }

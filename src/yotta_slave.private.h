@@ -1,5 +1,5 @@
-#ifndef _YOTTAPRIVATE_INIT
-#define _YOTTAPRIVATE_INIT
+#ifndef _YOTTAPRIVATE_SLAVE
+#define _YOTTAPRIVATE_SLAVE
 
 #include "yotta_prefix.h"
 
@@ -22,7 +22,7 @@ yotta_cmd_parameters_s
 
 // static: for testing (in ../tests/testlib_init.c)
 uint64_t
-yotta_init_slave_parse(yotta_cmd_parameters_t * out_parameters, uint64_t argc, char const * const * argv);
+yotta_slave_parse_parameters(yotta_cmd_parameters_t * out_parameters, uint64_t argc, char const * const * argv);
 
 
 #endif
