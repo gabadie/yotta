@@ -14,7 +14,7 @@
  *  != <0> if failed
  */
 uint64_t
-yotta_init(uint64_t argc, char const * const * argv);
+yotta_init(uint64_t argc, char * const * const argv);
 
 /*
  * @infos: contains executable's path (argv[0])
