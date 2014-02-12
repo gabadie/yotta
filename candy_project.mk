@@ -82,3 +82,7 @@ $(TEST_LIB_TARGETS): $(LIB_BINARIES_TARGET)
 $(TEST_LIB_TARGETS): LDFLAGS += $(PROJECT_LDFLAGS)
 $(TEST_LIB_TARGETS): LDFLAGS += $(LIB_BINARIES_TARGET)
 
+
+# ------------------------------------------------------------------------------ Yotta's hook
+
+$(call hook_precommit_configs, debug release)
