@@ -9,14 +9,12 @@
     { \
         if (argv + 1 > argv_end) \
         { \
-            yotta_crash_msg("unexpected parameter end %s", *argv); \
             return -1; \
         } \
     }
 
 #define yotta_slave_invalide_value() \
     { \
-        yotta_crash_msg("invalid argument %s value: %s", argv[0], argv[1]); \
         return -1; \
     }
 
@@ -38,7 +36,6 @@ yotta_slave_parse_parameters(yotta_slave_parameters_t * out_parameters, uint64_t
     {
         if (memcmp(*argv, parameter_prefix, parameter_prefix_length) != 0)
         {
-            yotta_crash_msg("unknown parameter %s", *argv);
             return -1;
         }
 
@@ -79,7 +76,6 @@ yotta_slave_parse_parameters(yotta_slave_parameters_t * out_parameters, uint64_t
         }
         else
         {
-            yotta_crash_msg("unknown parameter %s", *argv);
             return -1;
         }
     }
