@@ -7,7 +7,7 @@
 
 #define yotta_slave_assert_arguments(argument_count) \
     { \
-        if (argv + 1 == argv_end) \
+        if (argv + 1 > argv_end) \
         { \
             yotta_crash_msg("unexpected parameter end %s", *argv); \
             return -1; \
