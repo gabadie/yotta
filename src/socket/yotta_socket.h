@@ -1,37 +1,39 @@
 #ifndef _YOTTA_SOCKET
 #define _YOTTA_SOCKET
 
+#include "yotta_socket_prefix.h"
+
 /*
  * @infos: Socket wrapper
  */
 typedef struct
-socket_s
+yotta_socket_s
 {
     // File descriptor
-    int fd;
+    SOCKET fd;
 
     // Socket info
     struct addrinfo info;
 
-} socket_t;
+} yotta_socket_t;
 
 /*
  * @infos: TCP packet wrapper
  */
 typedef struct
-tcp_packet_s
+yotta_tcp_packet_s
 {
     void * const buffer;
     size_t len;
     int flags;
 
-} tcp_packet_t;
+} yotta_tcp_packet_t;
 
 /*
  * @infos: UDP packet wrapper
  */
 typedef struct
-udp_packet_s
+yotta_udp_packet_s
 {
     void * const buffer;
     size_t len;
@@ -39,22 +41,22 @@ udp_packet_s
     struct sockaddr const * to;
     socklen_t tolen;
 
-} udp_packet_t;
+} yotta_udp_packet_t;
 
 
 /*
  * @infos: Wrapper for TCP/UDP packets
  */
 typedef struct
-packet_s
+yotta_packet_s
 {
     union
     {
-        tcp_packet_t tcp;
-        udp_packet_t udp;
+        yotta_tcp_packet_t tcp;
+        yotta_udp_packet_t udp;
     };
 
-} packet_t;
+} yotta_packet_t;
 
 /*
  * @infos: init a yotta socket
@@ -71,7 +73,8 @@ packet_s
  *  == <0> if succeed
  *  != <0> if failed
  */
-int yotta_init_socket(socket_s * sock, char const * address, char const * port, int family, int type);
+int
+yotta_init_socket(yotta_socket_t * sock, char const * address, char const * port, int family, int type);
 
 /*
  * @infos: bind a yotta socket
@@ -82,7 +85,8 @@ int yotta_init_socket(socket_s * sock, char const * address, char const * port, 
  *  == <0> if succeed
  *  != <0> if failed
  */
-int yotta_bind_socket(socket_s * sock);
+int
+yotta_bind_socket(yotta_socket_t * sock);
 
 /*
  * @infos: listen with a yotta socket
@@ -94,7 +98,8 @@ int yotta_bind_socket(socket_s * sock);
  *  == <0> if succeed
  *  != <0> if failed
  */
-int yotta_listen_socket(socket_s * sock, int backlog);
+int
+yotta_listen_socket(yotta_socket_t * sock, int backlog);
 
 /*
  * @infos: accept a new connection on a yotta socket
@@ -108,19 +113,21 @@ int yotta_listen_socket(socket_s * sock, int backlog);
  *  == <0> if succeed
  *  != <0> if failed
  */
-int yotta_accept_socket(socket_s * sock, socket_s * new_sock);
+int
+yotta_accept_socket(yotta_socket_t * sock, yotta_socket_t * new_sock);
 
 /*
- * @infos: TODO
+ * @infos: Send a packet with the given socket
  *
- * @param <sock>: the yotta context to initialize
- * @param <packet>: the yotta context to initialize
+ * @param <sock>: the yotta socket used to send packet
+ * @param <packet>: the
  *
  * @returns:
  *  == <0> if succeed
  *  != <0> if failed
  */
-int yotta_send(socket_s * sock, packet_s * packet);
+int
+yotta_send(yotta_socket_t * sock, yotta_packet_t * packet);
 
 /*
  * @infos: close a yotta socket
@@ -131,7 +138,9 @@ int yotta_send(socket_s * sock, packet_s * packet);
  *  == <0> if succeed
  *  != <0> if failed
  */
-int yotta_close_socket(socket_s * sock);
+int
+yotta_close_socket(yotta_socket_t * sock);
+
 
 /*
  * @infos: init a yotta TCP socket

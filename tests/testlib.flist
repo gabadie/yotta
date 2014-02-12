@@ -7,3 +7,4 @@ testlib_address_translation.c
 testlib_logger.c
 testlib_slave.c
 testlib_str_utils.c
+#testlib_socket.c

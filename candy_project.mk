@@ -6,7 +6,7 @@ ifneq ($(config),debug)
     config=release
 endif
 
-PROJECT_CFLAGS := -Wall -Wextra
+PROJECT_CFLAGS := -Wall -Wextra -std=gnu11
 PROJECT_LDFLAGS :=
 
 # ------------------------------------------------------------ release configuration

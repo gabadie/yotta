@@ -7,4 +7,5 @@ yotta_init.c
 yotta_logger.c
 yotta_slave.c
 socket/yotta_socket_prefix.c
+socket/yotta_socket.c
 utils/yotta_str_utils.c

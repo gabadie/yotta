@@ -46,7 +46,7 @@
 #ifdef YOTTA_DEBUG
 #define yotta_crash_msg(...) \
     { \
-        printf("CRASH AT %s@%i: ", __FILE__, __LINE__); \
+        printf("CRASH AT %s@%i in %s: ", __FILE__, __LINE__, __func__); \
         printf(__VA_ARGS__); \
         printf("\n"); \
         yotta_crash_definitly(); \
@@ -65,11 +65,47 @@
 #define yotta_assert(condition) \
     if (!(condition)) \
     { \
-        printf("ASSERTION ERROR AT %s@%i: %s\n", __FILE__, __LINE__, yotta_to_str(condition)); \
+        printf("ASSERTION ERROR AT %s@%i in %s: %s\n", __FILE__, __LINE__, __func__, yotta_to_str(condition)); \
         yotta_crash_definitly(); \
     }
 #else
 #define yotta_assert(condition)
+#endif
+
+/*
+ * @infos: not implemented feature crash
+ */
+#ifdef YOTTA_DEBUG
+#define yotta_not_implemented_yet \
+    yotta_crash_msg("Not implemented yet");
+#else
+#define yotta_not_implemented_yet
+#endif
+
+/*
+ * @infos: log a message
+ *
+ * @params: like printf
+ *
+ */
+#ifdef YOTTA_DEBUG
+#define yotta_log(...) \
+    fprintf(stderr, __VA_ARGS__)
+#else
+#define yotta_log(...)
+#endif
+
+/*
+ * @infos: log a message
+ *
+ * @params <msg>: message to log
+ *
+ */
+#ifdef YOTTA_DEBUG
+#define yotta_perror(...) \
+    perror(__VA_ARGS__)
+#else
+#define yotta_perror(...)
 #endif
 
 
