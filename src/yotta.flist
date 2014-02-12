@@ -4,6 +4,7 @@
 
 yotta_address_translation.c
 yotta_init.c
+yotta_logger.c
 yotta_slave.c
 socket/yotta_socket_prefix.c
 utils/yotta_str_utils.c
