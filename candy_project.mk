@@ -26,7 +26,11 @@ LIB_HEADERS_PRODUCT := $(call product_create,BINHEADERS,headers)
 LIB_HEADERS_TARGET := $(call product_target,$(LIB_HEADERS_PRODUCT))
 $(call product_public,$(LIB_HEADERS_PRODUCT))
 
-$(LIB_HEADERS_TARGET): $(call bin_header_deps,./src/yotta.h)
+LIB_HEADERS := $(call bin_header_deps,./src/yotta.h)
+
+$(LIB_HEADERS_TARGET): $(LIB_HEADERS)
+$(LIB_HEADERS_TARGET): CPFLAGS += $(LIB_HEADERS)
+$(LIB_HEADERS_TARGET): CPROOTDIR = src/
 
 
 # ------------------------------------------------------------------------------ Yotta library's binaries
