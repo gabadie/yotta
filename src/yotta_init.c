@@ -29,7 +29,7 @@ yotta_init(uint64_t argc, char const * const * argv)
 
         if (strcmp(argv[i], "--yotta") == 0)
         {
-            yotta_cmd_parameters_t parameters;
+            yotta_slave_parameters_t parameters;
 
             if (yotta_slave_parse_parameters(&parameters, argc - i - 1, argv + i + 1) != 0)
             {
