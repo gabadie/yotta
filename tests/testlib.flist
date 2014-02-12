@@ -6,3 +6,4 @@ testlib_01_compilation.c
 testlib_address_translation.c
 testlib_slave.c
 testlib_str_utils.c
+#testlib_socket.c
