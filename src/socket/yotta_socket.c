@@ -1,11 +1,177 @@
 #include "yotta_socket.h"
+#include "../yotta_debug.h"
+
+#include <string.h>
+#include <stdlib.h>
+
+#ifdef YOTTA_DEBUG
+// Get sockaddr, IPv4 or IPv6:
+void * get_addr(struct sockaddr *sa)
+{
+    if (sa->sa_family == AF_INET) {
+        return &(((struct sockaddr_in*)sa)->sin_addr);
+    }
+
+    return &(((struct sockaddr_in6*)sa)->sin6_addr);
+}
+#endif
+
+int
+yotta_init_socket(yotta_socket_t * sock, char const * address, char const * port, int family, int type)
+{
+    yotta_assert(sock != NULL);
+
+    int sockfd;
+    struct addrinfo hints, *a;
+    struct addrinfo * results; // Linked list of addrinfo
+    int yes = 1;
+    int rv;
+
+    memset(&hints, 0, sizeof(hints));
+
+    hints.ai_family = family;                  // IPv4 (AF_INET), IPv6 (AF_INET6) or Unspecified (AF_UNSPEC)
+    hints.ai_socktype = type;                  // TCP (SOCK_STREAM) or UDP (SOCK_DGRAM)
+    hints.ai_flags = address ? 0 : AI_PASSIVE; // Set IP automatically
+    hints.ai_protocol = 0;                     // Any protocol
+    hints.ai_canonname = NULL;
+    hints.ai_addr = NULL;
+    hints.ai_next = NULL;
+
+    // Load address info structs
+    if((rv = getaddrinfo(address, port, &hints, &results)) != 0)
+    {
+        yotta_log("getaddrinfo: %s\n", gai_strerror(rv));
+        return -1;
+    }
+
+    // Loop through all the results and use the first valid one
+    for(a = results; a != NULL; a = a->ai_next)
+    {
+        if((sockfd = socket(a->ai_family, a->ai_socktype, a->ai_protocol)) == -1)
+        {
+            yotta_perror("server: socket");
+            continue;
+        }
+
+        if(setsockopt(sockfd, SOL_SOCKET, SO_REUSEADDR, &yes, sizeof(int)) == -1)
+        {
+            yotta_perror("setsockopt");
+            continue;
+        }
+
+        break;
+    }
+
+    if(a == NULL)
+    {
+        freeaddrinfo(results); // Free resources
+        return -1;
+    }
+
+    // Set the out socket
+    sock->fd = sockfd;
+    memcpy(&sock->info, a, sizeof(struct addrinfo));
+    sock->info.ai_next = NULL;
+
+    freeaddrinfo(results); // Free resources
+
+    return 0;
+}
+
+int
+yotta_bind_socket(yotta_socket_t * sock)
+{
+    yotta_assert(sock != NULL);
+
+    if (bind(sock->fd, sock->info.ai_addr, sock->info.ai_addrlen) == -1) {
+        yotta_close_socket(sock);
+        yotta_perror("bind_socket");
+        return -1;
+    }
+
+    return 0;
+}
+
+int
+yotta_listen_socket(yotta_socket_t * sock, int backlog)
+{
+    yotta_assert(sock != NULL);
+
+    if(listen(sock->fd, backlog) == -1)
+    {
+        yotta_perror("listen_socket");
+        return -1;
+    }
+    return 0;
+}
 
 
-int yotta_close_socket(socket_s * sock)
+int
+yotta_accept_socket(yotta_socket_t * sock, yotta_socket_t * new_sock)
+{
+    yotta_assert(sock != NULL && new_sock != NULL);
+
+    int new_fd;
+    struct sockaddr_storage connector_addr;
+    socklen_t connector_addr_len;
+
+    connector_addr_len = sizeof(connector_addr);
+
+    new_fd = accept(sock->fd, (struct sockaddr *) &connector_addr, &connector_addr_len);
+
+    if (new_fd == -1)
+    {
+        yotta_perror("accept_socket");
+        return -1;
+    }
+
+    new_sock->fd = new_fd;
+
+    new_sock->info.ai_family = sock->info.ai_family;     // IPv4 (AF_INET), IPv6 (AF_INET6) or Unspecified (AF_UNSPEC)
+    new_sock->info.ai_socktype = sock->info.ai_socktype; // TCP (SOCK_STREAM) or UDP (SOCK_DGRAM)
+    new_sock->info.ai_flags = 0;
+    new_sock->info.ai_protocol = 0;
+    new_sock->info.ai_canonname = NULL;
+    new_sock->info.ai_addr = NULL;
+    new_sock->info.ai_next = NULL;
+    //FIXME
+    /*printf("Size of sockaddr : %d == %d\n", connector_addr_len, sizeof(connector_addr));*/
+    new_sock->info.ai_addr = (struct sockaddr *) malloc(sizeof(struct sockaddr));
+    memcpy(new_sock->info.ai_addr, (struct sockaddr *) &connector_addr, sizeof(struct sockaddr));
+
+#ifdef YOTTA_DEBUG
+    char address[INET6_ADDRSTRLEN];
+
+    inet_ntop(connector_addr.ss_family,
+        get_addr((struct sockaddr *) &connector_addr), address, sizeof(address));
+
+    yotta_log("accept_socket: got connection from %s\n", address);
+#endif
+
+    return 0;
+}
+
+int
+yotta_send(yotta_socket_t * sock, yotta_packet_t * packet)
 {
     (void) sock;
+    (void) packet;
+    yotta_not_implemented_yet
+    return -1;
+}
 
-    //TODO: use closesocket instead of close
+int
+yotta_close_socket(yotta_socket_t * sock)
+{
+    yotta_assert(sock != NULL);
+
+    closesocket(sock->fd);
+
+    if(sock->info.ai_addr != NULL)
+    {
+        /*freeaddrinfo(sock->info);*/
+        /*free(sock->info.ai_addr);*/
+    }
 
     return 0;
 }
