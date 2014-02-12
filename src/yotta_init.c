@@ -36,7 +36,10 @@ yotta_init(uint64_t argc, char const * const * argv)
                 exit(-1);
             }
 
-
+            if (yotta_slave_main(&parameters) != 0)
+            {
+                exit(-1);
+            }
 
             exit(0);
         }

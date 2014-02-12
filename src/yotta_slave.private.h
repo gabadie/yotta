@@ -24,5 +24,16 @@ yotta_cmd_parameters_s
 uint64_t
 yotta_slave_parse_parameters(yotta_cmd_parameters_t * out_parameters, uint64_t argc, char const * const * argv);
 
+/*
+ * @infos: Slave launching called if the --yotta parameters is given to yotta_init()
+ *
+ * @param <out_parameters>: yotta's slave parameters parsed by yotta_slave_parse_parameters()
+ *
+ * @returns:
+ *  == <0> if succed
+ *  != <0> if failed
+ */
+uint64_t
+yotta_slave_main(yotta_cmd_parameters_t const * out_parameters);
 
 #endif

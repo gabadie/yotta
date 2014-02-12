@@ -88,3 +88,15 @@ yotta_slave_parse_parameters(yotta_cmd_parameters_t * out_parameters, uint64_t a
 
     return 0;
 }
+
+uint64_t
+yotta_slave_main(yotta_cmd_parameters_t const * out_parameters)
+{
+    if (out_parameters->client_ip == 0)
+    {
+        yotta_crash_msg("missing client ip");
+        return -1;
+    }
+
+    return 0;
+}
