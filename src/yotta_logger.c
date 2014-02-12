@@ -3,20 +3,11 @@
 #include "yotta_logger.private.h"
 
 
-/*
- * @infos: defines yotta logger's global variables
- */
-typedef struct
-yotta_global_logger_s
-{
-    yotta_logger_entry_t callback;
-    void * user_data;
-}
-yotta_global_logger_t;
+// global logger's callback
+yotta_logger_entry_t yotta_logger_callback = 0;
 
-// yotta logger globals
-static yotta_global_logger_t
-yotta_global_logger;
+// global logger's user data
+void * yotta_logger_user_data;
 
 
 /*
@@ -28,17 +19,17 @@ yotta_global_logger;
  * @returns: void
  */
 #define yotta_logger(msg_type,msg) \
-    if (yotta_global_logger.callback) \
+    if (yotta_logger_callback) \
     { \
-        yotta_global_logger.callback(msg_type, msg, yotta_global_logger.user_data); \
+        yotta_logger_callback(msg_type, msg, yotta_logger_user_data); \
     }
 
 
 uint64_t
 yotta_set_logger_entry(yotta_logger_entry_t callback, void * user_data)
 {
-    yotta_global_logger.callback = callback;
-    yotta_global_logger.user_data = user_data;
+    yotta_logger_callback = callback;
+    yotta_logger_user_data = user_data;
 
     return 0;
 }
