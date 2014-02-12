@@ -8,14 +8,14 @@ static const uint64_t
 yotta_base_address = (uint64_t) &yotta_base_function;
 
 
-uint64_t
+yotta_rel_addr_t
 yotta_address_absolute_to_relative(uint64_t address)
 {
-    return (uint64_t) address - yotta_base_address;
+    return (yotta_rel_addr_t) address - yotta_base_address;
 }
 
 uint64_t
-yotta_address_relative_to_absolute(uint64_t offset)
+yotta_address_relative_to_absolute(yotta_rel_addr_t offset)
 {
-    return (uint64_t) yotta_base_address + offset;
+    return (uint64_t) yotta_base_address + (uint64_t) offset;
 }

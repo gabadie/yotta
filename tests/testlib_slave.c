@@ -7,7 +7,7 @@
 void
 test_slave_parse_parameters()
 {
-    yotta_cmd_parameters_t parameters;
+    yotta_slave_parameters_t parameters;
 
     {
         char const * const argv[] = {

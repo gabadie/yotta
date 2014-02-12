@@ -21,7 +21,7 @@
     }
 
 uint64_t
-yotta_slave_parse_parameters(yotta_cmd_parameters_t * out_parameters, uint64_t argc, char const * const * argv)
+yotta_slave_parse_parameters(yotta_slave_parameters_t * out_parameters, uint64_t argc, char const * const * argv)
 {
     char const * const parameter_prefix = "--yotta-";
     size_t const parameter_prefix_length = strlen(parameter_prefix);
@@ -32,7 +32,7 @@ yotta_slave_parse_parameters(yotta_cmd_parameters_t * out_parameters, uint64_t a
 
     char const * const * const argv_end = argv + argc;
 
-    memset(out_parameters, 0, sizeof(yotta_cmd_parameters_t));
+    memset(out_parameters, 0, sizeof(yotta_slave_parameters_t));
 
     while (argv != argv_end)
     {
@@ -85,6 +85,18 @@ yotta_slave_parse_parameters(yotta_cmd_parameters_t * out_parameters, uint64_t a
     }
 
     yotta_assert(argv <= argv_end);
+
+    return 0;
+}
+
+uint64_t
+yotta_slave_main(yotta_slave_parameters_t const * out_parameters)
+{
+    if (out_parameters->client_ip == 0)
+    {
+        yotta_crash_msg("missing client ip");
+        return -1;
+    }
 
     return 0;
 }
