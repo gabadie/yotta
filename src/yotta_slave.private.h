@@ -2,6 +2,8 @@
 #define _YOTTAPRIVATE_SLAVE
 
 #include "yotta_prefix.h"
+#include "yotta_address_translation.h"
+
 
 /*
  * @infos: yotta command parameters
@@ -16,7 +18,7 @@ yotta_slave_parameters_s
     uint16_t client_port;
 
     // massive function pointer
-    uint64_t massive_function_offset;
+    yotta_rel_addr_t massive_function_offset;
 } yotta_slave_parameters_t;
 
 
