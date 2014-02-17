@@ -22,12 +22,14 @@ main(int argc, char const * const * argv)
 {
     yotta_init(argc, argv);
 
+    // Server's listening socket
     yotta_socket_t listening_socket;
-    yotta_socket_t sending_socket;
 
-    yotta_tcp_socket_server(&listening_socket, PORT);
+    // Server socket initialization
+    test_assert(yotta_tcp_socket_server(&listening_socket, PORT) == 0);
 
-    test_assert2("yotta_listen_socket failed", yotta_listen_socket(&listening_socket, BACKLOG) != -1);
+    // Server socket listen
+    test_assert(yotta_listen_socket(&listening_socket, BACKLOG) != -1);
 
     // SIGCHLD Handler
     struct sigaction sa;
@@ -40,34 +42,46 @@ main(int argc, char const * const * argv)
         exit(1);
     }
 
-    yotta_log("Server: waiting for connections...\n");
-
+    // Create client socket
     yotta_socket_t client_socket;
-    yotta_tcp_socket_client(&client_socket, "127.0.0.1", PORT);
+    test_assert(yotta_tcp_socket_client(&client_socket, "127.0.0.1", PORT) == 0);
 
-    yotta_accept_socket(&listening_socket, &sending_socket);
+    // Server's sending socket
+    yotta_socket_t sending_socket;
+
+    // Accept connection
+    test_assert(yotta_accept_socket(&listening_socket, &sending_socket) == 0);
+
+    char const * msg = "Hello, world!";
 
     if(fork() == 0)
     {
-        // Child process
-        yotta_close_socket(&listening_socket);
+        // >> Child process
 
-        test_assert2("Send failed", yotta_tcp_send(&sending_socket, "Hello, world!", 13) != -1);
+        // Close server's listening socket
+        test_assert(yotta_close_socket(&listening_socket) == 0);
 
-        yotta_close_socket(&sending_socket);
+        // Send message via server's sending socket
+        test_assert(yotta_tcp_send(&sending_socket, msg, strlen(msg)) != -1);
+
+        // Close server's sending socket
+        test_assert(yotta_close_socket(&sending_socket) == 0);
 
         exit(0);
     }
 
-    // Parent process
+    // >> Parent process
 
     char buf[512] = { 0 };
 
-    yotta_tcp_recv(&client_socket, buf, sizeof(buf));
+    // Receive data via client socket
+    test_assert(yotta_tcp_recv(&client_socket, buf, sizeof(buf)) == (int) strlen(msg));
 
-    yotta_log("Received : %s\n", buf);
+    // Check data validity
+    test_assert(memcmp(buf, msg, strlen(msg) + 1) == 0);
 
-    yotta_close_socket(&sending_socket);
+    // Close client socket
+    test_assert(yotta_close_socket(&sending_socket) == 0);
 
     return 0;
 }
