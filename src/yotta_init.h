@@ -6,7 +6,7 @@
 /*
  * @infos: return value when Yotta failed to parses parameters
  */
-int const
+static int const
 yotta_process_failed_return = 2;
 
 /*
