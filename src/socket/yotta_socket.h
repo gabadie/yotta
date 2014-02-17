@@ -94,19 +94,6 @@ int
 yotta_accept_socket(yotta_socket_t * sock, yotta_socket_t * new_sock);
 
 /*
- * @infos: Send a packet with the given socket
- *
- * @param <sock>: the yotta socket used to send packet
- * @param <packet>: the
- *
- * @returns:
- *  == <0> if succeed
- *  != <0> if failed
- */
-int
-yotta_send(yotta_socket_t * sock, yotta_packet_t * packet);
-
-/*
  * @infos: close a yotta socket
  *
  * @param <sock>: the yotta socket to close
