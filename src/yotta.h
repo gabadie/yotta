@@ -8,5 +8,7 @@
 #include "yotta_context.h"
 #include "yotta_address_translation.h"
 #include "socket/yotta_socket.h"
+#include "socket/yotta_tcp.h"
+#include "socket/yotta_udp.h"
 
 #endif
