@@ -127,12 +127,12 @@ yotta_init_socket_client(yotta_socket_t * sock, char const * address,
     }
 
 #ifdef YOTTA_DEBUG
-    char address[INET6_ADDRSTRLEN];
+    char addr[INET6_ADDRSTRLEN];
 
     inet_ntop(a->ai_family,
-        get_addr((struct sockaddr *)a->ai_addr), address, sizeof(address));
+        get_addr((struct sockaddr *)a->ai_addr), addr, sizeof(addr));
 
-    yotta_log("client: connecting to %s\n", s);
+    yotta_log("client: connecting to %s\n", addr);
 #endif
 
     // Set the out socket
