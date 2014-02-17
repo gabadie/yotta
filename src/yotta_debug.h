@@ -57,7 +57,7 @@
 #endif
 
 /*
- * @infos: crashes yotta execution with a message
+ * @infos: assert yotta execution
  *
  * @param <condition>: assertion's condition code to pass
  */
@@ -70,6 +70,23 @@
     }
 #else
 #define yotta_assert(condition)
+#endif
+
+/*
+ * @infos: assert yotta execution
+ *
+ * @param <condition>: assertion's returned value
+ */
+#ifdef YOTTA_DEBUG
+#define yotta_assert_return(function,returned) \
+    if ((function) != (returned)) \
+    { \
+        printf("ASSERTION ERROR AT %s@%i in %s: %s\n", __FILE__, __LINE__, __func__, yotta_to_str(function) " == " yotta_to_str(returned)); \
+        yotta_crash_definitly(); \
+    }
+#else
+#define yotta_assert_return(function,returned) \
+    function
 #endif
 
 /*
