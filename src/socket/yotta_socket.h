@@ -59,7 +59,24 @@ yotta_packet_s
 } yotta_packet_t;
 
 /*
- * @infos: init a yotta socket
+ * @infos: init a yotta socket server
+ *
+ * @param <sock>: the yotta socket to initialize
+ * @param <port>: the port of the yotta socket
+ * @param <family>: the family of the yotta socket
+ *                  (AF_INET (IPv4), AF_INET6 (IPv6) or AF_UNSPEC (Unspecified)
+ * @param <type>: the type of the yotta socket
+ *                SOCK_STREAM (TCP) or SOCK_DGRAM (UDP)
+ *
+ * @returns:
+ *  == <0> if succeed
+ *  != <0> if failed
+ */
+int
+yotta_init_socket_server(yotta_socket_t * sock, char const * port, int family, int type);
+
+/*
+ * @infos: init a yotta socket client
  *
  * @param <sock>: the yotta socket to initialize
  * @param <address>: the address of yotta socket
@@ -74,7 +91,8 @@ yotta_packet_s
  *  != <0> if failed
  */
 int
-yotta_init_socket(yotta_socket_t * sock, char const * address, char const * port, int family, int type);
+yotta_init_socket_client(yotta_socket_t * sock, char const * address,
+    char const * port, int family, int type);
 
 /*
  * @infos: bind a yotta socket
@@ -143,21 +161,20 @@ yotta_close_socket(yotta_socket_t * sock);
 
 
 /*
- * @infos: init a yotta TCP socket
+ * @infos: init a yotta TCP socket server
  *
  * @param <sock>: the yotta socket to initialize
- * @param <address>: the address of yotta socket
  * @param <port>: the port of the yotta socket
  *
  * @returns:
  *  == <0> if succeed
  *  != <0> if failed
  */
-#define yotta_tcp_socket(sock, address, port) \
-    yotta_init_socket(sock, address, port, AF_UNSPEC, SOCK_STREAM)
+#define yotta_tcp_socket_server(sock, port) \
+    yotta_init_socket_server(sock, port, AF_UNSPEC, SOCK_STREAM)
 
 /*
- * @infos: init a yotta UDP socket
+ * @infos: init a yotta TCP socket client
  *
  * @param <sock>: the yotta socket to initialize
  * @param <address>: the address of yotta socket
@@ -167,7 +184,34 @@ yotta_close_socket(yotta_socket_t * sock);
  *  == <0> if succeed
  *  != <0> if failed
  */
-#define yotta_udp_socket(sock, address, port) \
-    yotta_init_socket(sock, address, port, AF_UNSPEC, SOCK_DGRAM)
+#define yotta_tcp_socket_client(sock, address, port) \
+    yotta_init_socket_client(sock, address, port, AF_UNSPEC, SOCK_STREAM)
+
+/*
+ * @infos: init a yotta UDP socket server
+ *
+ * @param <sock>: the yotta socket to initialize
+ * @param <port>: the port of the yotta socket
+ *
+ * @returns:
+ *  == <0> if succeed
+ *  != <0> if failed
+ */
+#define yotta_udp_socket_server(sock, port) \
+    yotta_init_socket_server(sock, port, AF_UNSPEC, SOCK_DGRAM)
+
+/*
+ * @infos: init a yotta UDP socket client
+ *
+ * @param <sock>: the yotta socket to initialize
+ * @param <address>: the address of yotta socket
+ * @param <port>: the port of the yotta socket
+ *
+ * @returns:
+ *  == <0> if succeed
+ *  != <0> if failed
+ */
+#define yotta_udp_socket_client(sock, address, port) \
+    yotta_init_socket_client(sock, address, port, AF_UNSPEC, SOCK_DGRAM)
 
 #endif //_YOTTA_SOCKET

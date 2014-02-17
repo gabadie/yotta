@@ -6,7 +6,8 @@
 
 #ifdef YOTTA_DEBUG
 // Get sockaddr, IPv4 or IPv6:
-void * get_addr(struct sockaddr *sa)
+void *
+get_addr(struct sockaddr *sa)
 {
     if (sa->sa_family == AF_INET) {
         return &(((struct sockaddr_in*)sa)->sin_addr);
@@ -17,7 +18,7 @@ void * get_addr(struct sockaddr *sa)
 #endif
 
 int
-yotta_init_socket(yotta_socket_t * sock, char const * address, char const * port, int family, int type)
+yotta_init_socket_server(yotta_socket_t * sock, char const * port, int family, int type)
 {
     yotta_assert(sock != NULL);
 
@@ -31,14 +32,14 @@ yotta_init_socket(yotta_socket_t * sock, char const * address, char const * port
 
     hints.ai_family = family;                  // IPv4 (AF_INET), IPv6 (AF_INET6) or Unspecified (AF_UNSPEC)
     hints.ai_socktype = type;                  // TCP (SOCK_STREAM) or UDP (SOCK_DGRAM)
-    hints.ai_flags = address ? 0 : AI_PASSIVE; // Set IP automatically
+    hints.ai_flags = AI_PASSIVE;               // Set IP automatically
     hints.ai_protocol = 0;                     // Any protocol
     hints.ai_canonname = NULL;
     hints.ai_addr = NULL;
     hints.ai_next = NULL;
 
     // Load address info structs
-    if((rv = getaddrinfo(address, port, &hints, &results)) != 0)
+    if((rv = getaddrinfo(NULL, port, &hints, &results)) != 0)
     {
         yotta_log("getaddrinfo: %s\n", gai_strerror(rv));
         return -1;
@@ -65,8 +66,74 @@ yotta_init_socket(yotta_socket_t * sock, char const * address, char const * port
     if(a == NULL)
     {
         freeaddrinfo(results); // Free resources
+        yotta_log("Failed to create yotta socket server");
         return -1;
     }
+
+    // Set the out socket
+    sock->fd = sockfd;
+    memcpy(&sock->info, a, sizeof(struct addrinfo));
+    sock->info.ai_next = NULL;
+
+    freeaddrinfo(results); // Free resources
+
+    return 0;
+}
+
+int
+yotta_init_socket_client(yotta_socket_t * sock, char const * address,
+    char const * port, int family, int type)
+{
+    int sockfd;
+    struct addrinfo hints, *a;
+    struct addrinfo * results; // Linked list of addrinfo
+    int rv;
+
+    memset(&hints, 0, sizeof hints);
+    hints.ai_family = family;
+    hints.ai_socktype = type;
+
+    // Load address info structs
+    if((rv = getaddrinfo(address, port, &hints, &results)) != 0)
+    {
+        yotta_log("getaddrinfo: %s\n", gai_strerror(rv));
+        return -1;
+    }
+
+    // Loop through all the results and use the first valid one
+    for(a = results; a != NULL; a = a->ai_next)
+    {
+        if((sockfd = socket(a->ai_family, a->ai_socktype, a->ai_protocol)) == -1)
+        {
+            yotta_perror("client: socket");
+            continue;
+        }
+
+        if(connect(sockfd, a->ai_addr, a->ai_addrlen) == -1)
+        {
+            closesocket(sockfd);
+            yotta_perror("client: connect");
+            continue;
+        }
+
+        break;
+    }
+
+    if(a == NULL)
+    {
+        freeaddrinfo(results); // Free resources
+        yotta_log("Failed to create yotta socket client");
+        return -1;
+    }
+
+#ifdef YOTTA_DEBUG
+    char address[INET6_ADDRSTRLEN];
+
+    inet_ntop(a->ai_family,
+        get_addr((struct sockaddr *)a->ai_addr), address, sizeof(address));
+
+    yotta_log("client: connecting to %s\n", s);
+#endif
 
     // Set the out socket
     sock->fd = sockfd;
