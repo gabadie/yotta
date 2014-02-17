@@ -136,7 +136,7 @@ yotta_init_socket_client(yotta_socket_t * sock, char const * address,
         return -1;
     }
 
-#ifdef YOTTA_DEBUG
+#if 0
     char addr[INET6_ADDRSTRLEN];
 
     inet_ntop(a->ai_family,
@@ -202,7 +202,7 @@ yotta_accept_socket(yotta_socket_t * sock, yotta_socket_t * new_sock)
     new_sock->info.ai_addr = (struct sockaddr *) malloc(sizeof(struct sockaddr));
     memcpy(new_sock->info.ai_addr, (struct sockaddr *) &connector_addr, sizeof(struct sockaddr));
 
-#ifdef YOTTA_DEBUG
+#if 0
     char address[INET6_ADDRSTRLEN];
 
     inet_ntop(connector_addr.ss_family,
