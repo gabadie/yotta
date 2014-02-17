@@ -65,15 +65,8 @@ TEST_LIB_FILES := $(call filelist,tests/testlib.flist)
 TEST_LIB_C_FILES := $(filter %.c,$(TEST_LIB_FILES))
 TEST_LIB_SCRIPTS := $(filter-out %.c,$(TEST_LIB_FILES))
 
-# ------------------------------------------------------------ C test products
-$(foreach TEST,$(TEST_LIB_C_FILES), \
-    $(eval TEST_LIB_NAME := $(call product_create,BINEXEC,$(notdir $(TEST:.c=)))) \
-    $(eval TEST_LIB_TARGET := $(call product_target,$(TEST_LIB_NAME))) \
-    $(eval $(TEST_LIB_TARGET): $(call bin_object_files,$(TEST))) \
-    $(eval $(TEST_LIB_TARGET): LDFLAGS += $(call bin_object_files,$(TEST))) \
-    $(eval TEST_LIB_TARGETS += $(TEST_LIB_TARGET)) \
-    $(eval $($(call test_product,$(TEST_LIB_NAME)))) \
-)
+# ------------------------------------------------------------ C test targets
+TEST_LIB_TARGETS := $(call test_bins,$(TEST_LIB_C_FILES))
 
 # ------------------------------------------------------------ C configuration
 $(TEST_LIB_TARGETS): CDEPS += $(LIB_HEADERS_TARGET)
