@@ -61,8 +61,11 @@ $(SLAVE_TARGET): $(filter-out $(SLAVE_TARGET),$(SLAVE_PYTHON_FILES))
 
 # ------------------------------------------------------------------------------ Yotta library's tests
 
-TEST_LIB_C_FILES := $(call filelist,tests/testlib.flist)
+TEST_LIB_FILES := $(call filelist,tests/testlib.flist)
+TEST_LIB_C_FILES := $(filter %.c,$(TEST_LIB_FILES))
+TEST_LIB_SCRIPTS := $(filter-out %.c,$(TEST_LIB_FILES))
 
+# ------------------------------------------------------------ C test products
 $(foreach TEST,$(TEST_LIB_C_FILES), \
     $(eval TEST_LIB_NAME := $(call product_create,BINEXEC,$(notdir $(TEST:.c=)))) \
     $(eval TEST_LIB_TARGET := $(call product_target,$(TEST_LIB_NAME))) \
@@ -81,6 +84,11 @@ $(TEST_LIB_TARGETS): CFLAGS += -I $(LIB_HEADERS_TARGET) -I $(test_apis_dir) $(PR
 $(TEST_LIB_TARGETS): $(LIB_BINARIES_TARGET)
 $(TEST_LIB_TARGETS): LDFLAGS += $(PROJECT_LDFLAGS)
 $(TEST_LIB_TARGETS): LDFLAGS += $(LIB_BINARIES_TARGET)
+
+# ------------------------------------------------------------ test scripts
+TEST_SCRIPT_TARGETS := $(call test_scripts,$(TEST_LIB_SCRIPTS))
+
+$(TEST_SCRIPT_TARGETS): TESTFLAGS = $(BUILD_DIR)
 
 
 # ------------------------------------------------------------------------------ Yotta's hook
