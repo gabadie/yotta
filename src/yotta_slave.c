@@ -54,7 +54,7 @@ yotta_slave_parse_parameters(yotta_slave_parameters_t * out_parameters, uint64_t
 
             yotta_slave_assert_arguments(1);
 
-            if (yotta_str_dec_to_ui64(&client_port, argv[1]) != 0 || client_port > 0xFFFF)
+            if (yotta_str_dec_to_ui64(&client_port, argv[1]) != 0 || client_port > 0xFFFF || client_port == 0)
             {
                 yotta_slave_invalide_value();
             }
