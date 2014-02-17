@@ -218,14 +218,6 @@ yotta_accept_socket(yotta_socket_t * sock, yotta_socket_t * new_sock)
     return 0;
 }
 
-int
-yotta_send(yotta_socket_t * sock, yotta_packet_t * packet)
-{
-    (void) sock;
-    (void) packet;
-    yotta_not_implemented_yet
-    return -1;
-}
 
 int
 yotta_close_socket(yotta_socket_t * sock)

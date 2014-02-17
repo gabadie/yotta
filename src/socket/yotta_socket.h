@@ -18,47 +18,6 @@ yotta_socket_s
 } yotta_socket_t;
 
 /*
- * @infos: TCP packet wrapper
- */
-typedef struct
-yotta_tcp_packet_s
-{
-    void * const buffer;
-    size_t len;
-    int flags;
-
-} yotta_tcp_packet_t;
-
-/*
- * @infos: UDP packet wrapper
- */
-typedef struct
-yotta_udp_packet_s
-{
-    void * const buffer;
-    size_t len;
-    int flags;
-    struct sockaddr const * to;
-    socklen_t tolen;
-
-} yotta_udp_packet_t;
-
-
-/*
- * @infos: Wrapper for TCP/UDP packets
- */
-typedef struct
-yotta_packet_s
-{
-    union
-    {
-        yotta_tcp_packet_t tcp;
-        yotta_udp_packet_t udp;
-    };
-
-} yotta_packet_t;
-
-/*
  * @infos: init a yotta socket server
  *
  * @param <sock>: the yotta socket to initialize
