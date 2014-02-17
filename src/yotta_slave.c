@@ -7,7 +7,7 @@
 
 #define yotta_slave_assert_arguments(argument_count) \
     { \
-        if (argv + 1 > argv_end) \
+        if (argv + argument_count >= argv_end) \
         { \
             return -1; \
         } \
@@ -32,7 +32,7 @@ yotta_slave_parse_parameters(yotta_slave_parameters_t * out_parameters, uint64_t
 
     memset(out_parameters, 0, sizeof(yotta_slave_parameters_t));
 
-    while (argv != argv_end)
+    while (argv < argv_end)
     {
         if (memcmp(*argv, parameter_prefix, parameter_prefix_length) != 0)
         {
