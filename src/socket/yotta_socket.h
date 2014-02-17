@@ -54,18 +54,6 @@ yotta_init_socket_client(yotta_socket_t * sock, char const * address,
     char const * port, int family, int type);
 
 /*
- * @infos: bind a yotta socket
- *
- * @param <sock>: the yotta socket to bind
- *
- * @returns:
- *  == <0> if succeed
- *  != <0> if failed
- */
-int
-yotta_bind_socket(yotta_socket_t * sock);
-
-/*
  * @infos: listen with a yotta socket
  *
  * @param <sock>: the listening yotta socket

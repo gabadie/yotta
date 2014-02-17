@@ -60,6 +60,16 @@ yotta_init_socket_server(yotta_socket_t * sock, char const * port, int family, i
             continue;
         }
 
+        if(type == SOCK_STREAM)
+        {
+            if(bind(sockfd, a->ai_addr, a->ai_addrlen) == -1)
+            {
+                close(sockfd);
+                yotta_perror("server: bind");
+                continue;
+            }
+        }
+
         break;
     }
 
@@ -145,19 +155,6 @@ yotta_init_socket_client(yotta_socket_t * sock, char const * address,
     return 0;
 }
 
-int
-yotta_bind_socket(yotta_socket_t * sock)
-{
-    yotta_assert(sock != NULL);
-
-    if (bind(sock->fd, sock->info.ai_addr, sock->info.ai_addrlen) == -1) {
-        yotta_close_socket(sock);
-        yotta_perror("bind_socket");
-        return -1;
-    }
-
-    return 0;
-}
 
 int
 yotta_listen_socket(yotta_socket_t * sock, int backlog)
@@ -171,7 +168,6 @@ yotta_listen_socket(yotta_socket_t * sock, int backlog)
     }
     return 0;
 }
-
 
 int
 yotta_accept_socket(yotta_socket_t * sock, yotta_socket_t * new_sock)
