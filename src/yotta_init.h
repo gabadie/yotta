@@ -4,6 +4,12 @@
 #include "yotta_prefix.h"
 
 /*
+ * @infos: return value when Yotta failed to parses parameters
+ */
+int const
+yotta_process_failed_return = 2;
+
+/*
  * @infos: init the yotta library
  *
  * @param <argc>: the main's argc parameter

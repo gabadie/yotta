@@ -33,12 +33,12 @@ yotta_init(uint64_t argc, char const * const * argv)
 
             if (yotta_slave_parse_parameters(&parameters, argc - i - 1, argv + i + 1) != 0)
             {
-                exit(-1);
+                exit(yotta_process_failed_return);
             }
 
             if (yotta_slave_main(&parameters) != 0)
             {
-                exit(-1);
+                exit(yotta_process_failed_return);
             }
 
             exit(0);
