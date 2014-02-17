@@ -2,6 +2,7 @@
 
 #include <mk_test.h>
 #include <string.h>
+#include "testlib_helpers.h"
 #include "../src/yotta_slave.private.h"
 
 void
@@ -74,6 +75,8 @@ test_slave_parse_parameters()
 int
 main()
 {
+    yotta_test_helper_setup();
+
     test_slave_parse_parameters();
 
     return 0;
