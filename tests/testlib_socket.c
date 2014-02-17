@@ -1,14 +1,11 @@
-/*#include <yotta.h>*/
+#include <yotta.h>
 #include <mk_test.h>
-
-#include "../src/yotta_init.h"
-#include "../src/socket/yotta_socket.h"
 
 #include <stdlib.h>
 #include <sys/wait.h>
 #include <signal.h>
 
-#define PORT "5000"
+#define PORT "8001"
 #define BACKLOG 10     // how many pending connections queue will hold
 
 void sigchld_handler(int signal)
@@ -20,15 +17,15 @@ void sigchld_handler(int signal)
 int
 main(int argc, char const * const * argv)
 {
-    /*yotta_init(argc, argv);*/
+    yotta_init(argc, argv);
 
-    yotta_socket_t sock;
-    yotta_socket_t client_sock;
+    yotta_socket_t listening_socket;
+    yotta_socket_t sending_socket;
 
-    yotta_tcp_socket(&sock, "127.0.0.1", PORT);
-    yotta_bind_socket(&sock);
+    yotta_tcp_socket_server(&listening_socket, PORT);
+    yotta_bind_socket(&listening_socket);
 
-    test_assert2("yotta_listen_socket failed", yotta_listen_socket(&sock, BACKLOG) != -1);
+    test_assert2("yotta_listen_socket failed", yotta_listen_socket(&listening_socket, BACKLOG) != -1);
 
     // SIGCHLD Handler
     struct sigaction sa;
@@ -43,24 +40,27 @@ main(int argc, char const * const * argv)
 
     printf("Server: waiting for connections...\n");
 
-    yotta_accept_socket(&sock, &client_sock);
+    yotta_socket_t client_socket;
+    yotta_tcp_socket_client(&client_socket, "127.0.0.1", PORT);
+
+    yotta_accept_socket(&listening_socket, &sending_socket);
 
     if(fork() == 0)
     {
         // Child process
 
-        yotta_close_socket(&sock);
+        yotta_close_socket(&listening_socket);
 
-        test_assert2("Send failed", send(client_sock.fd, "Hello, world!\n", 13, 0) != -1);
+        test_assert2("Send failed", send(sending_socket.fd, "Hello, world!\n", 13, 0) != -1);
 
-        yotta_close_socket(&client_sock);
+        yotta_close_socket(&sending_socket);
 
         exit(0);
     }
 
     // Parent process
 
-    yotta_close_socket(&client_sock);
+    yotta_close_socket(&sending_socket);
 
     return 0;
 }
