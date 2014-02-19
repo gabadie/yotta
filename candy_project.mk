@@ -81,6 +81,7 @@ $(TEST_LIB_TARGETS): LDFLAGS += $(LIB_BINARIES_TARGET)
 # ------------------------------------------------------------ test scripts
 TEST_SCRIPT_TARGETS := $(call test_scripts,$(TEST_LIB_SCRIPTS))
 
+$(TEST_SCRIPT_TARGETS): $(LIB_BINARIES_TARGET)
 $(TEST_SCRIPT_TARGETS): TESTFLAGS = $(BUILD_DIR)
 
 
