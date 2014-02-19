@@ -28,7 +28,7 @@ yotta_init(uint64_t argc, char const * const * argv)
 
     if (yotta_init_csocket())
     {
-        return YOTTA_UNEXPECTED_FAIL;
+        yotta_return_unexpect_fail(yotta_init);
     }
 
     for (uint64_t i = 1; i < argc; i++)

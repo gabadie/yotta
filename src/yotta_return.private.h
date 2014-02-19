@@ -53,4 +53,18 @@
         return YOTTA_INVALID_OPERATION; \
     }
 
+/*
+ * @infos: returns YOTTA_UNEXPECTED_FAIL
+ *
+ * @param <function_name>: the function's name
+ */
+#define yotta_return_unexpect_fail(function_name) \
+    {\
+        yotta_logger_error( \
+            "UNEXPECTED_FAIL: " \
+            yotta_to_str(function_name) \
+        ); \
+        return YOTTA_UNEXPECTED_FAIL; \
+    }
+
 #endif
