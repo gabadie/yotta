@@ -5,6 +5,7 @@
 #include "yotta_debug.h"
 #include "yotta_init.h"
 #include "yotta_slave.private.h"
+#include "yotta_return.private.h"
 #include "socket/yotta_socket_prefix.h"
 
 char const *
@@ -14,9 +15,13 @@ yotta_executable_path = 0;
 uint64_t
 yotta_init(uint64_t argc, char const * const * argv)
 {
-    if (argc == 0 || argv == 0)
+    if (argc == 0)
     {
-        return YOTTA_INVALID_VALUE;
+        yotta_return_inv_value(yotta_init, argc);
+    }
+    else if (argv == 0)
+    {
+        yotta_return_inv_value(yotta_init, argv);
     }
 
     yotta_executable_path = argv[0];
@@ -30,7 +35,7 @@ yotta_init(uint64_t argc, char const * const * argv)
     {
         if (argv[i] == 0)
         {
-            return YOTTA_INVALID_VALUE;
+            yotta_return_inv_value(yotta_init, argv);
         }
 
         if (strcmp(argv[i], "--yotta") != 0)
