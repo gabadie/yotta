@@ -1,0 +1,53 @@
+
+// ----------------------------------------------------------------------------- META
+
+struct frame
+{
+    // identifiant du type de la trame
+    uint16_t data_label;
+
+    // taille en bytes de la zone de donnees
+    uint64_t data_size;
+
+    // zone de donnees
+    uint8_t data_meta_content[data_size];
+};
+
+
+// ----------------------------------------------------------------------------- PROTOCOLES FRAMES
+
+struct error_frame
+{
+    uint16_t data_label = 0x0000;
+    uint64_t data_size = strlen("my error message");
+
+    // error message content
+    char data_content[data_size] = "my error message";
+};
+
+
+// ----------------------------------------------------------------------------- FROM DEAMON TO CLIENT
+
+struct deamon_infos
+{
+    uint16_t data_label = 0x1000;
+    uint64_t data_size = 16;
+
+    // number of available computers
+    uint64_t available_computers = 1;
+
+    // number of available threads
+    uint64_t available_threads = 1;
+};
+
+
+// ----------------------------------------------------------------------------- FROM CLIENT TO DEAMON
+
+struct slave_binaries
+{
+    uint16_t data_label = 0x2000;
+    uint64_t data_size; // the executable size
+
+    // executable binaries
+    uint8_t executable_binaries[data_size];
+};
