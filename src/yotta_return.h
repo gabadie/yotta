@@ -24,4 +24,9 @@
  */
 #define YOTTA_INVALID_OPERATION ((uint64_t) -3)
 
+/*
+ * @infos: returned if a yotta function has an unexpected fail
+ */
+#define YOTTA_UNEXPECTED_FAIL ((uint64_t) -4)
+
 #endif
