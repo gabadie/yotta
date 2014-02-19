@@ -1,6 +1,7 @@
 #include <string.h>
 #include <stdlib.h>
 
+#include "yotta_return.h"
 #include "yotta_debug.h"
 #include "yotta_init.h"
 #include "yotta_slave.private.h"
@@ -13,37 +14,44 @@ yotta_executable_path = 0;
 uint64_t
 yotta_init(uint64_t argc, char const * const * argv)
 {
-    yotta_assert(argc >= 1);
-    yotta_assert(argv != 0);
+    if (argc == 0 || argv == 0)
+    {
+        return YOTTA_INVALID_VALUE;
+    }
 
     yotta_executable_path = argv[0];
 
     if (yotta_init_csocket())
     {
-        return -1;
+        return YOTTA_UNEXPECTED_FAIL;
     }
 
     for (uint64_t i = 1; i < argc; i++)
     {
-        yotta_assert(argv[i] != 0);
-
-        if (strcmp(argv[i], "--yotta") == 0)
+        if (argv[i] == 0)
         {
-            yotta_slave_parameters_t parameters;
-
-            if (yotta_slave_parse_parameters(&parameters, argc - i - 1, argv + i + 1) != 0)
-            {
-                exit(yotta_process_failed_return);
-            }
-
-            if (yotta_slave_main(&parameters) != 0)
-            {
-                exit(yotta_process_failed_return);
-            }
-
-            exit(0);
+            return YOTTA_INVALID_VALUE;
         }
+
+        if (strcmp(argv[i], "--yotta") != 0)
+        {
+            continue;
+        }
+
+        yotta_slave_parameters_t parameters;
+
+        if (yotta_slave_parse_parameters(&parameters, argc - i - 1, argv + i + 1) != 0)
+        {
+            exit(yotta_process_failed_return);
+        }
+
+        if (yotta_slave_main(&parameters) != 0)
+        {
+            exit(yotta_process_failed_return);
+        }
+
+        exit(0);
     }
 
-    return 0;
+    return YOTTA_SUCCESS;
 }
