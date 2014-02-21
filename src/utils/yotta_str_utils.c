@@ -1,3 +1,4 @@
+#include <stdio.h>
 
 #include "../yotta_debug.h"
 #include "yotta_str_utils.h"
@@ -52,5 +53,14 @@ yotta_str_dec_to_ui64(uint64_t * out_number, char const * str)
 
     *out_number = number;
 
+    return 0;
+}
+
+uint64_t
+yotta_ui16_to_str(char * out_str, uint16_t number)
+{
+    yotta_assert(out_str != NULL);
+    /*itoa(number, out_str, 10);*/
+    sprintf(out_str, "%d", number);
     return 0;
 }
