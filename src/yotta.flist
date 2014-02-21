@@ -11,3 +11,5 @@ socket/yotta_socket_prefix.c
 socket/yotta_socket.c
 utils/yotta_file.c
 utils/yotta_str_utils.c
+whisper/yotta_whisper_pull.c
+whisper/yotta_whisper_push.c
