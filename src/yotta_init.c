@@ -2,7 +2,6 @@
 #include <stdlib.h>
 
 #include "yotta_return.h"
-#include "yotta_debug.h"
 #include "yotta_init.h"
 #include "yotta_slave.private.h"
 #include "yotta_return.private.h"
