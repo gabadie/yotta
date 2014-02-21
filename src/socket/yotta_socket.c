@@ -222,11 +222,11 @@ yotta_close_socket(yotta_socket_t * sock)
 
     closesocket(sock->fd);
 
-    if(sock->info.ai_addr != NULL)
+    /*if(sock->info.ai_addr != NULL)
     {
-        /*freeaddrinfo(sock->info);*/
-        /*free(sock->info.ai_addr);*/
-    }
+        freeaddrinfo(sock->info);
+        free(sock->info.ai_addr);
+    }*/
 
     return 0;
 }
