@@ -3,6 +3,7 @@
 #
 
 yotta_address_translation.c
+yotta_command.c
 yotta_init.c
 yotta_logger.c
 yotta_slave.c
