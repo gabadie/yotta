@@ -1,6 +1,7 @@
 
 #include "../src/utils/yotta_str_utils.h"
 #include <mk_test.h>
+#include <string.h>
 
 void
 test_str_dec_to_ui64()
@@ -25,10 +26,21 @@ test_str_dec_to_ui64()
     );
 }
 
+void
+test_ui16_to_str()
+{
+    char str[6]; // Max: "65535\0" -> 6 chars
+
+    test_assert(yotta_ui16_to_str(str, 0) == 0 && strcmp(str, "0") == 0);
+    test_assert(yotta_ui16_to_str(str, 42) == 0 && strcmp(str, "42") == 0);
+    test_assert(yotta_ui16_to_str(str, 65535) == 0 && strcmp(str, "65535") == 0);
+}
+
 int
 main()
 {
     test_str_dec_to_ui64();
+    test_ui16_to_str();
     return 0;
 }
 
