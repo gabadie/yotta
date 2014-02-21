@@ -7,6 +7,7 @@
 #include "yotta_logger.h"
 #include "yotta_init.h"
 #include "yotta_context.h"
+#include "yotta_command.h"
 #include "yotta_address_translation.h"
 #include "socket/yotta_socket.h"
 #include "socket/yotta_tcp.h"
