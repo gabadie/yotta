@@ -1,5 +1,5 @@
-#ifndef _YOTTAPRIVATE_WHISPER_ENTRIES
-#define _YOTTAPRIVATE_WHISPER_ENTRIES
+#ifndef _YOTTAPRIVATE_WHISPER_COMMANDS
+#define _YOTTAPRIVATE_WHISPER_COMMANDS
 
 #include "yotta_whisper_entry.private.h"
 
