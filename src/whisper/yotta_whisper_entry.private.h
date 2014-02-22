@@ -48,6 +48,14 @@ yotta_whisper_entry_feedback_s
 } yotta_whisper_entry_feedback_t;
 
 /*
+ * @infos: inits the <feedback>
+ *
+ * @param <feedback>: the whisper feedback to initialize
+ */
+#define yotta_whisper_feedback_init(feedback) \
+    memset(feedback, 0, sizeof(yotta_whisper_entry_feedback_t));
+
+/*
  * @infos: gets the temporary buffer
  *
  * @param <feedback>: the entry's feedback ptr
