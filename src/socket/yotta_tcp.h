@@ -84,4 +84,17 @@ yotta_tcp_recvall(yotta_socket_t * socket, void * buffer, uint64_t buffer_size);
 uint64_t
 yotta_tcp_seek(yotta_socket_t * socket, uint64_t offset);
 
+/*
+ * @infos: gets the number of
+ *
+ * @param <socket>: the receiving yotta socket
+ * @param <available_data_size>: the returned number of bytes
+ *
+ * @returns:
+ *  the number of seeked bytes
+ */
+#define yotta_tcp_available(socket,available_data_size) \
+    ioctl((socket)->fd, FIONREAD, available_data_size);
+
+
 #endif //_YOTTA_TCP
