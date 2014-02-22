@@ -7,12 +7,14 @@ void
 yotta_whisper_entry_push(
     yotta_context_t * context,
     yotta_socket_t * socket,
-    yotta_whisper_entry_feedback_t * feedback
+    yotta_whisper_entry_feedback_t * feedback,
+    void * tmp_buffer_ptr
 )
 {
     (void) context;
     (void) socket;
     (void) feedback;
+    (void) tmp_buffer_ptr;
 }
 
 void
