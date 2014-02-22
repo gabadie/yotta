@@ -1,5 +1,6 @@
 
 #include "yotta_whisper_labels.private.h"
+#include "../yotta_debug.h"
 
 
 void
@@ -32,6 +33,10 @@ yotta_whisper_push(
     header.label = YOTTA_WHISPER_MEM_PUSH;
     header.master_address = master_address;
     header.data_size = data_size;
+
+    yotta_assert(socket != 0);
+    yotta_assert(data_size != 0);
+    yotta_assert(data != 0);
 
     yotta_tcp_send(socket, &header, sizeof(header));
     yotta_tcp_send(socket, data, data_size);
