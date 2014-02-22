@@ -7,8 +7,9 @@ yotta_command.c
 yotta_init.c
 yotta_logger.c
 yotta_slave.c
-socket/yotta_socket_prefix.c
 socket/yotta_socket.c
+socket/yotta_socket_prefix.c
+socket/yotta_tcp.c
 utils/yotta_file.c
 utils/yotta_str_utils.c
 whisper/yotta_whisper_pull.c

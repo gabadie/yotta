@@ -47,26 +47,29 @@
 
 
 /*
- * @infos: recv data via a yotta TCP socket
+ * @infos: receives data via a yotta TCP socket
  *
- * @param <sock>: the yotta socket used to recv
- * @param <buf>: the buffer that will contain the data to recv
- * @param <len>: the length of the data to be received
+ * @param <socket>: the receiving yotta socket
+ * @param <buffer>: the buffer that will contain the data to receive
+ * @param <buffer_size>: the maximum buffer size
  *
  * @returns:
- * the number of bytes received
- *
+ *  the number of received bytes
  */
-#define yotta_tcp_recv(sock, buf, len) \
-    recv((sock)->fd, (buf), (len), 0)
+#define yotta_tcp_recv(socket, buffer, buffer_size) \
+    recv((socket)->fd, (buffer), (buffer_size), 0)
 
-int
-yotta_tcp_sendall(yotta_socket_t * sock, char const * buf, int len);
-
-int
-yotta_tcp_sendall_(yotta_socket_t * sock, char const * buf, int * len);
-
-int
-yotta_tcp_recvall(yotta_socket_t * sock, void * buf, size_t len);
+/*
+ * @infos: receives data via yotta TCP socket independently of the send commands
+ *
+ * @param <socket>: the receiving yotta socket
+ * @param <buffer>: the buffer that will contain the data to receive
+ * @param <buffer_size>: the maximum buffer size
+ *
+ * @returns:
+ *  the number of received bytes
+ */
+uint64_t
+yotta_tcp_recvall(yotta_socket_t * socket, void * buffer, uint64_t buffer_size);
 
 #endif //_YOTTA_TCP
