@@ -32,7 +32,7 @@ yotta_whisper_push(
     yotta_socket_t * socket,
     uint64_t master_address,
     uint64_t data_size,
-    void * const data
+    void const * data
 );
 
 #endif
