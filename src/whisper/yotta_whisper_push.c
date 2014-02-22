@@ -29,6 +29,8 @@ yotta_whisper_entry_push(
     {
         // we are receiving the push's header
 
+        yotta_whisper_feedback_continue(feedback, yotta_whisper_entry_push);
+
         uint64_t header_remaining = sizeof(uint64_t) * 2 - buffer->header_received;
         uint64_t header_received = yotta_tcp_recv(
             socket,
@@ -45,15 +47,11 @@ yotta_whisper_entry_push(
 
         if (buffer->header_received < sizeof(uint64_t) * 2)
         {
-            // we din't fully received the push's header
-            yotta_whisper_feedback_continue(feedback, yotta_whisper_entry_push);
             return;
         }
 
         // we don't need to init the data_cursor as zero because the tmp buffer is null at the begining
         //buffer->data_cursor = 0;
-
-        yotta_whisper_feedback_continue(feedback, yotta_whisper_entry_push);
     }
 
     // we are receiving the push's data
