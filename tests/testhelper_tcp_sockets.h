@@ -1,8 +1,7 @@
 #ifndef _HELPER_TCP_SOCKETS
 #define _HELPER_TCP_SOCKETS
 
-#include <mk_test.h>
-#include <yotta.h>
+#include "testhelper_init.h"
 
 
 /*

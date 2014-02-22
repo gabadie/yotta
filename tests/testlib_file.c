@@ -1,8 +1,7 @@
-
-#include <mk_test.h>
+\
 #include <stdio.h>
 
-#include "testlib_helpers.h"
+#include "testhelper_init.h"
 #include "../src/utils/yotta_file.h"
 
 
@@ -33,7 +32,7 @@ test_file_size()
 int
 main()
 {
-    yotta_test_helper_setup();
+    testhelper_init();
 
     test_file_size();
 

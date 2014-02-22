@@ -5,9 +5,9 @@
 
 
 int
-main(int argc, char const * const * argv)
+main()
 {
-    yotta_init(argc, argv);
+    testhelper_init();
 
     testhelper_tcp_sockets_t sockets;
 
