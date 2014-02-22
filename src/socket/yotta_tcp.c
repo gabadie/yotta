@@ -79,3 +79,37 @@ yotta_tcp_recvall(yotta_socket_t * socket, void * buffer, uint64_t buffer_size)
 
     return total_size;
 }
+
+uint64_t
+yotta_tcp_seek(yotta_socket_t * socket, uint64_t offset)
+{
+    yotta_assert(socket != 0);
+
+    static uint64_t const buffer_size = 512;
+    uint8_t buffer[buffer_size];
+
+    uint64_t total_size = 0;
+
+    for ( ; ; )
+    {
+        uint64_t seek = offset - total_size;
+
+        if (seek == 0)
+        {
+            break;
+        }
+
+        seek = seek > 512 ? 512 : seek;
+
+        int64_t size_recv = yotta_tcp_recv(socket, buffer, seek);
+
+        if (size_recv < 0)
+        {
+            break;
+        }
+
+        total_size += (uint64_t)size_recv;
+    }
+
+    return total_size;
+}

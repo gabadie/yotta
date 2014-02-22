@@ -84,9 +84,7 @@ test_whisper_push_entry()
         yotta_whisper_feedback_init(&feedback);
         yotta_whisper_feedback_init(&feedback_cleaned);
 
-        uint16_t label;
-
-        test_assert(yotta_tcp_recv(&sockets.client_socket, &label, sizeof(label)) == sizeof(label));
+        test_assert(yotta_rcp_seek(&sockets.client_socket, 2) == 2);
 
         yotta_whisper_entry_push(0, &sockets.client_socket, &feedback);
 

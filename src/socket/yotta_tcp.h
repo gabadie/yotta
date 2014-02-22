@@ -72,4 +72,16 @@
 uint64_t
 yotta_tcp_recvall(yotta_socket_t * socket, void * buffer, uint64_t buffer_size);
 
+/*
+ * @infos: seek in comming data
+ *
+ * @param <socket>: the receiving yotta socket
+ * @param <offset>: the seek offset
+ *
+ * @returns:
+ *  the number of seeked bytes
+ */
+uint64_t
+yotta_tcp_seek(yotta_socket_t * socket, uint64_t offset);
+
 #endif //_YOTTA_TCP
