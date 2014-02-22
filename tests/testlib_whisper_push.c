@@ -69,28 +69,55 @@ test_whisper_push_entry()
 
     {
         char const * data_msg  = "hello world!";
+        uint64_t const data_msg_len = strlen(data_msg) + 1;
+        uint64_t const data_msg_cut = 4;
         char dest_buffer[CONTENT_SIZE];
+        uint64_t dest_buffer_addr = (uint64_t) dest_buffer;
 
-        yotta_whisper_push(
-            &sockets.sending_socket,
-            (uint64_t) dest_buffer,
-            strlen(data_msg) + 1,
-            (void const *) data_msg
-        );
-
-        yotta_whisper_entry_feedback_t feedback;
         yotta_whisper_entry_feedback_t feedback_cleaned;
 
-        yotta_whisper_feedback_init(&feedback);
         yotta_whisper_feedback_init(&feedback_cleaned);
 
-        test_assert(yotta_tcp_seek(&sockets.client_socket, 2) == 2);
+        { // tests full compatibility with yotta_whisper_push()
+            yotta_whisper_entry_feedback_t feedback;
+            yotta_whisper_feedback_init(&feedback);
 
-        yotta_whisper_entry_push(0, &sockets.client_socket, &feedback);
+            yotta_whisper_push(
+                &sockets.sending_socket,
+                dest_buffer_addr,
+                data_msg_len,
+                (void const *) data_msg
+            );
 
-        test_assert(strcmp(data_msg, dest_buffer) == 0);
+            test_assert(yotta_tcp_seek(&sockets.client_socket, 2) == 2);
 
-        test_assert(memcmp(&feedback, &feedback_cleaned, sizeof(feedback)) == 0);
+            yotta_whisper_entry_push(0, &sockets.client_socket, &feedback);
+
+            test_assert(strcmp(data_msg, dest_buffer) == 0);
+            test_assert(memcmp(&feedback, &feedback_cleaned, sizeof(feedback)) == 0);
+        }
+
+        { // tests small package sending
+            yotta_whisper_entry_feedback_t feedback;
+            yotta_whisper_feedback_init(&feedback);
+
+            yotta_tcp_send(&sockets.sending_socket, &dest_buffer_addr, sizeof(dest_buffer_addr));
+            yotta_whisper_entry_push(0, &sockets.client_socket, &feedback);
+
+            yotta_tcp_send(&sockets.sending_socket, &data_msg_len, sizeof(data_msg_len));
+            yotta_socket_nonblock(&sockets.client_socket);
+            yotta_whisper_entry_push(0, &sockets.client_socket, &feedback);
+            yotta_socket_block(&sockets.client_socket);
+
+            yotta_tcp_send(&sockets.sending_socket, data_msg, data_msg_cut);
+            yotta_whisper_entry_push(0, &sockets.client_socket, &feedback);
+
+            yotta_tcp_send(&sockets.sending_socket, data_msg + data_msg_cut, data_msg_len - data_msg_cut);
+            yotta_whisper_entry_push(0, &sockets.client_socket, &feedback);
+
+            test_assert(strcmp(data_msg, dest_buffer) == 0);
+            test_assert(memcmp(&feedback, &feedback_cleaned, sizeof(feedback)) == 0);
+        }
     }
 
     testhelper_tcp_clean(&sockets);
