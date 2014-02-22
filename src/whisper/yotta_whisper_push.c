@@ -51,7 +51,7 @@ yotta_whisper_entry_push(
     // we are receiving the push's data
 
     void * dest = (void *)(buffer->data_address + buffer->data_cursor);
-    uint64_t data_remaining = buffer->data_address - buffer->data_cursor;
+    uint64_t data_remaining = buffer->data_size - buffer->data_cursor;
 
     buffer->data_cursor += yotta_tcp_recv(socket, dest, data_remaining);
 
