@@ -3,7 +3,7 @@
 
 #include "testhelper_tcp_sockets.h"
 //#include "testhelper_lorem.h"
-#include "../src/whisper/yotta_whisper_commands.h"
+#include "../src/whisper/yotta_whisper_commands.private.h"
 #include "../src/whisper/yotta_whisper_entries.private.h"
 #include "../src/whisper/yotta_whisper_labels.private.h"
 
