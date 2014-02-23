@@ -2,6 +2,7 @@
 #include <string.h>
 
 #include "testhelper_tcp_sockets.h"
+//#include "testhelper_lorem.h"
 #include "../src/whisper/yotta_whisper_commands.h"
 #include "../src/whisper/yotta_whisper_entries.private.h"
 #include "../src/whisper/yotta_whisper_labels.private.h"
@@ -123,6 +124,49 @@ test_whisper_push_entry()
     testhelper_tcp_clean(&sockets);
 }
 
+#if 0 // TODO: must implements protocol feeding in another thread to pass this test
+
+static
+void
+test_whisper_push_stress()
+{
+    testhelper_tcp_sockets_t sockets;
+
+    testhelper_tcp_build(&sockets);
+
+    {
+        static uint64_t const data_size = 1024 * 1024;// 1024 * 1024 * 1;
+
+        void * src_data = malloc(data_size);
+        void * dest_data = malloc(data_size);
+
+        testhelper_lorem(src_data, data_size);
+
+        yotta_whisper_entry_feedback_t feedback;
+        yotta_whisper_feedback_init(&feedback);
+
+        yotta_whisper_push(
+            &sockets.sending_socket,
+            (uint64_t) dest_data,
+            data_size,
+            src_data
+        );
+
+        test_assert(yotta_tcp_seek(&sockets.client_socket, 2) == 2);
+
+        yotta_whisper_entry_push(0, &sockets.client_socket, &feedback);
+
+        test_assert(strcmp(src_data, dest_data) == 0);
+
+        free(src_data);
+        free(dest_data);
+    }
+
+    testhelper_tcp_clean(&sockets);
+}
+
+#endif
+
 int
 main()
 {
@@ -130,6 +174,7 @@ main()
 
     test_whisper_push();
     test_whisper_push_entry();
+    //test_whisper_push_stress();
 
     return 0;
 }

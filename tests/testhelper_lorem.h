@@ -19,4 +19,4 @@ testhelper_lorem(void * data_dest, uint64_t data_size)
 }
 
 
-#endif _TESTHELPER_LOREM
+#endif
