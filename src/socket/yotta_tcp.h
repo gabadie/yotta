@@ -45,6 +45,8 @@
 #define yotta_tcp_send(sock, buf, len) \
     send((sock)->fd, (buf), (len), 0)
 
+uint64_t
+yotta_tcp_sendall(yotta_socket_t * socket, void const * buffer, uint64_t buffer_size);
 
 /*
  * @infos: receives data via a yotta TCP socket
