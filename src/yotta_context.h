@@ -2,6 +2,7 @@
 #define _YOTTA_CONTEXT
 
 #include "yotta_prefix.h"
+#include "socket/yotta_socket.h"
 
 /*
  * @infos: store all context's information
@@ -9,11 +10,11 @@
 typedef
 struct yotta_context_s
 {
+    // Port used for incoming connections
     uint16_t incoming_port;
-    char client_ip[16];
-    uint16_t client_port;
 
-    //socket_s socket;
+    // Socket used for slave connections
+    yotta_socket_t slave;
 
 } yotta_context_t;
 
