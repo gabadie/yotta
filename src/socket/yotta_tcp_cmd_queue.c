@@ -74,6 +74,7 @@ yotta_tcp_cmd_queue_init(yotta_tcp_cmd_queue_t * cmd_queue)
 {
     yotta_assert(cmd_queue != 0);
 
+    yotta_socket_event_init(cmd_queue);
     yotta_socket_event_send(cmd_queue, 0);
 
     cmd_queue->queue_first = 0;

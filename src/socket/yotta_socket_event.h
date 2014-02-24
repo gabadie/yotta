@@ -12,6 +12,13 @@ yotta_socket_event_s
 yotta_socket_event_t;
 
 /*
+ * @infos; forward declaration of yotta_socket_thread_t
+ */
+typedef struct
+yotta_socket_thread_s
+yotta_socket_thread_t;
+
+/*
  * @infos: defines yotta socket event entry point function pointer type
  *
  * The socket event entry received 1 parameters:
@@ -39,8 +46,24 @@ yotta_socket_event_s
 
     // previous and next socket
     yotta_socket_event_t * socket_next;
-    yotta_socket_event_t * socket_previous;
+
+    // parent socket event thread
+    yotta_socket_thread_t * socket_thread;
 };
+
+/*
+ * @infos: initializes a socket event
+ *
+ * @param <socket_event>: the socket event to init
+ */
+#ifdef YOTTA_DEBUG
+#define yotta_socket_event_init(socket_event) \
+    ((yotta_socket_event_t *) (socket_event))->socket_thread = 0;
+
+#else
+#define yotta_socket_event_init(socket_event)
+
+#endif // YOTTA_DEBUG
 
 /*
  * @infos: sets socket event entries
