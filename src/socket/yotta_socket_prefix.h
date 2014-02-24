@@ -14,10 +14,12 @@ typedef int socklen_t;
 
 #include <sys/types.h>
 #include <sys/socket.h>
+#include <sys/ioctl.h>
 #include <netdb.h>
 #include <netinet/in.h>
 #include <arpa/inet.h>
 #include <unistd.h>
+#include <fcntl.h>
 #define closesocket(a) close(a)
 typedef int SOCKET;
 typedef struct sockaddr_in SOCKADDR_IN;

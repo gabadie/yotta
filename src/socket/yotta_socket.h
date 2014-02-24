@@ -93,4 +93,28 @@ yotta_accept_socket(yotta_socket_t * sock, yotta_socket_t * new_sock);
 int
 yotta_close_socket(yotta_socket_t * sock);
 
+/*
+ * @infos: switches socket mode to passing mode
+ *
+ * @param <sock>: the yotta socket to close
+ *
+ * @returns:
+ *  == <0> if succeed
+ *  != <0> if failed
+ */
+#define yotta_socket_nonblock(socket) \
+    fcntl((socket)->fd, F_SETFL, O_NONBLOCK)
+
+/*
+ * @infos: switches socket mode to blocking mode
+ *
+ * @param <sock>: the yotta socket to close
+ *
+ * @returns:
+ *  == <0> if succeed
+ *  != <0> if failed
+ */
+#define yotta_socket_block(socket) \
+    fcntl((socket)->fd, F_SETFL, 0)
+
 #endif //_YOTTA_SOCKET

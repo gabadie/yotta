@@ -1,31 +1,38 @@
+
 #include "yotta_tcp.h"
+#include "../yotta_debug.h"
 
-#define YOTTA_CHUNK_SIZE 512
 
-int
-yotta_tcp_sendall(yotta_socket_t * sock, char const * buf, int len)
+uint64_t
+yotta_tcp_sendall(yotta_socket_t * socket, void const * buffer, uint64_t buffer_size)
 {
-    yotta_assert(sock != NULL);
+    yotta_assert(socket != NULL);
 
-    int total = 0;       // how many bytes we've sent
-    int bytesleft = len; // how many we have left to send
-    int n;
+    static uint64_t const package_size = 512;
 
-    while(total < len)
+    uint64_t total_size = 0;
+
+    while (total_size != buffer_size)
     {
-        n = send(sock->fd, buf + total, bytesleft, 0);
-        if(n == -1)
+        uint64_t sending_size = buffer_size - total_size;
+
+        sending_size = sending_size > package_size ? package_size : sending_size;
+
+        int64_t size_sent = yotta_tcp_send(socket, ((uint8_t *) buffer) + total_size, sending_size);
+
+        if (size_sent < 0)
         {
-            /*yotta_perror("yotta_tcp_socket_send");*/
             break;
         }
-        total += n;
-        bytesleft -= n;
+
+        total_size += (uint64_t)size_sent;
     }
 
-    return n == -1 ? -1 : 0; // return -1 on failure, 0 on success
+    return total_size;
 }
 
+
+#if 0  // TODO: unfinished work
 
 int
 yotta_tcp_sendall_(yotta_socket_t * sock, char const * buf, int * len)
@@ -52,38 +59,60 @@ yotta_tcp_sendall_(yotta_socket_t * sock, char const * buf, int * len)
 
     return n == -1 ? -1 : 0; // return -1 on failure, 0 on success
 }
+#endif
 
 
-int
-yotta_tcp_recvall(yotta_socket_t * sock, void * buf, size_t len)
+uint64_t
+yotta_tcp_recvall(yotta_socket_t * socket, void * buffer, uint64_t buffer_size)
 {
-    yotta_assert(sock != NULL);
+    yotta_assert(socket != 0);
 
-    int size_recv;
-    size_t total_size = 0;
-    char chunk[YOTTA_CHUNK_SIZE];
+    uint64_t total_size = 0;
 
-    while(1)
+    while (buffer_size - total_size > 0)
     {
-        memset(chunk, 0, YOTTA_CHUNK_SIZE);
-        if((size_recv = recv(sock->fd, chunk, YOTTA_CHUNK_SIZE, 0)) < 0)
+        int64_t size_recv = yotta_tcp_recv(socket, ((uint8_t *) buffer) + total_size, buffer_size - total_size);
+
+        if (size_recv < 0)
         {
             break;
         }
-        else
+
+        total_size += (uint64_t)size_recv;
+    }
+
+    return total_size;
+}
+
+uint64_t
+yotta_tcp_seek(yotta_socket_t * socket, uint64_t offset)
+{
+    yotta_assert(socket != 0);
+
+    static uint64_t const buffer_size = 512;
+    uint8_t buffer[buffer_size];
+
+    uint64_t total_size = 0;
+
+    for ( ; ; )
+    {
+        uint64_t seek = offset - total_size;
+
+        if (seek == 0)
         {
-            if(total_size + size_recv <= len)
-            {
-                memcpy(buf + total_size, chunk, size_recv);
-            }
-            else
-            {
-                yotta_log("yotta_tcp_recvall: received too mush data");
-                memcpy(buf + total_size, chunk, len - total_size);
-            }
+            break;
         }
 
-        total_size += size_recv;
+        seek = seek > 512 ? 512 : seek;
+
+        int64_t size_recv = yotta_tcp_recv(socket, buffer, seek);
+
+        if (size_recv < 0)
+        {
+            break;
+        }
+
+        total_size += (uint64_t)size_recv;
     }
 
     return total_size;

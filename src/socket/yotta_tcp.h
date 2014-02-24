@@ -45,28 +45,58 @@
 #define yotta_tcp_send(sock, buf, len) \
     send((sock)->fd, (buf), (len), 0)
 
+uint64_t
+yotta_tcp_sendall(yotta_socket_t * socket, void const * buffer, uint64_t buffer_size);
 
 /*
- * @infos: recv data via a yotta TCP socket
+ * @infos: receives data via a yotta TCP socket
  *
- * @param <sock>: the yotta socket used to recv
- * @param <buf>: the buffer that will contain the data to recv
- * @param <len>: the length of the data to be received
+ * @param <socket>: the receiving yotta socket
+ * @param <buffer>: the buffer that will contain the data to receive
+ * @param <buffer_size>: the maximum buffer size
  *
  * @returns:
- * the number of bytes received
- *
+ *  the number of received bytes
  */
-#define yotta_tcp_recv(sock, buf, len) \
-    recv((sock)->fd, (buf), (len), 0)
+#define yotta_tcp_recv(socket, buffer, buffer_size) \
+    recv((socket)->fd, (buffer), (buffer_size), 0)
 
-int
-yotta_tcp_sendall(yotta_socket_t * sock, char const * buf, int len);
+/*
+ * @infos: receives data via yotta TCP socket independently of the send commands
+ *
+ * @param <socket>: the receiving yotta socket
+ * @param <buffer>: the buffer that will contain the data to receive
+ * @param <buffer_size>: the maximum buffer size
+ *
+ * @returns:
+ *  the number of received bytes
+ */
+uint64_t
+yotta_tcp_recvall(yotta_socket_t * socket, void * buffer, uint64_t buffer_size);
 
-int
-yotta_tcp_sendall_(yotta_socket_t * sock, char const * buf, int * len);
+/*
+ * @infos: seek in comming data
+ *
+ * @param <socket>: the receiving yotta socket
+ * @param <offset>: the seek offset
+ *
+ * @returns:
+ *  the number of seeked bytes
+ */
+uint64_t
+yotta_tcp_seek(yotta_socket_t * socket, uint64_t offset);
 
-int
-yotta_tcp_recvall(yotta_socket_t * sock, void * buf, size_t len);
+/*
+ * @infos: gets the number of
+ *
+ * @param <socket>: the receiving yotta socket
+ * @param <available_data_size>: the returned number of bytes
+ *
+ * @returns:
+ *  the number of seeked bytes
+ */
+#define yotta_tcp_available(socket,available_data_size) \
+    ioctl((socket)->fd, FIONREAD, available_data_size);
+
 
 #endif //_YOTTA_TCP
