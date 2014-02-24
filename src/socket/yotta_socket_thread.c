@@ -81,13 +81,10 @@ yotta_socket_thread_main(yotta_socket_thread_t * thread)
             return 0;
         }
 
-        if (event_counts == 0)
-        {
-            continue;
-        }
-
         while (event_counts != 0)
         {
+            yotta_assert(socket_head != 0);
+
             yotta_socket_event_t * socket_event = socket_head;
 
             /*
@@ -112,20 +109,20 @@ yotta_socket_thread_main(yotta_socket_thread_t * thread)
                 {
                     event_counts -= 1;
                 }
-            }
-            else
-            {
-                if (FD_ISSET(fd, &fd_set_recv))
-                {
-                    socket_event->recv_event(socket_event);
-                    event_counts -= 1;
-                }
 
-                if (FD_ISSET(fd, &fd_set_send))
-                {
-                    socket_event->send_event(socket_event);
-                    event_counts -= 1;
-                }
+                continue;
+            }
+
+            if (FD_ISSET(fd, &fd_set_recv))
+            {
+                socket_event->recv_event(socket_event);
+                event_counts -= 1;
+            }
+
+            if (FD_ISSET(fd, &fd_set_send))
+            {
+                socket_event->send_event(socket_event);
+                event_counts -= 1;
             }
         }
     }
