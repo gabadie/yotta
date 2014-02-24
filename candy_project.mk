@@ -7,7 +7,7 @@ ifneq ($(config),debug)
 endif
 
 PROJECT_CFLAGS := -Wall -Wextra -std=gnu11
-PROJECT_LDFLAGS :=
+PROJECT_LDFLAGS := -lpthread
 
 # ------------------------------------------------------------ release configuration
 ifeq ($(config),release)
