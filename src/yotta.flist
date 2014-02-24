@@ -12,6 +12,7 @@ dictate/yotta_dictate_binary_send.c
 socket/yotta_socket.c
 socket/yotta_socket_prefix.c
 socket/yotta_tcp.c
+socket/yotta_tcp_cmd_queue.c
 socket/yotta_udp.c
 socket/yotta_socket_thread.c
 utils/yotta_file.c
