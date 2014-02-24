@@ -17,6 +17,9 @@ yotta_tcp_cmd_queue_s
     // the first and last TCP command in the queue
     yotta_tcp_cmd_t * queue_first;
     yotta_tcp_cmd_t * queue_last;
+
+    // the command queue stack entry
+    yotta_tcp_cmd_t * queue_stack;
 }
 yotta_tcp_cmd_queue_t;
 
@@ -29,13 +32,23 @@ void
 yotta_tcp_cmd_queue_init(yotta_tcp_cmd_queue_t * cmd_queue);
 
 /*
- * @infos: append a command in the queue
+ * @threadsafe
+ * @infos: appends a command in the queue
  *
  * @param <cmd_queue>: the command queue to append to
  * @param <cmd>: the command to append
  */
 void
 yotta_tcp_cmd_queue_append(yotta_tcp_cmd_queue_t * cmd_queue, yotta_tcp_cmd_t * cmd);
+
+/*
+ * @threadsafe
+ * @infos: dequeues the first command
+ *
+ * @param <cmd_queue>: the command queue to dequeue
+ */
+void
+yotta_tcp_cmd_dequeue(yotta_tcp_cmd_queue_t * cmd_queue);
 
 /*
  * @infos: cleans TCP command queue
