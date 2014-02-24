@@ -44,7 +44,7 @@ LIB_OBJECT_BINARIES := $(call bin_object_files,$(call filelist,./src/yotta.flist
 # ------------------------------------------------------------ compilation/link configuration
 $(LIB_BINARIES_TARGET): $(LIB_OBJECT_BINARIES)
 $(LIB_BINARIES_TARGET): CFLAGS += $(PROJECT_CFLAGS)
-$(LIB_BINARIES_TARGET): LDFLAGS += $(LIB_OBJECT_BINARIES)
+$(LIB_BINARIES_TARGET): ARFLAGS += $(LIB_OBJECT_BINARIES)
 
 
 # ------------------------------------------------------------------------------ Yotta slave application
@@ -75,8 +75,8 @@ $(TEST_LIB_TARGETS): CFLAGS += -I $(LIB_HEADERS_TARGET) -I $(test_apis_dir) $(PR
 
 # ------------------------------------------------------------ link configuration
 $(TEST_LIB_TARGETS): $(LIB_BINARIES_TARGET)
-$(TEST_LIB_TARGETS): LDFLAGS += $(PROJECT_LDFLAGS)
 $(TEST_LIB_TARGETS): LDFLAGS += $(LIB_BINARIES_TARGET)
+$(TEST_LIB_TARGETS): LDFLAGS += $(PROJECT_LDFLAGS)
 
 # ------------------------------------------------------------ test scripts
 TEST_SCRIPT_TARGETS := $(call test_scripts,$(TEST_LIB_SCRIPTS))
