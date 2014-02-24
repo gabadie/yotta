@@ -44,6 +44,9 @@ yotta_socket_event_s
     // the exception event entry point
     yotta_socket_entry_t except_event;
 
+    // the release event entry point
+    yotta_socket_entry_t release_event;
+
     // previous and next socket
     yotta_socket_event_t * socket_next;
 
@@ -71,14 +74,25 @@ yotta_socket_event_s
  * @param <socket_event>: the socket event
  * @param <function_ptr>: the function pointer
  */
-#define yotta_socket_event_recv(socket_event,function_ptr) \
-    ((yotta_socket_event_t *) (socket_event))->recv_event = (yotta_socket_entry_t)(function_ptr);
+#define yotta_socket_event_set_recv(socket_event,function_ptr) \
+    ((yotta_socket_event_t *) (socket_event))->recv_event = (yotta_socket_entry_t)(function_ptr)
 
-#define yotta_socket_event_send(socket_event,function_ptr) \
-    ((yotta_socket_event_t *) (socket_event))->send_event = (yotta_socket_entry_t)(function_ptr);
+#define yotta_socket_event_set_send(socket_event,function_ptr) \
+    ((yotta_socket_event_t *) (socket_event))->send_event = (yotta_socket_entry_t)(function_ptr)
 
-#define yotta_socket_event_except(socket_event,function_ptr) \
-    ((yotta_socket_event_t *) (socket_event))->except_event = (yotta_socket_entry_t)(function_ptr);
+#define yotta_socket_event_set_except(socket_event,function_ptr) \
+    ((yotta_socket_event_t *) (socket_event))->except_event = (yotta_socket_entry_t)(function_ptr)
+
+#define yotta_socket_event_set_release(socket_event,function_ptr) \
+    ((yotta_socket_event_t *) (socket_event))->release_event = (yotta_socket_entry_t)(function_ptr)
+
+/*
+ * @infos: triggers the release event
+ *
+ * @param <socket_event>: the socket event
+ */
+#define yotta_socket_event_release(socket_event) \
+    ((yotta_socket_event_t *) (socket_event))->release_event((yotta_socket_event_t *) (socket_event))
 
 /*
  * @infos: destroyes the socket event

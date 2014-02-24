@@ -147,6 +147,7 @@ yotta_socket_thread_listen(yotta_socket_thread_t * thread, yotta_socket_event_t 
     yotta_assert(thread != 0);
     yotta_assert(socket_event != 0);
     yotta_assert(socket_event->socket_thread == 0);
+    yotta_assert(socket_event->release_event != 0);
 
     socket_event->socket_thread = thread;
 
@@ -166,7 +167,21 @@ yotta_socket_thread_destroy(yotta_socket_thread_t * thread)
 
     thread->quit_status = YOTTA_SOCKET_THREAD_STOP_NOW;
 
-    return pthread_join(thread->id, 0);
+    if (pthread_join(thread->id, 0) != 0)
+    {
+        return -1;
+    }
+
+    while (thread->socket_head)
+    {
+        yotta_socket_event_t * socket_event = thread->socket_head;
+
+        thread->socket_head = socket_event->socket_next;
+
+        yotta_socket_event_release(socket_event);
+    }
+
+    return 0;
 }
 
 

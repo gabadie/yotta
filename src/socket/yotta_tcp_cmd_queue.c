@@ -60,7 +60,7 @@ yotta_tcp_cmd_queue_send(yotta_tcp_cmd_queue_t * cmd_queue)
 
     if (cmd == 0)
     {
-        yotta_socket_event_send(cmd_queue, 0);
+        yotta_socket_event_set_send(cmd_queue, 0);
         return;
     }
 
@@ -75,7 +75,7 @@ yotta_tcp_cmd_queue_init(yotta_tcp_cmd_queue_t * cmd_queue)
     yotta_assert(cmd_queue != 0);
 
     yotta_socket_event_init(cmd_queue);
-    yotta_socket_event_send(cmd_queue, 0);
+    yotta_socket_event_set_send(cmd_queue, 0);
 
     cmd_queue->queue_first = 0;
 }
@@ -92,7 +92,7 @@ yotta_tcp_cmd_queue_append(yotta_tcp_cmd_queue_t * cmd_queue, yotta_tcp_cmd_t * 
     }
     while (!__sync_bool_compare_and_swap(&cmd_queue->queue_stack, cmd->queue_next, cmd));
 
-    yotta_socket_event_send(cmd_queue, yotta_tcp_cmd_queue_send);
+    yotta_socket_event_set_send(cmd_queue, yotta_tcp_cmd_queue_send);
 }
 
 void
