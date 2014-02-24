@@ -32,7 +32,7 @@ yotta_socket_s
  *  != <0> if failed
  */
 int
-yotta_init_socket_server(yotta_socket_t * sock, char const * port, int family, int type);
+yotta_init_socket_server(yotta_socket_t * sock, uint16_t port, int family, int type);
 
 /*
  * @infos: init a yotta socket client
@@ -51,7 +51,7 @@ yotta_init_socket_server(yotta_socket_t * sock, char const * port, int family, i
  */
 int
 yotta_init_socket_client(yotta_socket_t * sock, char const * address,
-    char const * port, int family, int type);
+    uint16_t port, int family, int type);
 
 /*
  * @infos: listen with a yotta socket

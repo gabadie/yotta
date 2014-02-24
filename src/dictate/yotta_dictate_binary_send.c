@@ -1,16 +1,21 @@
-#include <yotta_dictate_binary_send.h>
-#include <yotta_return.h>
+#include <stdio.h>
+
+#include "yotta_dictate_binary_send.h"
+#include "../yotta_debug.h"
+#include "../yotta_init.h"
+#include "../yotta_logger.private.h"
+#include "../yotta_return.h"
+#include "../utils/yotta_str_utils.h"
+#include "../socket/yotta_tcp.h"
+
+#define BINARY_BUFFER_SIZE 1024
 
 uint64_t
-yotta_dictate_binary_send(yotta_context_t * context, const char * ip, uint16_t port)
+yotta_dictate_binary_send(yotta_context_t * context, char const * ip, uint16_t port)
 {
     yotta_assert(context != NULL);
 
-    //TODO: move to folder Master->Daemon
-    char[6] port_str;
-    yotta_ui16_to_str(port_str, port);
-
-    uint64_t return_code = yotta_tcp_socket_client(&context->slave, ip, port_str);
+    uint64_t return_code = yotta_tcp_socket_client(&context->slave, ip, port);
 
     if(return_code != YOTTA_SUCCESS)
     {

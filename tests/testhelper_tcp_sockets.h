@@ -30,7 +30,7 @@ static
 void
 testhelper_tcp_build(testhelper_tcp_sockets_t * testing_sockets)
 {
-    static char const PORT[] = "8001";
+    static uint16_t PORT = 8001;
     static int32_t const BACKLOG = 16;
 
     test_assert(testing_sockets != 0);

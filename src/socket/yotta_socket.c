@@ -1,5 +1,6 @@
 #include "yotta_socket.h"
 #include "../yotta_debug.h"
+#include "../utils/yotta_str_utils.h"
 
 #include <string.h>
 #include <stdlib.h>
@@ -18,7 +19,7 @@ get_addr(struct sockaddr *sa)
 #endif
 
 int
-yotta_init_socket_server(yotta_socket_t * sock, char const * port, int family, int type)
+yotta_init_socket_server(yotta_socket_t * sock, uint16_t port, int family, int type)
 {
     yotta_assert(sock != NULL);
 
@@ -38,8 +39,11 @@ yotta_init_socket_server(yotta_socket_t * sock, char const * port, int family, i
     hints.ai_addr = NULL;
     hints.ai_next = NULL;
 
+    char port_str[6];
+    yotta_ui16_to_str(port_str, port);
+
     // Load address info structs
-    if((rv = getaddrinfo(NULL, port, &hints, &results)) != 0)
+    if((rv = getaddrinfo(NULL, port_str, &hints, &results)) != 0)
     {
         yotta_log("getaddrinfo: %s\n", gai_strerror(rv));
         return -1;
@@ -92,7 +96,7 @@ yotta_init_socket_server(yotta_socket_t * sock, char const * port, int family, i
 
 int
 yotta_init_socket_client(yotta_socket_t * sock, char const * address,
-    char const * port, int family, int type)
+    uint16_t port, int family, int type)
 {
     int sockfd;
     struct addrinfo hints, *a;
@@ -103,8 +107,13 @@ yotta_init_socket_client(yotta_socket_t * sock, char const * address,
     hints.ai_family = family;
     hints.ai_socktype = type;
 
+    char port_str[6];
+    yotta_ui16_to_str(port_str, port);
+
     // Load address info structs
-    if((rv = getaddrinfo(address, port, &hints, &results)) != 0)
+
+    // Load address info structs
+    if((rv = getaddrinfo(address, port_str, &hints, &results)) != 0)
     {
         yotta_log("getaddrinfo: %s\n", gai_strerror(rv));
         return -1;
