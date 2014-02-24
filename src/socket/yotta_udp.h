@@ -1,6 +1,7 @@
 #ifndef _YOTTA_UDP
 #define _YOTTA_UDP
 
+#include "../yotta_prefix.h"
 #include "yotta_socket.h"
 
 /*

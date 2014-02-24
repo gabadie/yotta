@@ -1,4 +1,7 @@
+#include <string.h>
+
 #include "yotta_udp.h"
+#include "../yotta_debug.h"
 
 #define YOTTA_CHUNK_SIZE 512
 
