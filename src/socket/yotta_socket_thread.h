@@ -44,7 +44,7 @@ uint64_t
 yotta_socket_thread_listen(yotta_socket_thread_t * thread, yotta_socket_event_t * socket_event);
 
 /*
- * @infos: destroyes the sockets' thread
+ * @infos: hang until all sockets are released and destroyes the sockets' thread
  *
  * @param <thread>: the sockets's thread to destroy
  *
@@ -54,6 +54,18 @@ yotta_socket_thread_listen(yotta_socket_thread_t * thread, yotta_socket_event_t 
  */
 uint64_t
 yotta_socket_thread_destroy(yotta_socket_thread_t * thread);
+
+/*
+ * @infos: Forces the the sockets' thread destruction
+ *
+ * @param <thread>: the sockets's thread to destroy
+ *
+ * @returns:
+ *  == <0> if succeed
+ *  != <0> if failed
+ */
+uint64_t
+yotta_socket_thread_kill(yotta_socket_thread_t * thread);
 
 
 

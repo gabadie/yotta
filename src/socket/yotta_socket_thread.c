@@ -165,6 +165,23 @@ yotta_socket_thread_destroy(yotta_socket_thread_t * thread)
 {
     yotta_assert(thread != 0);
 
+    thread->quit_status = YOTTA_SOCKET_THREAD_STOP_ON_EMPTY;
+
+    if (pthread_join(thread->id, 0) != 0)
+    {
+        return -1;
+    }
+
+    yotta_assert(thread->socket_head == 0);
+
+    return 0;
+}
+
+uint64_t
+yotta_socket_thread_kill(yotta_socket_thread_t * thread)
+{
+    yotta_assert(thread != 0);
+
     thread->quit_status = YOTTA_SOCKET_THREAD_STOP_NOW;
 
     if (pthread_join(thread->id, 0) != 0)
