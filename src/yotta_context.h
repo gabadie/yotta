@@ -3,6 +3,7 @@
 
 #include "yotta_prefix.h"
 #include "socket/yotta_socket.h"
+#include "socket/yotta_socket_thread.h"
 
 /*
  * @infos: store all context's information
@@ -15,6 +16,9 @@ struct yotta_context_s
 
     // Socket used for slave connections
     yotta_socket_t slave;
+
+    // Socket thread
+    yotta_socket_thread_t worker_thread;
 
 } yotta_context_t;
 
@@ -29,7 +33,8 @@ struct yotta_context_s
  *  != <0> if failed
  */
 uint64_t
-yotta_context_init(yotta_context_t * context, uint16_t incoming_port);
+yotta_context_init(yotta_context_t * context, yotta_thread_func_t func,
+    yotta_thread_args_t args, uint16_t incoming_port);
 
 /*
  * @infos: connection to the yotta's server
