@@ -45,6 +45,18 @@
 #define yotta_tcp_send(sock, buf, len) \
     send((sock)->fd, (buf), (len), 0)
 
+/*
+ * @infos: send all the data via a yotta TCP socket
+ *
+ * @param <sock>: the yotta socket used to send
+ * @param <buf>: the buffer containing the data to send
+ * @param <len>: the length of the data to send
+ *
+ * @returns:
+ * the number of bytes sent
+ *
+ * @important: the socket must be in blocking mode
+ */
 uint64_t
 yotta_tcp_sendall(yotta_socket_t * socket, void const * buffer, uint64_t buffer_size);
 
@@ -70,6 +82,8 @@ yotta_tcp_sendall(yotta_socket_t * socket, void const * buffer, uint64_t buffer_
  *
  * @returns:
  *  the number of received bytes
+ *
+ * @important: the socket must be in blocking mode
  */
 uint64_t
 yotta_tcp_recvall(yotta_socket_t * socket, void * buffer, uint64_t buffer_size);
