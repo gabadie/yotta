@@ -142,6 +142,21 @@ yotta_socket_thread_init(yotta_socket_thread_t * thread)
 }
 
 uint64_t
+yotta_socket_thread_listen(yotta_socket_thread_t * thread, yotta_socket_event_t * socket_event)
+{
+    yotta_assert(thread != 0);
+    yotta_assert(socket_event != 0);
+
+    do
+    {
+        socket_event->socket_next = thread->socket_head;
+    }
+    while (!__sync_bool_compare_and_swap(&thread->socket_head, socket_event->socket_next, socket_event));
+
+    return 0;
+}
+
+uint64_t
 yotta_socket_thread_destroy(yotta_socket_thread_t * thread)
 {
     yotta_assert(thread != 0);

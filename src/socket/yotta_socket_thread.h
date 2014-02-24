@@ -21,14 +21,36 @@ yotta_socket_thread_s
  * @infos: inits and launches the sockets' thread
  *
  * @param <thread>: the sockets's thread to init and launch
+ *
+ * @returns:
+ *  == <0> if succeed
+ *  != <0> if failed
  */
 uint64_t
 yotta_socket_thread_init(yotta_socket_thread_t * thread);
 
 /*
+ * @threadsafe
+ * @infos: listens socket's events
+ *
+ * @param <thread>: the listening sockets's thread
+ * @param <socket_event>: the socket event
+ *
+ * @returns:
+ *  == <0> if succeed
+ *  != <0> if failed
+ */
+uint64_t
+yotta_socket_thread_listen(yotta_socket_thread_t * thread, yotta_socket_event_t * socket_event);
+
+/*
  * @infos: destroyes the sockets' thread
  *
  * @param <thread>: the sockets's thread to destroy
+ *
+ * @returns:
+ *  == <0> if succeed
+ *  != <0> if failed
  */
 uint64_t
 yotta_socket_thread_destroy(yotta_socket_thread_t * thread);
