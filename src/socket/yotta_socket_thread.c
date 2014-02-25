@@ -27,8 +27,8 @@ yotta_socket_thread_main(yotta_socket_thread_t * thread)
     fd_set fd_set_except;
     struct timeval timer;
 
-    timer.tv_sec = 1;
-    timer.tv_usec = 0;
+    timer.tv_sec = 0;
+    timer.tv_usec = 20000;
 
     while (thread->quit_status != YOTTA_SOCKET_THREAD_STOP_NOW)
     {
