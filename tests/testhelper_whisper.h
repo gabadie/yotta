@@ -82,7 +82,7 @@ testhelper_whisper_protocol_destroy(testhelper_whisper_protocol_t * testing_prot
      *
      * we close only one because the other will be then closed by an exception
      */
-    yotta_tcp_cmd_queue_close((yotta_tcp_cmd_queue_t *) &testing_protocol->queue0);
+    yotta_tcp_cmd_queue_finish((yotta_tcp_cmd_queue_t *) &testing_protocol->queue0);
 
     // cleans the sockets' thread
     yotta_socket_thread_destroy(&testing_protocol->thread);

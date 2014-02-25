@@ -51,12 +51,12 @@ void
 yotta_tcp_cmd_dequeue(yotta_tcp_cmd_queue_t * cmd_queue);
 
 /*
- * @infos: close the TCP command queue after processing all comamnds
+ * @infos: async finish the TCP command queue after processing all comamnds
  *
  * @param <cmd_queue>: the command queue to close
  */
 void
-yotta_tcp_cmd_queue_close(yotta_tcp_cmd_queue_t * cmd_queue);
+yotta_tcp_cmd_queue_finish(yotta_tcp_cmd_queue_t * cmd_queue);
 
 /*
  * @infos: cleans TCP command queue

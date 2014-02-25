@@ -168,6 +168,7 @@ yotta_socket_thread_listen(yotta_socket_thread_t * thread, yotta_socket_event_t 
     yotta_assert(thread != 0);
     yotta_assert(socket_event != 0);
     yotta_assert(socket_event->socket_thread == 0);
+    yotta_assert(socket_event->except_event != 0);
     yotta_assert(socket_event->release_event != 0);
 
     socket_event->socket_thread = thread;

@@ -123,7 +123,7 @@ yotta_tcp_cmd_dequeue(yotta_tcp_cmd_queue_t * cmd_queue)
 
 static
 void
-yotta_tcp_queue_close_recv(yotta_tcp_cmd_t * cmd, yotta_tcp_cmd_queue_t * cmd_queue)
+yotta_tcp_queue_finish_recv(yotta_tcp_cmd_t * cmd, yotta_tcp_cmd_queue_t * cmd_queue)
 {
     (void) cmd;
 
@@ -134,21 +134,21 @@ yotta_tcp_queue_close_recv(yotta_tcp_cmd_t * cmd, yotta_tcp_cmd_queue_t * cmd_qu
 
 static
 void
-yotta_tcp_queue_close_release(yotta_tcp_cmd_t * cmd)
+yotta_tcp_queue_finish_release(yotta_tcp_cmd_t * cmd)
 {
     yotta_free(cmd);
 }
 
 void
-yotta_tcp_cmd_queue_close(yotta_tcp_cmd_queue_t * cmd_queue)
+yotta_tcp_cmd_queue_finish(yotta_tcp_cmd_queue_t * cmd_queue)
 {
     yotta_assert(cmd_queue != 0);
     yotta_assert(cmd_queue->socket_event.socket_thread != 0);
 
     yotta_tcp_cmd_t * cmd = yotta_alloc_s(yotta_tcp_cmd_t);
 
-    yotta_tcp_cmd_set_send(cmd, yotta_tcp_queue_close_recv);
-    yotta_tcp_cmd_set_release(cmd, yotta_tcp_queue_close_release);
+    yotta_tcp_cmd_set_send(cmd, yotta_tcp_queue_finish_recv);
+    yotta_tcp_cmd_set_release(cmd, yotta_tcp_queue_finish_release);
 
     yotta_tcp_cmd_queue_append(cmd_queue, cmd);
 }
