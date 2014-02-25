@@ -11,7 +11,8 @@ typedef enum
 {
     YOTTA_WHISPER_MEM_PULL_ANSWER,
     YOTTA_WHISPER_MEM_PULL_REQUEST,
-    YOTTA_WHISPER_MEM_PUSH
-} yotta_whisper_trame_t;
+    YOTTA_WHISPER_MEM_PUSH,
+    YOTTA_WHISPER_LABELS_COUNT
+} yotta_whisper_label_t;
 
 #endif

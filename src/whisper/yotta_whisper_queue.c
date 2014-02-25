@@ -10,6 +10,20 @@
 #include "../yotta_debug.h"
 
 
+/*
+ * @infos: groups all whisper protocol labels' entries
+ *
+ * @important: must the order of yotta_whisper_label_t (yotta_whisper_labels.private.h)
+ */
+static
+yotta_whisper_recv_t const
+yotta_whisper_label_entries[YOTTA_WHISPER_LABELS_COUNT] =
+{
+    0,
+    0,
+    (yotta_whisper_recv_t) yotta_whisper_entry_push
+};
+
 static
 void
 yotta_whisper_queue_recv(yotta_whisper_queue_t * cmd_queue)
@@ -33,15 +47,10 @@ yotta_whisper_queue_recv(yotta_whisper_queue_t * cmd_queue)
 
         if (label_size == sizeof(label))
         {
-            switch (label)
-            {
-                case YOTTA_WHISPER_MEM_PUSH:
-                    cmd_queue->callback = yotta_whisper_entry_push;
-                    break;
+            yotta_assert(label < YOTTA_WHISPER_LABELS_COUNT);
+            yotta_assert(yotta_whisper_label_entries[label] != 0);
 
-                default:
-                    yotta_crash_msg("unknown whisper label");
-            }
+            cmd_queue->callback = yotta_whisper_label_entries[label];
 
             continue;
         }
