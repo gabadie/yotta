@@ -2,14 +2,55 @@
 #include <string.h>
 
 #include "yotta_whisper_queue.private.h"
+#include "yotta_whisper_labels.private.h"
+#include "yotta_whisper_push.private.h"
+#include "../socket/yotta_tcp.h"
 #include "../yotta_logger.private.h"
+#include "../yotta_debug.h"
 
 
 static
 void
 yotta_whisper_queue_recv(yotta_whisper_queue_t * cmd_queue)
 {
-    (void) cmd_queue;
+    while (1)
+    {
+        if (cmd_queue->callback != 0)
+        {
+            cmd_queue->callback(cmd_queue);
+
+            if (cmd_queue->callback != 0)
+            {
+                // the callback has not finished to receive all data
+                break;
+            }
+        }
+
+        uint16_t label = 0;
+
+        ssize_t label_size = yotta_tcp_recv(&cmd_queue->tcp_queue.socket_event.socket, &label, sizeof(label));
+
+        if (label_size == 1)
+        {
+            yotta_crash_msg("unsupported label receiving");
+        }
+
+        if (label_size != sizeof(label))
+        {
+            // no data available
+            break;
+        }
+
+        switch (label)
+        {
+            case YOTTA_WHISPER_MEM_PUSH:
+                cmd_queue->callback = yotta_whisper_entry_push;
+                break;
+
+            default:
+                yotta_crash_msg("unknown whisper label");
+        }
+    }
 }
 
 static
