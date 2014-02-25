@@ -1,0 +1,22 @@
+#
+# List of the library's C files
+#
+
+yotta_address_translation.c
+yotta_command.c
+yotta_context.c
+yotta_init.c
+yotta_logger.c
+yotta_slave.c
+dictate/yotta_dictate_binary_send.c
+socket/yotta_socket.c
+socket/yotta_socket_prefix.c
+socket/yotta_tcp.c
+socket/yotta_tcp_cmd_queue.c
+socket/yotta_udp.c
+socket/yotta_socket_thread.c
+utils/yotta_file.c
+utils/yotta_str_utils.c
+whisper/yotta_whisper_master.c
+whisper/yotta_whisper_push.c
+whisper/yotta_whisper_queue.c

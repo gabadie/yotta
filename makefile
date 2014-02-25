@@ -1,3 +1,3 @@
 
-include ./mk/build.mk
+include ./candy_makefile/build.mk
 
