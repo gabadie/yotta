@@ -27,8 +27,6 @@ yotta_whisper_entry_push(
     {
         // we are receiving the push's header
 
-        yotta_whisper_queue_continue(cmd_queue, yotta_whisper_entry_push);
-
         uint64_t header_remaining = sizeof(uint64_t) * 2 - buffer->header_received;
         uint64_t header_received = yotta_tcp_recv(
             &cmd_queue->tcp_queue.socket_event.socket,

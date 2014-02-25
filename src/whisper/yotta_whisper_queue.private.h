@@ -78,13 +78,4 @@ yotta_whisper_queue_destroy(yotta_whisper_queue_t * cmd_queue);
 #define yotta_whisper_queue_finish(cmd_queue) \
     (cmd_queue)->callback = 0;
 
-/*
- * @infos: sets in the <cmd_queue>'s <callback> to process futur incomming data
- *
- * @param <cmd_queue>: the command queue
- * @param <callback_func_ptr>: the callback to call when receiving some data
- */
-#define yotta_whisper_queue_continue(cmd_queue,callback_func_ptr) \
-    (cmd_queue)->callback = (callback_func_ptr);
-
 #endif
