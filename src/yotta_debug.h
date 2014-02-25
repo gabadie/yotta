@@ -57,6 +57,24 @@
 #endif
 
 /*
+ * @infos: definies a todo that crash when reached
+ *
+ * @params: like printf
+ */
+#ifdef YOTTA_DEBUG
+#define yotta_todo(...) \
+    { \
+        printf("TODO AT %s@%i in %s: ", __FILE__, __LINE__, __func__); \
+        printf(__VA_ARGS__); \
+        printf("\n"); \
+        yotta_crash_definitly(); \
+    }
+
+#else
+#define yotta_todo(...)
+#endif
+
+/*
  * @infos: assert yotta execution
  *
  * @param <condition>: assertion's condition code to pass

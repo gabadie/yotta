@@ -65,7 +65,7 @@ yotta_whisper_queue_recv(yotta_whisper_queue_t * cmd_queue)
         }
         else if (label_size == 1)
         {
-            yotta_crash_msg("unsupported label receiving");
+            yotta_todo("unsupported troncated label");
         }
 
         yotta_crash_msg("select error");
