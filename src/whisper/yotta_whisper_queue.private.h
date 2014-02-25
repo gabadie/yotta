@@ -1,7 +1,7 @@
 #ifndef _YOTTAPRIVATE_WHISPER_QUEUE
 #define _YOTTAPRIVATE_WHISPER_QUEUE
 
-#include "../socket/yotta_tcp_cmd_queue.private.h"
+#include "../socket/yotta_tcp_queue.private.h"
 
 
 /*
@@ -32,7 +32,7 @@ typedef void (* yotta_whisper_recv_t)(
 struct
 yotta_whisper_queue_s
 {
-    yotta_tcp_cmd_queue_t tcp_queue;
+    yotta_tcp_queue_t tcp_queue;
 
     // callback entry to complete the message
     yotta_whisper_recv_t callback;

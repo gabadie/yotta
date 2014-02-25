@@ -5,27 +5,27 @@
 
 
 /*
- * @infos; forward declaration of yotta_socket_event_t
+ * @infos; forward declaration of yotta_tcp_cmd_t
  */
 typedef struct
 yotta_tcp_cmd_s
 yotta_tcp_cmd_t;
 
 /*
- * @infos; forward declaration of yotta_socket_event_t
+ * @infos; forward declaration of yotta_tcp_queue_t
  */
 typedef struct
-yotta_tcp_cmd_queue_s
-yotta_tcp_cmd_queue_t;
+yotta_tcp_queue_s
+yotta_tcp_queue_t;
 
 /*
  * @infos: defines yotta tcp command entry point function pointer type
  *
  * The tcp command entry received 2 parameters:
  *  - yotta_tcp_cmd_t cmd: the tcp_cmd
- *  - yotta_tcp_cmd_queue_t cmd_queue: the parrent cmd_queue
+ *  - yotta_tcp_queue_t cmd_queue: the parrent cmd_queue
  */
-typedef void (*yotta_tcp_entry_t)(yotta_tcp_cmd_t *, yotta_tcp_cmd_queue_t *);
+typedef void (*yotta_tcp_entry_t)(yotta_tcp_cmd_t *, yotta_tcp_queue_t *);
 
 /*
  * @infos: defines yotta tcp command entry point function pointer type

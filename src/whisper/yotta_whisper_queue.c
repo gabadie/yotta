@@ -75,7 +75,7 @@ yotta_whisper_queue_except(yotta_whisper_queue_t * cmd_queue)
 void
 yotta_whisper_queue_init(yotta_whisper_queue_t * cmd_queue)
 {
-    yotta_tcp_cmd_queue_init((yotta_tcp_cmd_queue_t *) cmd_queue);
+    yotta_tcp_queue_init((yotta_tcp_queue_t *) cmd_queue);
     yotta_socket_event_set_recv(cmd_queue, yotta_whisper_queue_recv);
     yotta_socket_event_set_except(cmd_queue, yotta_whisper_queue_except);
 
@@ -87,5 +87,5 @@ yotta_whisper_queue_init(yotta_whisper_queue_t * cmd_queue)
 void
 yotta_whisper_queue_destroy(yotta_whisper_queue_t * cmd_queue)
 {
-    yotta_tcp_cmd_queue_destroy((yotta_tcp_cmd_queue_t *) cmd_queue);
+    yotta_tcp_queue_destroy((yotta_tcp_queue_t *) cmd_queue);
 }

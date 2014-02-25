@@ -1,5 +1,5 @@
-#ifndef _YOTTAPRIVATE_TCP_CMD_QUEUE
-#define _YOTTAPRIVATE_TCP_CMD_QUEUE
+#ifndef _YOTTAPRIVATE_TCP_QUEUE
+#define _YOTTAPRIVATE_TCP_QUEUE
 
 #include "yotta_socket_event.h"
 #include "yotta_tcp_cmd.private.h"
@@ -9,7 +9,7 @@
  * @infos: overloads yotta_socket_event_t
  */
 typedef struct
-yotta_tcp_cmd_queue_s
+yotta_tcp_queue_s
 {
     // overloads yotta_socket_event_t
     yotta_socket_event_t socket_event;
@@ -21,7 +21,7 @@ yotta_tcp_cmd_queue_s
     // the command queue stack entry
     yotta_tcp_cmd_t * queue_stack;
 }
-yotta_tcp_cmd_queue_t;
+yotta_tcp_queue_t;
 
 /*
  * @infos: inits TCP command queue
@@ -29,7 +29,7 @@ yotta_tcp_cmd_queue_t;
  * @param <cmd_queue>: the command queue to initialize
  */
 void
-yotta_tcp_cmd_queue_init(yotta_tcp_cmd_queue_t * cmd_queue);
+yotta_tcp_queue_init(yotta_tcp_queue_t * cmd_queue);
 
 /*
  * @threadsafe
@@ -39,7 +39,7 @@ yotta_tcp_cmd_queue_init(yotta_tcp_cmd_queue_t * cmd_queue);
  * @param <cmd>: the command to append
  */
 void
-yotta_tcp_cmd_queue_append(yotta_tcp_cmd_queue_t * cmd_queue, yotta_tcp_cmd_t * cmd);
+yotta_tcp_queue_append(yotta_tcp_queue_t * cmd_queue, yotta_tcp_cmd_t * cmd);
 
 /*
  * @threadsafe
@@ -48,7 +48,7 @@ yotta_tcp_cmd_queue_append(yotta_tcp_cmd_queue_t * cmd_queue, yotta_tcp_cmd_t * 
  * @param <cmd_queue>: the command queue to dequeue
  */
 void
-yotta_tcp_cmd_dequeue(yotta_tcp_cmd_queue_t * cmd_queue);
+yotta_tcp_cmd_dequeue(yotta_tcp_queue_t * cmd_queue);
 
 /*
  * @infos: async finish the TCP command queue after processing all comamnds
@@ -56,7 +56,7 @@ yotta_tcp_cmd_dequeue(yotta_tcp_cmd_queue_t * cmd_queue);
  * @param <cmd_queue>: the command queue to close
  */
 void
-yotta_tcp_cmd_queue_finish(yotta_tcp_cmd_queue_t * cmd_queue);
+yotta_tcp_queue_finish(yotta_tcp_queue_t * cmd_queue);
 
 /*
  * @infos: cleans TCP command queue
@@ -64,7 +64,7 @@ yotta_tcp_cmd_queue_finish(yotta_tcp_cmd_queue_t * cmd_queue);
  * @param <cmd_queue>: the command queue to clean
  */
 void
-yotta_tcp_cmd_queue_destroy(yotta_tcp_cmd_queue_t * cmd_queue);
+yotta_tcp_queue_destroy(yotta_tcp_queue_t * cmd_queue);
 
 
 #endif

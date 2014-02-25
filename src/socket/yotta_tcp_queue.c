@@ -1,5 +1,5 @@
 
-#include "yotta_tcp_cmd_queue.private.h"
+#include "yotta_tcp_queue.private.h"
 #include "yotta_socket_thread.h"
 #include "../yotta_debug.h"
 #include "../yotta_memory.h"
@@ -7,7 +7,7 @@
 
 static
 void
-yotta_tcp_cmd_queue_pop_stack(yotta_tcp_cmd_queue_t * cmd_queue)
+yotta_tcp_queue_pop_stack(yotta_tcp_queue_t * cmd_queue)
 {
     yotta_assert(cmd_queue != 0);
 
@@ -52,11 +52,11 @@ yotta_tcp_cmd_queue_pop_stack(yotta_tcp_cmd_queue_t * cmd_queue)
 
 static
 void
-yotta_tcp_cmd_queue_send(yotta_tcp_cmd_queue_t * cmd_queue)
+yotta_tcp_queue_send(yotta_tcp_queue_t * cmd_queue)
 {
     yotta_assert(cmd_queue != 0);
 
-    yotta_tcp_cmd_queue_pop_stack(cmd_queue);
+    yotta_tcp_queue_pop_stack(cmd_queue);
 
     yotta_tcp_cmd_t * cmd = cmd_queue->queue_first;
 
@@ -72,7 +72,7 @@ yotta_tcp_cmd_queue_send(yotta_tcp_cmd_queue_t * cmd_queue)
 }
 
 void
-yotta_tcp_cmd_queue_init(yotta_tcp_cmd_queue_t * cmd_queue)
+yotta_tcp_queue_init(yotta_tcp_queue_t * cmd_queue)
 {
     yotta_assert(cmd_queue != 0);
 
@@ -85,7 +85,7 @@ yotta_tcp_cmd_queue_init(yotta_tcp_cmd_queue_t * cmd_queue)
 }
 
 void
-yotta_tcp_cmd_queue_append(yotta_tcp_cmd_queue_t * cmd_queue, yotta_tcp_cmd_t * cmd)
+yotta_tcp_queue_append(yotta_tcp_queue_t * cmd_queue, yotta_tcp_cmd_t * cmd)
 {
     yotta_assert(cmd_queue != 0);
     yotta_assert(cmd != 0);
@@ -96,11 +96,11 @@ yotta_tcp_cmd_queue_append(yotta_tcp_cmd_queue_t * cmd_queue, yotta_tcp_cmd_t * 
     }
     while (!__sync_bool_compare_and_swap(&cmd_queue->queue_stack, cmd->queue_next, cmd));
 
-    yotta_socket_event_set_send(cmd_queue, yotta_tcp_cmd_queue_send);
+    yotta_socket_event_set_send(cmd_queue, yotta_tcp_queue_send);
 }
 
 void
-yotta_tcp_cmd_dequeue(yotta_tcp_cmd_queue_t * cmd_queue)
+yotta_tcp_cmd_dequeue(yotta_tcp_queue_t * cmd_queue)
 {
     yotta_assert(cmd_queue != 0);
     yotta_assert(cmd_queue->queue_first != 0);
@@ -123,7 +123,7 @@ yotta_tcp_cmd_dequeue(yotta_tcp_cmd_queue_t * cmd_queue)
 
 static
 void
-yotta_tcp_queue_finish_recv(yotta_tcp_cmd_t * cmd, yotta_tcp_cmd_queue_t * cmd_queue)
+yotta_tcp_queue_finish_recv(yotta_tcp_cmd_t * cmd, yotta_tcp_queue_t * cmd_queue)
 {
     (void) cmd;
 
@@ -140,7 +140,7 @@ yotta_tcp_queue_finish_release(yotta_tcp_cmd_t * cmd)
 }
 
 void
-yotta_tcp_cmd_queue_finish(yotta_tcp_cmd_queue_t * cmd_queue)
+yotta_tcp_queue_finish(yotta_tcp_queue_t * cmd_queue)
 {
     yotta_assert(cmd_queue != 0);
     yotta_assert(cmd_queue->socket_event.socket_thread != 0);
@@ -150,11 +150,11 @@ yotta_tcp_cmd_queue_finish(yotta_tcp_cmd_queue_t * cmd_queue)
     yotta_tcp_cmd_set_send(cmd, yotta_tcp_queue_finish_recv);
     yotta_tcp_cmd_set_release(cmd, yotta_tcp_queue_finish_release);
 
-    yotta_tcp_cmd_queue_append(cmd_queue, cmd);
+    yotta_tcp_queue_append(cmd_queue, cmd);
 }
 
 void
-yotta_tcp_cmd_queue_destroy(yotta_tcp_cmd_queue_t * cmd_queue)
+yotta_tcp_queue_destroy(yotta_tcp_queue_t * cmd_queue)
 {
     yotta_assert(cmd_queue != 0);
 
