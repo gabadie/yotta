@@ -1,13 +1,13 @@
 
+#include "yotta_whisper_push.private.h"
 #include "yotta_whisper_labels.private.h"
+#include "../socket/yotta_tcp.h"
 #include "../yotta_debug.h"
 
 
 void
 yotta_whisper_entry_push(
-    yotta_context_t * context,
-    yotta_socket_t * socket,
-    yotta_whisper_entry_feedback_t * feedback
+    yotta_whisper_queue_t * cmd_queue
 )
 {
     typedef struct
@@ -20,20 +20,18 @@ yotta_whisper_entry_push(
     }
     yotta_whisper_buffer_t;
 
-    (void) context;
-
     yotta_whisper_buffer_t * buffer =
-        yotta_whisper_tmp_buffer(feedback, yotta_whisper_buffer_t);
+        yotta_whisper_queue_recv_buffer(cmd_queue, yotta_whisper_buffer_t);
 
     if (buffer->header_received < sizeof(uint64_t) * 2)
     {
         // we are receiving the push's header
 
-        yotta_whisper_feedback_continue(feedback, yotta_whisper_entry_push);
+        yotta_whisper_queue_continue(cmd_queue, yotta_whisper_entry_push);
 
         uint64_t header_remaining = sizeof(uint64_t) * 2 - buffer->header_received;
         uint64_t header_received = yotta_tcp_recv(
-            socket,
+            &cmd_queue->tcp_queue.socket_event.socket,
             ((uint8_t *) &buffer->data_address) + buffer->header_received,
             header_remaining
         );
@@ -59,7 +57,11 @@ yotta_whisper_entry_push(
     void * dest = (void *)(buffer->data_address + buffer->data_cursor);
     uint64_t data_remaining = buffer->data_size - buffer->data_cursor;
 
-    uint64_t data_received = yotta_tcp_recv(socket, dest, data_remaining);
+    uint64_t data_received = yotta_tcp_recv(
+        &cmd_queue->tcp_queue.socket_event.socket,
+        dest,
+        data_remaining
+    );
 
     if (data_received == -1ull)
     {
@@ -76,7 +78,7 @@ yotta_whisper_entry_push(
         buffer->data_size = 0;
         buffer->data_cursor = 0;
 
-        yotta_whisper_feedback_finish(feedback);
+        yotta_whisper_queue_finish(cmd_queue);
 
         return;
     }
@@ -84,7 +86,7 @@ yotta_whisper_entry_push(
 
 void
 yotta_whisper_push(
-    yotta_socket_t * socket,
+    yotta_whisper_queue_t * cmd_queue,
     uint64_t master_address,
     uint64_t data_size,
     void const * data
@@ -105,6 +107,6 @@ yotta_whisper_push(
     yotta_assert(data_size != 0);
     yotta_assert(data != 0);
 
-    yotta_tcp_send(socket, &header, sizeof(header));
-    yotta_tcp_send(socket, data, data_size);
+    yotta_tcp_send(&cmd_queue->tcp_queue.socket_event.socket, &header, sizeof(header));
+    yotta_tcp_send(&cmd_queue->tcp_queue.socket_event.socket, data, data_size);
 }

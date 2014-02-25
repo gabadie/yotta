@@ -57,5 +57,34 @@ yotta_whisper_queue_init(yotta_whisper_queue_t * cmd_queue);
 void
 yotta_whisper_queue_destroy(yotta_whisper_queue_t * cmd_queue);
 
+/*
+ * @infos: gets the receive buffer
+ *
+ * @param <cmd_queue>: the command queue
+ * @param <buffer_type>: the receive buffer struct to cast to
+ *
+ * @return:
+ *  (<buffer_type> *) receive buffer
+ */
+#define yotta_whisper_queue_recv_buffer(cmd_queue,buffer_type) \
+    (buffer_type *) (cmd_queue)->recv_buffer ; \
+    yotta_assert(sizeof(buffer_type) <= YOTTA_WHISPER_RECV_BUFFER_SIZE)
+
+/*
+ * @infos: finish  in the <cmd_queue> the number of unreaded bytes
+ *
+ * @param <cmd_queue>: the command queue
+ */
+#define yotta_whisper_queue_finish(cmd_queue) \
+    (cmd_queue)->callback = 0;
+
+/*
+ * @infos: sets in the <cmd_queue>'s <callback> to process futur incomming data
+ *
+ * @param <cmd_queue>: the command queue
+ * @param <callback_func_ptr>: the callback to call when receiving some data
+ */
+#define yotta_whisper_queue_continue(cmd_queue,callback_func_ptr) \
+    (cmd_queue)->callback = (callback_func_ptr);
 
 #endif

@@ -18,6 +18,5 @@ socket/yotta_socket_thread.c
 utils/yotta_file.c
 utils/yotta_str_utils.c
 whisper/yotta_whisper_master.c
-whisper/yotta_whisper_pull.c
 whisper/yotta_whisper_push.c
 whisper/yotta_whisper_queue.c
