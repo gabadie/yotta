@@ -45,7 +45,7 @@ testhelper_whisper_protocol_init(testhelper_whisper_protocol_t * testing_protoco
     test_assert(yotta_tcp_socket_server(&listening_socket, PORT) == 0);
 
     // Server socket listen
-    test_assert(yotta_listen_socket(&listening_socket, BACKLOG) != -1);
+    test_assert(yotta_listen_socket(&listening_socket, BACKLOG) == 0);
 
     // Create queue 0's socket
     test_assert(yotta_tcp_socket_client((yotta_socket_t *) &testing_protocol->queue0, "127.0.0.1", PORT) == 0);

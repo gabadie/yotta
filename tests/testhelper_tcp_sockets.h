@@ -39,7 +39,7 @@ testhelper_tcp_build(testhelper_tcp_sockets_t * testing_sockets)
     test_assert(yotta_tcp_socket_server(&testing_sockets->listening_socket, PORT) == 0);
 
     // Server socket listen
-    test_assert(yotta_listen_socket(&testing_sockets->listening_socket, BACKLOG) != -1);
+    test_assert(yotta_listen_socket(&testing_sockets->listening_socket, BACKLOG) != (uint64_t) -1);
 
     // Create client socket
     test_assert(yotta_tcp_socket_client(&testing_sockets->client_socket, "127.0.0.1", PORT) == 0);

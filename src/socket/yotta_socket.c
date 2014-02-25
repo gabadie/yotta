@@ -18,7 +18,7 @@ get_addr(struct sockaddr *sa)
 }
 #endif
 
-int
+uint64_t
 yotta_init_socket_server(yotta_socket_t * sock, uint16_t port, int family, int type)
 {
     yotta_assert(sock != NULL);
@@ -94,7 +94,7 @@ yotta_init_socket_server(yotta_socket_t * sock, uint16_t port, int family, int t
     return 0;
 }
 
-int
+uint64_t
 yotta_init_socket_client(yotta_socket_t * sock, char const * address,
     uint16_t port, int family, int type)
 {
@@ -165,7 +165,7 @@ yotta_init_socket_client(yotta_socket_t * sock, char const * address,
 }
 
 
-int
+uint64_t
 yotta_listen_socket(yotta_socket_t * sock, int backlog)
 {
     yotta_assert(sock != NULL);
@@ -178,7 +178,7 @@ yotta_listen_socket(yotta_socket_t * sock, int backlog)
     return 0;
 }
 
-int
+uint64_t
 yotta_accept_socket(yotta_socket_t * sock, yotta_socket_t * new_sock)
 {
     yotta_assert(sock != NULL && new_sock != NULL);
@@ -224,7 +224,7 @@ yotta_accept_socket(yotta_socket_t * sock, yotta_socket_t * new_sock)
 }
 
 
-int
+uint64_t
 yotta_close_socket(yotta_socket_t * sock)
 {
     yotta_assert(sock != NULL);
