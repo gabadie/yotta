@@ -1,8 +1,20 @@
 
 #include "yotta_whisper_master.private.h"
+#include "yotta_whisper_queue.private.h"
+#include "../socket/yotta_socket_thread.h"
 #include "../socket/yotta_tcp.h"
 #include "../yotta_logger.private.h"
+#include "../yotta_memory.h"
 
+
+static
+void
+yotta_whisper_queue_release(yotta_whisper_queue_t * cmd_queue)
+{
+    yotta_whisper_queue_destroy(cmd_queue);
+
+    yotta_free(cmd_queue);
+}
 
 static
 void
@@ -13,8 +25,18 @@ yotta_whisper_master_recv(yotta_whisper_master_t * master)
     // TODO: yotta_whisper_queue
     yotta_socket_t slave_socket;
 
+    yotta_whisper_queue_t * cmd_queue = yotta_alloc_s(yotta_whisper_queue_t);
+
     yotta_accept_socket(&master->socket, &slave_socket);
-    yotta_close_socket(&slave_socket);
+
+    yotta_whisper_queue_init(cmd_queue);
+    yotta_socket_event_set_release(cmd_queue, yotta_whisper_queue_release);
+
+    if (yotta_socket_thread_listen(master->socket_thread, (yotta_socket_event_t *) cmd_queue) != 0)
+    {
+        yotta_whisper_queue_destroy(cmd_queue);
+        yotta_free(cmd_queue);
+    }
 }
 
 static
