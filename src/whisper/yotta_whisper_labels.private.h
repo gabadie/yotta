@@ -1,10 +1,6 @@
 #ifndef _YOTTAPRIVATE_WHISPER_LABELS
 #define _YOTTAPRIVATE_WHISPER_LABELS
 
-#include "yotta_whisper_entry.private.h"
-#include "yotta_whisper_entries.private.h"
-
-
 /*
  * @infos: Enumeration listing all messages label in the whisper protocol, the
  *      the very one between the master and the slave.
