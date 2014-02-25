@@ -1,6 +1,8 @@
 
 #include "yotta_tcp_cmd_queue.private.h"
+#include "yotta_socket_thread.h"
 #include "../yotta_debug.h"
+#include "../yotta_memory.h"
 
 
 static
@@ -115,6 +117,35 @@ yotta_tcp_cmd_dequeue(yotta_tcp_cmd_queue_t * cmd_queue)
         }
     }
     while (1);
+}
+
+static
+void
+yotta_tcp_queue_close_recv(yotta_tcp_cmd_t * cmd, yotta_tcp_cmd_queue_t * cmd_queue)
+{
+    (void) cmd;
+
+    yotta_socket_thread_unlisten(cmd_queue->socket_event.socket_thread, (yotta_socket_event_t *) cmd_queue);
+
+    yotta_socket_event_release(cmd_queue);
+}
+
+static
+void
+yotta_tcp_queue_close_release(yotta_tcp_cmd_t * cmd)
+{
+    yotta_free(cmd);
+}
+
+void
+yotta_tcp_cmd_queue_close(yotta_tcp_cmd_queue_t * cmd_queue)
+{
+    yotta_tcp_cmd_t * cmd = yotta_alloc_s(yotta_tcp_cmd_t);
+
+    yotta_tcp_cmd_set_send(cmd, yotta_tcp_queue_close_recv);
+    yotta_tcp_cmd_set_release(cmd, yotta_tcp_queue_close_release);
+
+    yotta_tcp_cmd_queue_append(cmd_queue, cmd);
 }
 
 void
