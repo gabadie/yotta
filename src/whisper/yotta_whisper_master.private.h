@@ -17,6 +17,10 @@ yotta_whisper_master_t;
  *
  * @param <master>: the master to initialize
  * @param <listening_port>: the master's listening port
+ *
+ * @returns:
+ *  == <0> if succeed
+ *  != <0> if failed
  */
 uint64_t
 yotta_whisper_master_init(yotta_whisper_master_t * master, uint16_t listening_port);
@@ -25,6 +29,10 @@ yotta_whisper_master_init(yotta_whisper_master_t * master, uint16_t listening_po
  * @infos: destroyes the whisper master
  *
  * @param <master>: the master to destroyes
+ *
+ * @returns:
+ *  == <0> if succeed
+ *  != <0> if failed
  */
 uint64_t
 yotta_whisper_master_destroy(yotta_whisper_master_t * master);
