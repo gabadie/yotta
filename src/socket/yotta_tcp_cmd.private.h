@@ -57,11 +57,19 @@ yotta_tcp_cmd_s
  * @param <socket_event>: the tcp command event
  * @param <function_ptr>: the function pointer
  */
-#define yotta_tcp_cmd_set_send(socket_event,function_ptr) \
-    ((yotta_tcp_cmd_t *) (socket_event))->send_event = (yotta_tcp_entry_t)(function_ptr)
+#define yotta_tcp_cmd_set_send(cmd,function_ptr) \
+    ((yotta_tcp_cmd_t *) (cmd))->send_event = (yotta_tcp_entry_t)(function_ptr)
 
-#define yotta_tcp_cmd_set_release(socket_event,function_ptr) \
-    ((yotta_tcp_cmd_t *) (socket_event))->release_event = (yotta_tcp_cmd_release_t)(function_ptr)
+#define yotta_tcp_cmd_set_release(cmd,function_ptr) \
+    ((yotta_tcp_cmd_t *) (cmd))->release_event = (yotta_tcp_cmd_release_t)(function_ptr)
+
+/*
+ * @infos: triggers the release event
+ *
+ * @param <socket_event>: the socket event
+ */
+#define yotta_tcp_cmd_release(cmd) \
+    ((yotta_tcp_cmd_t *) (cmd))->release_event(cmd)
 
 
 #endif
