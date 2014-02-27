@@ -1,7 +1,7 @@
 #ifndef _YOTTA_ADDRESS_TRANSLATION
 #define _YOTTA_ADDRESS_TRANSLATION
 
-#include "yotta_prefix.h"
+#include "../yotta_prefix.h"
 
 
 /*
