@@ -8,6 +8,7 @@ testlib_command.c
 testlib_file.c
 testlib_headers.sh
 testlib_logger.c
+testlib_memory.c
 testlib_slave.c
 testlib_socket.c
 testlib_socket_thread.c
