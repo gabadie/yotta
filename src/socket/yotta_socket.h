@@ -103,7 +103,7 @@ yotta_close_socket(yotta_socket_t * sock);
  *  != <0> if failed
  */
 #define yotta_socket_nonblock(socket) \
-    fcntl((socket)->fd, F_SETFL, O_NONBLOCK)
+    fcntl((socket)->fd, F_SETFL, fcntl((socket)->fd, F_GETFL, 0) | O_NONBLOCK)
 
 /*
  * @infos: switches socket mode to blocking mode
@@ -115,6 +115,6 @@ yotta_close_socket(yotta_socket_t * sock);
  *  != <0> if failed
  */
 #define yotta_socket_block(socket) \
-    fcntl((socket)->fd, F_SETFL, 0)
+    fcntl((socket)->fd, F_SETFL, fcntl((socket)->fd, F_GETFL, 0) & ~O_NONBLOCK)
 
 #endif //_YOTTA_SOCKET
