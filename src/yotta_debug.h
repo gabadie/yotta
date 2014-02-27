@@ -9,10 +9,23 @@
 
 
 /*
+ * @infos: generates a debug breakpoint when reached
+ */
+#ifdef YOTTA_DEBUG
+#define yotta_break_point() \
+    __builtin_trap()
+
+#else
+#define yotta_break_point()
+
+#endif
+
+/*
  * @infos: use yotta_crash instead
  */
 #define yotta_crash_definitly() \
     do { \
+        yotta_break_point(); \
         *((volatile int*) NULL) = 123; \
     } while (0)
 
