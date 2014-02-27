@@ -4,7 +4,7 @@
 #include <unistd.h>
 
 #include "yotta_socket_thread.h"
-#include "../yotta_debug.h"
+#include "../core/yotta_debug.h"
 #include "../core/yotta_return.h"
 #include "../core/yotta_logger.private.h"
 

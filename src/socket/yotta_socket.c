@@ -1,5 +1,5 @@
 #include "yotta_socket.h"
-#include "../yotta_debug.h"
+#include "../core/yotta_debug.h"
 #include "../utils/yotta_str_utils.h"
 
 #include <string.h>

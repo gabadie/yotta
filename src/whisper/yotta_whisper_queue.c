@@ -6,9 +6,9 @@
 #include "yotta_whisper_labels.private.h"
 #include "yotta_whisper_push.private.h"
 #include "../core/yotta_logger.private.h"
+#include "../core/yotta_debug.h"
 #include "../socket/yotta_tcp.h"
 #include "../socket/yotta_socket_thread.h"
-#include "../yotta_debug.h"
 
 
 /*

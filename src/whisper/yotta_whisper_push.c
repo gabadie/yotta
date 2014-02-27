@@ -1,9 +1,9 @@
 
 #include "yotta_whisper_push.private.h"
 #include "yotta_whisper_labels.private.h"
+#include "../core/yotta_debug.h"
 #include "../core/yotta_memory.h"
 #include "../socket/yotta_tcp.h"
-#include "../yotta_debug.h"
 
 
 void

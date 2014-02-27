@@ -1,8 +1,8 @@
 #include <string.h>
 #include <stdlib.h>
 
-#include "yotta_debug.h"
 #include "yotta_slave.private.h"
+#include "core/yotta_debug.h"
 #include "utils/yotta_str_utils.h"
 
 #define yotta_slave_assert_arguments(argument_count) \

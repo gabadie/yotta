@@ -1,7 +1,7 @@
 #ifndef _YOTTA_DEBUG
 #define _YOTTA_DEBUG
 
-#include "yotta_prefix.h"
+#include "../yotta_prefix.h"
 
 #ifdef YOTTA_DEBUG
 #include <stdio.h>
