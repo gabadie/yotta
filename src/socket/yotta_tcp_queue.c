@@ -127,7 +127,7 @@ yotta_tcp_queue_finish_send(yotta_tcp_cmd_t * cmd, yotta_tcp_queue_t * cmd_queue
 {
     (void) cmd;
 
-    yotta_socket_thread_unlisten(cmd_queue->socket_event.socket_thread, (yotta_socket_event_t *) cmd_queue);
+    yotta_socket_event_unlisten((yotta_socket_event_t *) cmd_queue);
 
     yotta_socket_event_release(cmd_queue);
 }

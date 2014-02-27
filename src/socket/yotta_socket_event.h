@@ -87,6 +87,15 @@ yotta_socket_event_s
     ((yotta_socket_event_t *) (socket_event))->release_event = (yotta_socket_entry_t)(function_ptr)
 
 /*
+ * @threadsafe
+ * @infos: unlistens socket events
+ *
+ * @param <socket_event>: the socket event
+ */
+void
+yotta_socket_event_unlisten(yotta_socket_event_t * socket_event);
+
+/*
  * @infos: triggers the release event
  *
  * @param <socket_event>: the socket event

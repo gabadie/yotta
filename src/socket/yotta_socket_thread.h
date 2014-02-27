@@ -46,20 +46,6 @@ uint64_t
 yotta_socket_thread_listen(yotta_socket_thread_t * thread, yotta_socket_event_t * socket_event);
 
 /*
- * @threadsafe
- * @infos: unlistens socket's events
- *
- * @param <thread>: the listening sockets's thread
- * @param <socket_event>: the socket event
- *
- * @returns:
- *  == <0> if succeed
- *  != <0> if failed
- */
-uint64_t
-yotta_socket_thread_unlisten(yotta_socket_thread_t * thread, yotta_socket_event_t * socket_event);
-
-/*
  * @infos: hang until all sockets are released and destroyes the sockets' thread
  *
  * @param <thread>: the sockets's thread to destroy

@@ -61,7 +61,7 @@ yotta_whisper_queue_recv(yotta_whisper_queue_t * cmd_queue)
         {
             // the socket has been closed properly on the other side
 
-            yotta_socket_thread_unlisten(cmd_queue->tcp_queue.socket_event.socket_thread, (yotta_socket_event_t *) cmd_queue);
+            yotta_socket_event_unlisten((yotta_socket_event_t *) cmd_queue);
             yotta_socket_event_release(cmd_queue);
 
             return;
@@ -90,6 +90,8 @@ void
 yotta_whisper_queue_except(yotta_whisper_queue_t * cmd_queue)
 {
     yotta_logger_error("yotta_whisper_queue_except: received a TCP socket exception -> releasing");
+
+    //yotta_socket_event_unlisten((yotta_socket_event_t *) cmd_queue);
 
     yotta_socket_event_release(cmd_queue);
 }
