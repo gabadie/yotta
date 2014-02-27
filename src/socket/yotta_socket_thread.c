@@ -166,7 +166,7 @@ yotta_socket_thread_main(yotta_socket_thread_t * thread)
             thread->current_socket = socket_it;
         }
 
-        yotta_assert(thread->current_socket == 0);
+        thread->current_socket = 0;
 
         pthread_mutex_unlock(&thread->mutex);
     }
