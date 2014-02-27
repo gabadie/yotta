@@ -1,9 +1,9 @@
 
 #include <string.h>
 
-//#include "testhelper_tcp_sockets.h"
-#include "testhelper_whisper.h"
 #include "testhelper_lorem.h"
+#include "testhelper_memory.h"
+#include "testhelper_whisper.h"
 #include "../src/whisper/yotta_whisper_push.private.h"
 #include "../src/whisper/yotta_whisper_labels.private.h"
 
@@ -196,12 +196,15 @@ test_whisper_push_stress()
 
     free(src_data);
     free(dest_data);
+
+    testhelper_memory_check();
 }
 
 int
 main()
 {
     testhelper_init();
+    testhelper_memory_setup();
 
     test_whisper_push_stress();
 
