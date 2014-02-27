@@ -1,10 +1,10 @@
 
 #include "yotta_whisper_master.private.h"
 #include "yotta_whisper_queue.private.h"
+#include "../core/yotta_logger.private.h"
 #include "../core/yotta_memory.h"
 #include "../socket/yotta_socket_thread.h"
 #include "../socket/yotta_tcp.h"
-#include "../yotta_logger.private.h"
 
 
 static

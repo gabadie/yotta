@@ -1,7 +1,7 @@
 #ifndef _YOTTA_LOGGER
 #define _YOTTA_LOGGER
 
-#include "yotta_prefix.h"
+#include "../yotta_prefix.h"
 
 
 /*

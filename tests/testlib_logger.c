@@ -1,8 +1,8 @@
 
 
 #include <mk_test.h>
-#include "../src/yotta_logger.h"
-#include "../src/yotta_logger.private.h"
+#include "../src/core/yotta_logger.h"
+#include "../src/core/yotta_logger.private.h"
 
 static yotta_log_msg_type_t g_msg_type;
 
