@@ -42,15 +42,6 @@ void
 yotta_tcp_queue_append(yotta_tcp_queue_t * cmd_queue, yotta_tcp_cmd_t * cmd);
 
 /*
- * @threadsafe
- * @infos: dequeues the first command
- *
- * @param <cmd_queue>: the command queue to dequeue
- */
-void
-yotta_tcp_cmd_dequeue(yotta_tcp_queue_t * cmd_queue);
-
-/*
  * @infos: async finish the TCP command queue after processing all comamnds
  *
  * @param <cmd_queue>: the command queue to close

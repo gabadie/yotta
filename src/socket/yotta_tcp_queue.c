@@ -68,7 +68,7 @@ yotta_tcp_queue_send(yotta_tcp_queue_t * cmd_queue)
 
     yotta_assert(cmd->send_event != 0);
 
-    cmd->send_event(cmd, cmd_queue);
+    cmd->send_event(cmd);
 }
 
 void
@@ -89,6 +89,9 @@ yotta_tcp_queue_append(yotta_tcp_queue_t * cmd_queue, yotta_tcp_cmd_t * cmd)
 {
     yotta_assert(cmd_queue != 0);
     yotta_assert(cmd != 0);
+    yotta_assert(cmd->queue == 0);
+
+    cmd->queue = cmd_queue;
 
     do // atomic commands stack pushing
     {
@@ -99,43 +102,26 @@ yotta_tcp_queue_append(yotta_tcp_queue_t * cmd_queue, yotta_tcp_cmd_t * cmd)
     yotta_socket_event_set_send(cmd_queue, yotta_tcp_queue_send);
 }
 
-void
-yotta_tcp_cmd_dequeue(yotta_tcp_queue_t * cmd_queue)
-{
-    yotta_assert(cmd_queue != 0);
-    yotta_assert(cmd_queue->queue_first != 0);
-
-    do // atomic command dequeuing
-    {
-        if (
-            __sync_bool_compare_and_swap(
-                &cmd_queue->queue_first,
-                cmd_queue->queue_first,
-                cmd_queue->queue_first->queue_next
-            )
-        )
-        {
-            break;
-        }
-    }
-    while (1);
-}
-
 static
 void
-yotta_tcp_queue_finish_send(yotta_tcp_cmd_t * cmd, yotta_tcp_queue_t * cmd_queue)
+yotta_tcp_queue_finish_send(yotta_tcp_cmd_t * cmd)
 {
-    (void) cmd;
+    yotta_assert(cmd != 0);
+    yotta_assert(yotta_tcp_cmd_queue(cmd));
 
-    yotta_socket_event_unlisten((yotta_socket_event_t *) cmd_queue);
+    yotta_socket_event_t * socket_event = (yotta_socket_event_t * )yotta_tcp_cmd_queue(cmd);
 
-    yotta_socket_event_release(cmd_queue);
+    yotta_socket_event_unlisten(socket_event);
+
+    yotta_socket_event_release(socket_event);
 }
 
 static
 void
 yotta_tcp_queue_finish_release(yotta_tcp_cmd_t * cmd)
 {
+    yotta_assert(cmd != 0);
+
     yotta_free(cmd);
 }
 
@@ -147,6 +133,7 @@ yotta_tcp_queue_finish(yotta_tcp_queue_t * cmd_queue)
 
     yotta_tcp_cmd_t * cmd = yotta_alloc_s(yotta_tcp_cmd_t);
 
+    yotta_tcp_cmd_init(cmd);
     yotta_tcp_cmd_set_send(cmd, yotta_tcp_queue_finish_send);
     yotta_tcp_cmd_set_release(cmd, yotta_tcp_queue_finish_release);
 

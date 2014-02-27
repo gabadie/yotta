@@ -106,14 +106,14 @@ yotta_whisper_push_cmd_t;
 
 static
 void
-yotta_whisper_push_send(yotta_whisper_push_cmd_t * cmd, yotta_tcp_queue_t * cmd_queue)
+yotta_whisper_push_send(yotta_whisper_push_cmd_t * cmd)
 {
     if (cmd->header_sent != sizeof(yotta_whisper_push_header_t))
     {
         ssize_t header_sending = sizeof(yotta_whisper_push_header_t) - cmd->header_sent;
 
         ssize_t header_sent = yotta_tcp_send(
-            (yotta_socket_t *) cmd_queue,
+            (yotta_socket_t *) yotta_tcp_cmd_queue(cmd),
             ((uint8_t *) &cmd->header) + cmd->header_sent,
             header_sending
         );
@@ -134,7 +134,7 @@ yotta_whisper_push_send(yotta_whisper_push_cmd_t * cmd, yotta_tcp_queue_t * cmd_
     ssize_t data_sending = cmd->header.data_size - cmd->data_sent;
 
     ssize_t data_sent = yotta_tcp_send(
-        (yotta_socket_t *) cmd_queue,
+        (yotta_socket_t *) yotta_tcp_cmd_queue(cmd),
         ((uint8_t *) cmd->data) + cmd->data_sent,
         data_sending
     );
@@ -148,7 +148,7 @@ yotta_whisper_push_send(yotta_whisper_push_cmd_t * cmd, yotta_tcp_queue_t * cmd_
 
     if (cmd->data_sent == cmd->header.data_size)
     {
-        yotta_tcp_cmd_dequeue(cmd_queue);
+        yotta_tcp_cmd_finish((yotta_tcp_cmd_t *) cmd);
         yotta_tcp_cmd_release(cmd);
     }
 }
@@ -175,6 +175,7 @@ yotta_whisper_push(
 
     yotta_whisper_push_cmd_t * cmd = yotta_alloc_s(yotta_whisper_push_cmd_t);
 
+    yotta_tcp_cmd_init(cmd);
     yotta_tcp_cmd_set_send(cmd, yotta_whisper_push_send);
     yotta_tcp_cmd_set_release(cmd, yotta_whisper_push_release);
 

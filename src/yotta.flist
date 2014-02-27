@@ -15,6 +15,7 @@ socket/yotta_socket_event.c
 socket/yotta_socket_prefix.c
 socket/yotta_socket_thread.c
 socket/yotta_tcp.c
+socket/yotta_tcp_cmd.c
 socket/yotta_tcp_queue.c
 socket/yotta_udp.c
 utils/yotta_file.c

@@ -23,17 +23,8 @@ yotta_tcp_queue_t;
  *
  * The tcp command entry received 2 parameters:
  *  - yotta_tcp_cmd_t cmd: the tcp_cmd
- *  - yotta_tcp_queue_t cmd_queue: the parrent cmd_queue
  */
-typedef void (*yotta_tcp_entry_t)(yotta_tcp_cmd_t *, yotta_tcp_queue_t *);
-
-/*
- * @infos: defines yotta tcp command entry point function pointer type
- *
- * The tcp command entry received 1 parameters:
- *  - yotta_tcp_cmd_t cmd: the tcp_cmd
- */
-typedef void (*yotta_tcp_cmd_release_t)(yotta_tcp_cmd_t *);
+typedef void (*yotta_tcp_cmd_entry_t)(yotta_tcp_cmd_t *);
 
 /*
  * @infos: defines a TCP command to be inherited
@@ -42,31 +33,63 @@ struct
 yotta_tcp_cmd_s
 {
     // the send event entry point
-    yotta_tcp_entry_t send_event;
+    yotta_tcp_cmd_entry_t send_event;
 
     // the release the tcp_cmd
-    yotta_tcp_cmd_release_t release_event;
+    yotta_tcp_cmd_entry_t release_event;
 
     // the next TCP command in the queue
     yotta_tcp_cmd_t * queue_next;
+
+    // the parent TCP command queue
+    yotta_tcp_queue_t * queue;
 };
+
+/*
+ * @infos: inits the TCP command
+ *
+ * @param <cmd>: the socket event
+ */
+#ifdef YOTTA_DEBUG
+#define yotta_tcp_cmd_init(cmd) \
+    ((yotta_tcp_cmd_t *) (cmd))->queue = 0
+
+#else
+#define yotta_tcp_cmd_init(cmd)
+
+#endif // YOTTA_DEBUG
 
 /*
  * @infos: sets TCP command's event entries
  *
- * @param <socket_event>: the tcp command event
+ * @param <cmd>: the tcp command
  * @param <function_ptr>: the function pointer
  */
 #define yotta_tcp_cmd_set_send(cmd,function_ptr) \
-    ((yotta_tcp_cmd_t *) (cmd))->send_event = (yotta_tcp_entry_t)(function_ptr)
+    ((yotta_tcp_cmd_t *) (cmd))->send_event = (yotta_tcp_cmd_entry_t)(function_ptr)
 
 #define yotta_tcp_cmd_set_release(cmd,function_ptr) \
-    ((yotta_tcp_cmd_t *) (cmd))->release_event = (yotta_tcp_cmd_release_t)(function_ptr)
+    ((yotta_tcp_cmd_t *) (cmd))->release_event = (yotta_tcp_cmd_entry_t)(function_ptr)
+
+/*
+ * @infos: gets command's queue
+ */
+#define yotta_tcp_cmd_queue(cmd) \
+    ((yotta_tcp_cmd_t *) (cmd))->queue
+
+/*
+ * @threadsafe
+ * @infos: finishes the command
+ *
+ * @param <cmd>: the command to finish
+ */
+void
+yotta_tcp_cmd_finish(yotta_tcp_cmd_t * cmd);
 
 /*
  * @infos: triggers the release event
  *
- * @param <socket_event>: the socket event
+ * @param <cmd>: the command to release
  */
 #define yotta_tcp_cmd_release(cmd) \
     ((yotta_tcp_cmd_t *) (cmd))->release_event((yotta_tcp_cmd_t *) (cmd))
