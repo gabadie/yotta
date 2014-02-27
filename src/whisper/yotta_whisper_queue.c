@@ -1,5 +1,6 @@
 
 #include <string.h>
+#include <errno.h>
 
 #include "yotta_whisper_queue.private.h"
 #include "yotta_whisper_labels.private.h"
@@ -52,6 +53,8 @@ yotta_whisper_queue_recv(yotta_whisper_queue_t * cmd_queue)
 
             cmd_queue->callback = yotta_whisper_label_entries[label];
 
+            yotta_assert(cmd_queue->callback != 0);
+
             continue;
         }
         else if (label_size == 0)
@@ -62,6 +65,16 @@ yotta_whisper_queue_recv(yotta_whisper_queue_t * cmd_queue)
             yotta_socket_event_release(cmd_queue);
 
             return;
+        }
+        else if (label_size == -1 && EAGAIN)
+        {
+            errno_t errno_recv = errno;
+
+            if (errno_recv == EAGAIN)
+            {
+                // no incomming information available
+                break;
+            }
         }
         else if (label_size == 1)
         {
