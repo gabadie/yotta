@@ -10,6 +10,7 @@ core/yotta_address_translation.c
 core/yotta_logger.c
 core/yotta_memory.c
 dictate/yotta_dictate_binary_send.c
+features/yotta_push.c
 socket/yotta_socket.c
 socket/yotta_socket_event.c
 socket/yotta_socket_prefix.c

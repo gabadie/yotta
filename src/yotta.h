@@ -11,6 +11,7 @@
 #include "core/yotta_memory.h"
 #include "core/yotta_return.h"
 #include "dictate/yotta_dictate_binary_send.h"
+#include "features/yotta_push.h"
 #include "socket/yotta_socket.h"
 #include "socket/yotta_tcp.h"
 #include "socket/yotta_udp.h"
