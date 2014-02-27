@@ -3,7 +3,7 @@
 
 #include "yotta_context.h"
 #include "yotta_debug.h"
-#include "yotta_return.private.h"
+#include "core/yotta_return.private.h"
 #include "dictate/yotta_dictate_binary_send.h"
 #include "socket/yotta_socket.h"
 

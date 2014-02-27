@@ -2,7 +2,7 @@
 #include <string.h>
 
 #include "yotta_command.h"
-#include "yotta_return.private.h"
+#include "core/yotta_return.private.h"
 
 
 uint64_t

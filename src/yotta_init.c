@@ -1,10 +1,9 @@
 #include <string.h>
 #include <stdlib.h>
 
-#include "yotta_return.h"
 #include "yotta_init.h"
 #include "yotta_slave.private.h"
-#include "yotta_return.private.h"
+#include "core/yotta_return.private.h"
 #include "socket/yotta_socket_prefix.h"
 
 char const *

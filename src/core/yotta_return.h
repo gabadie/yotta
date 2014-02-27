@@ -1,7 +1,7 @@
 #ifndef _YOTTA_RETURN
 #define _YOTTA_RETURN
 
-#include "yotta_prefix.h"
+#include "../yotta_prefix.h"
 
 
 /*

@@ -2,8 +2,8 @@
 #define _YOTTAPRIVATE_RETURN
 
 #include "yotta_return.h"
-#include "yotta_debug.h"
-#include "core/yotta_logger.private.h"
+#include "../yotta_debug.h"
+#include "yotta_logger.private.h"
 
 
 /*

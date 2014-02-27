@@ -2,7 +2,7 @@
 #include <stdlib.h>
 
 #include "yotta_memory.h"
-#include "../yotta_return.private.h"
+#include "yotta_return.private.h"
 
 
 static
