@@ -8,6 +8,7 @@ yotta_context.c
 yotta_init.c
 yotta_logger.c
 yotta_slave.c
+core/yotta_memory.c
 dictate/yotta_dictate_binary_send.c
 socket/yotta_socket.c
 socket/yotta_socket_prefix.c
