@@ -22,7 +22,7 @@ yotta_whisper_label_entries[YOTTA_WHISPER_LABELS_COUNT] =
 {
     0,
     0,
-    (yotta_whisper_recv_t) yotta_whisper_entry_push
+    (yotta_whisper_recv_t) yotta_whisper_push_master_recv
 };
 
 static
@@ -81,7 +81,7 @@ yotta_whisper_queue_recv(yotta_whisper_queue_t * cmd_queue)
             yotta_todo("unsupported troncated label");
         }
 
-        yotta_crash_msg("select error");
+        yotta_crash_msg("receive error");
     }
 }
 
@@ -90,8 +90,6 @@ void
 yotta_whisper_queue_except(yotta_whisper_queue_t * cmd_queue)
 {
     yotta_logger_error("yotta_whisper_queue_except: received a TCP socket exception -> releasing");
-
-    //yotta_socket_event_unlisten((yotta_socket_event_t *) cmd_queue);
 
     yotta_socket_event_release(cmd_queue);
 }

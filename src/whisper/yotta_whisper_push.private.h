@@ -26,7 +26,7 @@ yotta_whisper_push(
  * @params: see yotta_whisper_recv_t in yotta_whisper_queue.private.h
  */
 void
-yotta_whisper_entry_push(
+yotta_whisper_push_master_recv(
     yotta_whisper_queue_t * cmd_queue
 );
 
