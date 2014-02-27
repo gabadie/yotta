@@ -1,8 +1,8 @@
 
 #include "yotta_tcp_queue.private.h"
 #include "yotta_socket_thread.h"
+#include "../core/yotta_memory.h"
 #include "../yotta_debug.h"
-#include "../yotta_memory.h"
 
 
 static
