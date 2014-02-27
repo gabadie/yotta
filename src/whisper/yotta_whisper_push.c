@@ -87,7 +87,7 @@ yotta_whisper_push_master_recv(
 typedef struct
 yotta_whisper_push_header_s
 {
-    uint16_t label;
+    yotta_whisper_label_t label;
     uint64_t master_address;
     uint64_t data_size;
 } __attribute__((packed))

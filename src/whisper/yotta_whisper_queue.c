@@ -29,6 +29,8 @@ static
 void
 yotta_whisper_queue_recv(yotta_whisper_queue_t * cmd_queue)
 {
+    yotta_assert(cmd_queue != 0);
+
     while (1)
     {
         if (cmd_queue->callback != 0)
@@ -42,7 +44,7 @@ yotta_whisper_queue_recv(yotta_whisper_queue_t * cmd_queue)
             }
         }
 
-        uint16_t label = 0;
+        yotta_whisper_label_t label = 0;
 
         ssize_t label_size = yotta_tcp_recv(&cmd_queue->tcp_queue.socket_event.socket, &label, sizeof(label));
 
@@ -76,10 +78,6 @@ yotta_whisper_queue_recv(yotta_whisper_queue_t * cmd_queue)
                 break;
             }
         }
-        else if (label_size == 1)
-        {
-            yotta_todo("unsupported troncated label");
-        }
 
         yotta_crash_msg("receive error");
     }
@@ -89,6 +87,8 @@ static
 void
 yotta_whisper_queue_except(yotta_whisper_queue_t * cmd_queue)
 {
+    yotta_assert(cmd_queue != 0);
+
     yotta_logger_error("yotta_whisper_queue_except: received a TCP socket exception -> releasing");
 
     yotta_socket_event_release(cmd_queue);
@@ -97,6 +97,10 @@ yotta_whisper_queue_except(yotta_whisper_queue_t * cmd_queue)
 void
 yotta_whisper_queue_init(yotta_whisper_queue_t * cmd_queue)
 {
+    yotta_assert(cmd_queue != 0);
+    yotta_assert(YOTTA_WHISPER_LABELS_COUNT <= sizeof(yotta_whisper_label_t) * 8);
+    yotta_assert(sizeof(yotta_whisper_label_t) == 1);
+
     yotta_tcp_queue_init((yotta_tcp_queue_t *) cmd_queue);
     yotta_socket_event_set_recv(cmd_queue, yotta_whisper_queue_recv);
     yotta_socket_event_set_except(cmd_queue, yotta_whisper_queue_except);
@@ -109,5 +113,7 @@ yotta_whisper_queue_init(yotta_whisper_queue_t * cmd_queue)
 void
 yotta_whisper_queue_destroy(yotta_whisper_queue_t * cmd_queue)
 {
+    yotta_assert(cmd_queue != 0);
+
     yotta_tcp_queue_destroy((yotta_tcp_queue_t *) cmd_queue);
 }
