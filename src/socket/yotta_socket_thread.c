@@ -21,6 +21,7 @@ void *
 yotta_socket_thread_main(yotta_socket_thread_t * thread)
 {
     yotta_assert(thread != 0);
+    yotta_assert(thread->current_socket == 0);
 
     fd_set fd_set_recv;
     fd_set fd_set_send;
@@ -84,25 +85,18 @@ yotta_socket_thread_main(yotta_socket_thread_t * thread)
 
         pthread_mutex_lock(&thread->mutex);
 
-        yotta_socket_event_t * socket_cursor = thread->socket_head;
+        yotta_socket_event_t * socket_it = thread->socket_head;
+        thread->current_socket = socket_it;
 
-        while (event_counts != 0 && socket_cursor != 0)
+        while (event_counts != 0 && socket_it != 0)
         {
-            yotta_socket_event_t * socket_event = socket_cursor;
-
-            /*
-             * we move to the next socket event because the current one might be
-             * destroyed in the exception callback
-             */
-            socket_cursor = socket_cursor->socket_next;
-
-            int32_t fd = (int32_t)socket_event->socket.fd;
+            int32_t fd = (int32_t)socket_it->socket.fd;
 
             pthread_mutex_unlock(&thread->mutex);
 
             if (FD_ISSET(fd, &fd_set_except))
             {
-                socket_event->except_event(socket_event);
+                socket_it->except_event(socket_it);
                 event_counts -= 1;
 
                 if (FD_ISSET(fd, &fd_set_recv))
@@ -116,23 +110,63 @@ yotta_socket_thread_main(yotta_socket_thread_t * thread)
                 }
 
                 pthread_mutex_lock(&thread->mutex);
+
+                /*
+                 * Makes sure that the iterator has been changed because of its
+                 * suicide
+                 */
+                yotta_assert(thread->current_socket != socket_it);
+
+                socket_it = thread->current_socket;
+
                 continue;
             }
 
             if (FD_ISSET(fd, &fd_set_recv))
             {
-                socket_event->recv_event(socket_event);
+                socket_it->recv_event(socket_it);
                 event_counts -= 1;
+
+                /*
+                 * Checks if the iterator has been changed because of a suicide
+                 * in the receive event.
+                 */
+                if (thread->current_socket != socket_it)
+                {
+                    pthread_mutex_lock(&thread->mutex);
+
+                    socket_it = thread->current_socket;
+
+                    continue;
+                }
             }
 
             if (FD_ISSET(fd, &fd_set_send))
             {
-                socket_event->send_event(socket_event);
+                socket_it->send_event(socket_it);
                 event_counts -= 1;
+
+                /*
+                 * Checks if the iterator has been changed because of a suicide
+                 * in the receive event.
+                 */
+                if (thread->current_socket != socket_it)
+                {
+                    pthread_mutex_lock(&thread->mutex);
+
+                    socket_it = thread->current_socket;
+
+                    continue;
+                }
             }
 
             pthread_mutex_lock(&thread->mutex);
+
+            socket_it = socket_it->socket_next;
+            thread->current_socket = socket_it;
         }
+
+        yotta_assert(thread->current_socket == 0);
 
         pthread_mutex_unlock(&thread->mutex);
     }
@@ -146,6 +180,7 @@ yotta_socket_thread_init(yotta_socket_thread_t * thread)
     yotta_assert(thread != 0);
 
     thread->socket_head = 0;
+    thread->current_socket = 0;
     thread->quit_status = YOTTA_SOCKET_THREAD_CONTINUE;
 
     if (pthread_mutex_init(&thread->mutex, 0) != 0)
@@ -202,6 +237,18 @@ yotta_socket_thread_unlisten(yotta_socket_thread_t * thread, yotta_socket_event_
         }
 
         *parent_ptr = socket_event->socket_next;
+
+        if (thread->current_socket != 0)
+        {
+            /*
+             * the socket thread might be currently working on excatly on this
+             * socket event. In this case, we have to change it's iterator
+             */
+            if (thread->current_socket == socket_event)
+            {
+                thread->current_socket = socket_event->socket_next;
+            }
+        }
     }
     pthread_mutex_unlock(&thread->mutex);
 

@@ -16,6 +16,7 @@ yotta_socket_thread_s
     pthread_mutex_t mutex;
     uint64_t quit_status;
     yotta_socket_event_t * socket_head;
+    yotta_socket_event_t * current_socket;
 } yotta_socket_thread_t;
 
 /*
