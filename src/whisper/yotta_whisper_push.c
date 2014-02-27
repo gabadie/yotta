@@ -185,5 +185,5 @@ yotta_whisper_push(
     cmd->data = data;
     cmd->data_sent = 0;
 
-    yotta_tcp_queue_append(cmd_queue, cmd);
+    yotta_tcp_queue_append((yotta_tcp_queue_t *) cmd_queue, (yotta_tcp_cmd_t *) cmd);
 }

@@ -69,7 +69,7 @@ yotta_tcp_cmd_s
  * @param <socket_event>: the socket event
  */
 #define yotta_tcp_cmd_release(cmd) \
-    ((yotta_tcp_cmd_t *) (cmd))->release_event(cmd)
+    ((yotta_tcp_cmd_t *) (cmd))->release_event((yotta_tcp_cmd_t *) (cmd))
 
 
 #endif

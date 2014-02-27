@@ -1,7 +1,7 @@
 
 #include <string.h>
 
-#include "testhelper_tcp_sockets.h"
+//#include "testhelper_tcp_sockets.h"
 #include "testhelper_whisper.h"
 #include "testhelper_lorem.h"
 #include "../src/whisper/yotta_whisper_push.private.h"
