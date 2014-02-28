@@ -3,7 +3,6 @@
 #include "yotta_whisper_labels.private.h"
 #include "../core/yotta_debug.h"
 #include "../core/yotta_memory.h"
-#include "../socket/yotta_tcp.h"
 
 
 void
