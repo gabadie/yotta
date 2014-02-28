@@ -28,59 +28,42 @@ yotta_whisper_push_master_recv(
     {
         // we are receiving the push's header
 
-        uint64_t header_remaining = sizeof(uint64_t) * 2 - buffer->header_received;
-        uint64_t header_received = yotta_tcp_recv(
-            &cmd_queue->tcp_queue.socket_event.socket,
-            ((uint8_t *) &buffer->data_address) + buffer->header_received,
-            header_remaining
+        uint64_t op = yotta_tcp_queue_recv(
+            (yotta_tcp_queue_t *) cmd_queue,
+            sizeof(uint64_t) * 2,
+            &buffer->header_received,
+            &buffer->data_address
         );
 
-        if (header_received == -1ull)
+        if (op != 0)
         {
             return;
         }
+    }
 
-        buffer->header_received += header_received;
+    {
+        // we are receiving the push's data
 
-        if (buffer->header_received < sizeof(uint64_t) * 2)
+        uint64_t op = yotta_tcp_queue_recv(
+            (yotta_tcp_queue_t *) cmd_queue,
+            buffer->data_size,
+            &buffer->data_cursor,
+            (void *) buffer->data_address
+        );
+
+        if (op != 0)
         {
             return;
         }
-
-        // we don't need to init the data_cursor as zero because the tmp buffer is null at the begining
-        //buffer->data_cursor = 0;
     }
 
-    // we are receiving the push's data
+    // we clean up the tmp buffer
+    buffer->header_received = 0;
+    buffer->data_address = 0;
+    buffer->data_size = 0;
+    buffer->data_cursor = 0;
 
-    void * dest = (void *)(buffer->data_address + buffer->data_cursor);
-    uint64_t data_remaining = buffer->data_size - buffer->data_cursor;
-
-    uint64_t data_received = yotta_tcp_recv(
-        &cmd_queue->tcp_queue.socket_event.socket,
-        dest,
-        data_remaining
-    );
-
-    if (data_received == -1ull)
-    {
-        return;
-    }
-
-    buffer->data_cursor += data_received;
-
-    if (buffer->data_cursor == buffer->data_size)
-    {
-        // we clean up the tmp buffer
-        buffer->header_received = 0;
-        buffer->data_address = 0;
-        buffer->data_size = 0;
-        buffer->data_cursor = 0;
-
-        yotta_whisper_queue_finish(cmd_queue);
-
-        return;
-    }
+    yotta_whisper_queue_finish(cmd_queue);
 }
 
 

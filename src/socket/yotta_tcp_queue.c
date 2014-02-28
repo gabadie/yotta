@@ -1,4 +1,5 @@
 
+#include "yotta_tcp.h"
 #include "yotta_tcp_queue.private.h"
 #include "yotta_socket_thread.h"
 #include "../core/yotta_debug.h"
@@ -100,6 +101,34 @@ yotta_tcp_queue_append(yotta_tcp_queue_t * cmd_queue, yotta_tcp_cmd_t * cmd)
     while (!__sync_bool_compare_and_swap(&cmd_queue->queue_stack, cmd->queue_next, cmd));
 
     yotta_socket_event_set_send(cmd_queue, yotta_tcp_queue_send);
+}
+
+uint64_t
+yotta_tcp_queue_recv(yotta_tcp_queue_t * cmd_queue, uint64_t buffer_size, uint64_t * buffer_cursor, void * buffer)
+{
+    yotta_assert(cmd_queue != 0);
+    yotta_assert(buffer_size != 0);
+    yotta_assert(buffer_cursor != 0);
+    yotta_assert(buffer != 0);
+
+    ssize_t buffer_receiving = buffer_size - *buffer_cursor;
+
+    ssize_t buffer_received = yotta_tcp_recv(
+        (yotta_socket_t *) cmd_queue,
+        ((uint8_t *) buffer) + *buffer_cursor,
+        buffer_receiving
+    );
+
+    if (buffer_received == -1)
+    {
+        return 1;
+    }
+
+    *buffer_cursor += (uint64_t)buffer_received;
+
+    yotta_assert(*buffer_cursor <= buffer_size);
+
+    return *buffer_cursor != buffer_size;
 }
 
 static

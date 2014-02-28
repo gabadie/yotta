@@ -42,6 +42,21 @@ void
 yotta_tcp_queue_append(yotta_tcp_queue_t * cmd_queue, yotta_tcp_cmd_t * cmd);
 
 /*
+ * @infos: receives the buffer through the TCP command's queue
+ *
+ * @param <cmd_queue>: the TCP command queue
+ * @param <buffer_size>: the buffer's size to send
+ * @param <buffer_cursor>: the buffer's sending cursor
+ * @param <buffer>: the buffer to send
+ *
+ * @returns
+ *  - <0> when *buffer_cursor == buffer_size
+ *  - <1> if *buffer_cursor < buffer_size
+ */
+uint64_t
+yotta_tcp_queue_recv(yotta_tcp_queue_t * cmd_queue, uint64_t buffer_size, uint64_t * buffer_cursor, void * buffer);
+
+/*
  * @infos: async finish the TCP command queue after processing all comamnds
  *
  * @param <cmd_queue>: the command queue to close
