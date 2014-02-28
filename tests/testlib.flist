@@ -13,5 +13,5 @@ testlib_slave.c
 testlib_socket.c
 testlib_socket_thread.c
 testlib_str_utils.c
+testlib_whisper_fetch.c
 testlib_whisper_push.c
-#testlib_context.c
