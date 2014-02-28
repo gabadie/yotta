@@ -50,6 +50,20 @@ void
 yotta_whisper_queue_init(yotta_whisper_queue_t * cmd_queue);
 
 /*
+ * @infos: connects a whisper command queue to a whisper master
+ *
+ * @param <cmd_queue>: the command queue to connect to
+ * @param <ip>: the whisper master' ip
+ * @param <port>: the whisper master' port
+ *
+ * @returns:
+ *  == <0> if succeed
+ *  != <0> if failed
+ */
+uint64_t
+yotta_whisper_queue_connect(yotta_whisper_queue_t * cmd_queue, char const * ip, uint16_t port);
+
+/*
  * @infos: destroyes a whisper command queue
  *
  * @param <cmd_queue>: the command queue to destroy
