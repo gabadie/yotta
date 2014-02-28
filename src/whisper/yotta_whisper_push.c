@@ -5,6 +5,89 @@
 #include "../core/yotta_memory.h"
 
 
+/*
+ * @infos: defines a push command
+ */
+typedef struct
+yotta_whisper_push_cmd_s
+{
+    // the TCP command inheritance
+    yotta_tcp_cmd_t abstract_cmd;
+
+    // the header
+    uint64_t header_cursor;
+    struct
+    {
+        yotta_whisper_label_t label;
+        uint64_t master_address;
+        uint64_t data_size;
+    } __attribute__((packed))
+    header;
+
+    // the data
+    uint64_t data_cursor;
+    void const * data;
+}
+yotta_whisper_push_cmd_t;
+
+
+/*
+ * @infos: yotta_whisper_push__cmd_t's release event
+ */
+static
+void
+yotta_whisper_push_release(yotta_tcp_cmd_t * cmd)
+{
+    yotta_free(cmd);
+}
+
+/*
+ * @infos: yotta_whisper_fetch_request_cmd_t's send event
+ */
+static
+void
+yotta_whisper_push_send(yotta_whisper_push_cmd_t * cmd)
+{
+    yotta_assert(cmd != 0);
+    yotta_assert(cmd->abstract_cmd.queue != 0);
+
+    if (cmd->header_cursor != sizeof(cmd->header))
+    {
+        // send push's header
+
+        uint64_t op = yotta_tcp_cmd_send(
+            (yotta_tcp_cmd_t *) cmd,
+            sizeof(cmd->header),
+            &cmd->header_cursor,
+            &cmd->header
+        );
+
+        if (op != 0)
+        {
+            return;
+        }
+    }
+
+    {
+        // send push's data
+
+        uint64_t op = yotta_tcp_cmd_send(
+            (yotta_tcp_cmd_t *) cmd,
+            cmd->header.data_size,
+            &cmd->data_cursor,
+            cmd->data
+        );
+
+        if (op != 0)
+        {
+            return;
+        }
+    }
+
+    yotta_tcp_cmd_finish((yotta_tcp_cmd_t *) cmd);
+    yotta_tcp_cmd_release(cmd);
+}
+
 void
 yotta_whisper_push_master_recv(
     yotta_whisper_queue_t * cmd_queue
@@ -70,77 +153,6 @@ yotta_whisper_push_master_recv(
     buffer->data_cursor = 0;
 
     yotta_whisper_queue_finish(cmd_queue);
-}
-
-
-typedef struct
-yotta_whisper_push_cmd_s
-{
-    yotta_tcp_cmd_t abstract_cmd;
-
-    uint64_t header_cursor;
-    struct
-    {
-        yotta_whisper_label_t label;
-        uint64_t master_address;
-        uint64_t data_size;
-    } __attribute__((packed))
-    header;
-
-    uint64_t data_cursor;
-    void const * data;
-}
-yotta_whisper_push_cmd_t;
-
-static
-void
-yotta_whisper_push_send(yotta_whisper_push_cmd_t * cmd)
-{
-    yotta_assert(cmd != 0);
-    yotta_assert(cmd->abstract_cmd.queue != 0);
-
-    if (cmd->header_cursor != sizeof(cmd->header))
-    {
-        // send push's header
-
-        uint64_t op = yotta_tcp_cmd_send(
-            (yotta_tcp_cmd_t *) cmd,
-            sizeof(cmd->header),
-            &cmd->header_cursor,
-            &cmd->header
-        );
-
-        if (op != 0)
-        {
-            return;
-        }
-    }
-
-    {
-        // send push's data
-
-        uint64_t op = yotta_tcp_cmd_send(
-            (yotta_tcp_cmd_t *) cmd,
-            cmd->header.data_size,
-            &cmd->data_cursor,
-            cmd->data
-        );
-
-        if (op != 0)
-        {
-            return;
-        }
-    }
-
-    yotta_tcp_cmd_finish((yotta_tcp_cmd_t *) cmd);
-    yotta_tcp_cmd_release(cmd);
-}
-
-static
-void
-yotta_whisper_push_release(yotta_tcp_cmd_t * cmd)
-{
-    yotta_free(cmd);
 }
 
 void
