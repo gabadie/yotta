@@ -15,10 +15,10 @@
  *
  * @param <sync>: sync object to initialize
  */
-#define yotta_sync_init(yotta_sync_t * sync) \
+#define yotta_sync_init(yotta_sync) \
     { \
-        yotta_assert((sync) != NULL); \
-        (sync)->sem = YOTTA_SYNC_UNTRIGGERED; \
+        yotta_assert((yotta_sync) != NULL); \
+        (yotta_sync)->sem = YOTTA_SYNC_UNTRIGGERED; \
     }
 
 /*
