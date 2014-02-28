@@ -91,6 +91,8 @@ yotta_whisper_queue_except(yotta_whisper_queue_t * cmd_queue)
 
     yotta_logger_error("yotta_whisper_queue_except: received a TCP socket exception -> releasing");
 
+    yotta_socket_event_unlisten((yotta_socket_event_t *) cmd_queue);
+
     yotta_socket_event_release(cmd_queue);
 }
 

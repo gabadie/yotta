@@ -173,6 +173,7 @@ void
 yotta_tcp_queue_destroy(yotta_tcp_queue_t * cmd_queue)
 {
     yotta_assert(cmd_queue != 0);
+    yotta_assert(cmd_queue->socket_event.socket_thread == 0);
 
     while (cmd_queue->queue_first)
     {
