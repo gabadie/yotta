@@ -11,6 +11,8 @@ yotta_whisper_push_master_recv(
     yotta_whisper_queue_t * cmd_queue
 )
 {
+    yotta_assert(cmd_queue != 0);
+
     typedef struct
     yotta_whisper_buffer_s
     {
@@ -91,6 +93,9 @@ static
 void
 yotta_whisper_push_send(yotta_whisper_push_cmd_t * cmd)
 {
+    yotta_assert(cmd != 0);
+    yotta_assert(cmd->abstract_cmd.queue != 0);
+
     if (cmd->header_sent != sizeof(yotta_whisper_push_header_t))
     {
         // send push's header
