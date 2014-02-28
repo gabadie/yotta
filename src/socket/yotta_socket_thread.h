@@ -70,18 +70,4 @@ uint64_t
 yotta_socket_thread_kill(yotta_socket_thread_t * thread);
 
 
-
-
-typedef void * (*yotta_thread_func_t)(void *);
-typedef void * restrict yotta_thread_args_t;
-
-// TODO(@tcantenot): comments
-uint64_t
-yotta_socket_thread_plumbing_init(yotta_socket_thread_t * thread,
-    yotta_thread_func_t func, yotta_thread_args_t args);
-
-// TODO(@tcantenot): comments
-uint64_t
-yotta_socket_thread_join(yotta_socket_thread_t * thread);
-
 #endif //_YOTTA_SOCKET_THREAD
