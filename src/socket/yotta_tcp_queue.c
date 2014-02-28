@@ -82,6 +82,12 @@ yotta_tcp_queue_init(yotta_tcp_queue_t * cmd_queue)
     yotta_socket_event_init(cmd_queue);
     yotta_socket_event_set_send(cmd_queue, 0);
 
+#ifdef YOTTA_DEBUG
+    yotta_socket_event_set_recv(cmd_queue, 0);
+    yotta_socket_event_set_except(cmd_queue, 0);
+    yotta_socket_event_set_release(cmd_queue, 0);
+#endif // YOTTA_DEBUG
+
     cmd_queue->queue_first = 0;
     cmd_queue->queue_stack = 0;
 }
@@ -92,6 +98,8 @@ yotta_tcp_queue_append(yotta_tcp_queue_t * cmd_queue, yotta_tcp_cmd_t * cmd)
     yotta_assert(cmd_queue != 0);
     yotta_assert(cmd != 0);
     yotta_assert(cmd->queue == 0);
+    yotta_assert(cmd->release_event != 0);
+    yotta_assert(cmd->send_event != 0);
 
     cmd->queue = cmd_queue;
 

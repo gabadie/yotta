@@ -46,20 +46,6 @@ yotta_tcp_cmd_s
 };
 
 /*
- * @infos: inits the TCP command
- *
- * @param <cmd>: the socket event
- */
-#ifdef YOTTA_DEBUG
-#define yotta_tcp_cmd_init(cmd) \
-    ((yotta_tcp_cmd_t *) (cmd))->queue = 0
-
-#else
-#define yotta_tcp_cmd_init(cmd)
-
-#endif // YOTTA_DEBUG
-
-/*
  * @infos: sets TCP command's event entries
  *
  * @param <cmd>: the tcp command
@@ -70,6 +56,24 @@ yotta_tcp_cmd_s
 
 #define yotta_tcp_cmd_set_release(cmd,function_ptr) \
     ((yotta_tcp_cmd_t *) (cmd))->release_event = (yotta_tcp_cmd_entry_t)(function_ptr)
+
+/*
+ * @infos: inits the TCP command
+ *
+ * @param <cmd>: the socket event
+ */
+#ifdef YOTTA_DEBUG
+#define yotta_tcp_cmd_init(cmd) \
+    {\
+        ((yotta_tcp_cmd_t *) (cmd))->queue = 0; \
+        yotta_tcp_cmd_set_send(cmd, 0); \
+        yotta_tcp_cmd_set_release(cmd, 0); \
+    }
+
+#else
+#define yotta_tcp_cmd_init(cmd)
+
+#endif // YOTTA_DEBUG
 
 /*
  * @infos: gets command's queue
