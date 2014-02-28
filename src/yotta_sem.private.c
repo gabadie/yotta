@@ -1,10 +1,11 @@
 #include <string.h>
 #include <pthread.h>
 
-#include "yotta_sem.h"
-#include "yotta_memory.h"
-#include "yotta_return.h"
-#include "yotta_logger.private.h"
+#include "core/yotta_debug.h"
+#include "core/yotta_logger.private.h"
+#include "core/yotta_memory.h"
+#include "core/yotta_return.h"
+#include "yotta_sem.private.h"
 
 #define YOTTA_SEM_CHUNK_SIZE 64
 
@@ -49,31 +50,31 @@ yotta_sem_fetch(sem_t ** out_sem)
     pthread_mutex_lock(&sem_pool_lock);
 
     {
-        int sem_found = 0;
-        int chunk_idx = 0;
-        yotta_sem_t * current_chunk = sem_pool;
+        uint8_t sem_found = 0;
+        uint64_t chunk_idx = 0;
+        yotta_sem_t ** current_chunk = &sem_pool;
 
         while(!sem_found)
         {
             // If the current chunk is empty, we allocate a new one
-            if(current_chunk == NULL)
+            if(*current_chunk == NULL)
             {
-                current_chunk = yotta_alloc_s(yotta_sem_t);
-                memset(current_chunk, 0, sizeof(yotta_sem_t));
+                *current_chunk = yotta_alloc_s(yotta_sem_t);
+                memset(*current_chunk, 0, sizeof(yotta_sem_t));
             }
 
-            if(!yotta_sem_all_used(current_chunk))
+            if(!yotta_sem_all_used(*current_chunk))
             {
                 // We search for the first free semaphore
                 for(int i = 0; i < YOTTA_SEM_CHUNK_SIZE; i++)
                 {
                     // Skip if the semaphore is currently in use
-                    if(yotta_sem_used(sem_pool, i))
+                    if(yotta_sem_used(*current_chunk, i))
                     {
                         continue;
                     }
 
-                    sem_t * free_sem = &current_chunk->sem[i];
+                    sem_t * free_sem = &(*current_chunk)->sem[i];
 
                     // If the free semphore has not been initialized, ...
                     if((chunk_idx * YOTTA_SEM_CHUNK_SIZE + i) >= sem_count)
@@ -88,14 +89,15 @@ yotta_sem_fetch(sem_t ** out_sem)
                         sem_count++;
                     }
 
-                    current_chunk->used |= i;
+
+                    (*current_chunk)->used |= i;
                     *out_sem = free_sem;
                     sem_found = 1;
                     break;
                 }
             }
 
-            current_chunk = current_chunk->next;
+            current_chunk = &(*current_chunk)->next;
             chunk_idx++;
         }
     }
@@ -109,11 +111,11 @@ void
 yotta_sem_release(sem_t * sem)
 {
     yotta_assert(sem != NULL);
+    yotta_assert(sem_pool != NULL);
 
     pthread_mutex_lock(&sem_pool_lock);
 
     {
-        int sem_found = 0;
         yotta_sem_t * current_chunk = sem_pool;
 
         while(current_chunk != NULL)
@@ -125,6 +127,7 @@ yotta_sem_release(sem_t * sem)
                 {
                     current_chunk->used &= ~(1 << i);
                     pthread_mutex_unlock(&sem_pool_lock);
+                    return;
                 }
             }
 
