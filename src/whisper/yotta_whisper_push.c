@@ -15,9 +15,14 @@ yotta_whisper_push_master_recv(
     typedef struct
     yotta_whisper_buffer_s
     {
-        uint64_t header_received;
-        uint64_t data_address;
-        uint64_t data_size;
+        uint64_t header_cursor;
+        struct
+        {
+            uint64_t data_address;
+            uint64_t data_size;
+        }
+        header;
+
         uint64_t data_cursor;
     }
     yotta_whisper_buffer_t;
@@ -25,15 +30,15 @@ yotta_whisper_push_master_recv(
     yotta_whisper_buffer_t * buffer =
         yotta_whisper_queue_recv_buffer(cmd_queue, yotta_whisper_buffer_t);
 
-    if (buffer->header_received < sizeof(uint64_t) * 2)
+    if (buffer->header_cursor < sizeof(buffer->header))
     {
         // we are receiving the push's header
 
         uint64_t op = yotta_tcp_queue_recv(
             (yotta_tcp_queue_t *) cmd_queue,
-            sizeof(uint64_t) * 2,
-            &buffer->header_received,
-            &buffer->data_address
+            sizeof(buffer->header),
+            &buffer->header_cursor,
+            &buffer->header
         );
 
         if (op != 0)
@@ -47,9 +52,9 @@ yotta_whisper_push_master_recv(
 
         uint64_t op = yotta_tcp_queue_recv(
             (yotta_tcp_queue_t *) cmd_queue,
-            buffer->data_size,
+            buffer->header.data_size,
             &buffer->data_cursor,
-            (void *) buffer->data_address
+            (void *) buffer->header.data_address
         );
 
         if (op != 0)
@@ -59,9 +64,9 @@ yotta_whisper_push_master_recv(
     }
 
     // we clean up the tmp buffer
-    buffer->header_received = 0;
-    buffer->data_address = 0;
-    buffer->data_size = 0;
+    buffer->header_cursor = 0;
+    buffer->header.data_address = 0;
+    buffer->header.data_size = 0;
     buffer->data_cursor = 0;
 
     yotta_whisper_queue_finish(cmd_queue);
@@ -69,22 +74,21 @@ yotta_whisper_push_master_recv(
 
 
 typedef struct
-yotta_whisper_push_header_s
-{
-    yotta_whisper_label_t label;
-    uint64_t master_address;
-    uint64_t data_size;
-} __attribute__((packed))
-yotta_whisper_push_header_t;
-
-typedef struct
 yotta_whisper_push_cmd_s
 {
     yotta_tcp_cmd_t abstract_cmd;
-    yotta_whisper_push_header_t header;
-    uint64_t header_sent;
+
+    uint64_t header_cursor;
+    struct
+    {
+        yotta_whisper_label_t label;
+        uint64_t master_address;
+        uint64_t data_size;
+    } __attribute__((packed))
+    header;
+
+    uint64_t data_cursor;
     void const * data;
-    uint64_t data_sent;
 }
 yotta_whisper_push_cmd_t;
 
@@ -95,14 +99,14 @@ yotta_whisper_push_send(yotta_whisper_push_cmd_t * cmd)
     yotta_assert(cmd != 0);
     yotta_assert(cmd->abstract_cmd.queue != 0);
 
-    if (cmd->header_sent != sizeof(yotta_whisper_push_header_t))
+    if (cmd->header_cursor != sizeof(cmd->header))
     {
         // send push's header
 
         uint64_t op = yotta_tcp_cmd_send(
             (yotta_tcp_cmd_t *) cmd,
-            sizeof(yotta_whisper_push_header_t),
-            &cmd->header_sent,
+            sizeof(cmd->header),
+            &cmd->header_cursor,
             &cmd->header
         );
 
@@ -118,7 +122,7 @@ yotta_whisper_push_send(yotta_whisper_push_cmd_t * cmd)
         uint64_t op = yotta_tcp_cmd_send(
             (yotta_tcp_cmd_t *) cmd,
             cmd->header.data_size,
-            &cmd->data_sent,
+            &cmd->data_cursor,
             cmd->data
         );
 
@@ -158,12 +162,12 @@ yotta_whisper_push(
     yotta_tcp_cmd_set_send(cmd, yotta_whisper_push_send);
     yotta_tcp_cmd_set_release(cmd, yotta_whisper_push_release);
 
+    cmd->header_cursor = 0;
     cmd->header.label = YOTTA_WHISPER_MEM_PUSH;
     cmd->header.master_address = master_address;
     cmd->header.data_size = data_size;
-    cmd->header_sent = 0;
+    cmd->data_cursor = 0;
     cmd->data = data;
-    cmd->data_sent = 0;
 
     yotta_tcp_queue_append((yotta_tcp_queue_t *) cmd_queue, (yotta_tcp_cmd_t *) cmd);
 }
