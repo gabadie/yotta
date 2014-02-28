@@ -78,6 +78,21 @@ yotta_tcp_cmd_s
     ((yotta_tcp_cmd_t *) (cmd))->queue
 
 /*
+ * @infos: sends the buffer through the TCP command's queue
+ *
+ * @param <cmd>: the TCP command
+ * @param <buffer_size>: the buffer's size to send
+ * @param <buffer_cursor>: the buffer's sending cursor
+ * @param <buffer>: the buffer to send
+ *
+ * @returns
+ *  - <0> when *buffer_cursor == buffer_size
+ *  - <1> if *buffer_cursor < buffer_size
+ */
+uint64_t
+yotta_tcp_cmd_send(yotta_tcp_cmd_t * cmd, uint64_t buffer_size, uint64_t * buffer_cursor, void const * buffer);
+
+/*
  * @threadsafe
  * @infos: finishes the command
  *

@@ -110,47 +110,39 @@ yotta_whisper_push_send(yotta_whisper_push_cmd_t * cmd)
 {
     if (cmd->header_sent != sizeof(yotta_whisper_push_header_t))
     {
-        ssize_t header_sending = sizeof(yotta_whisper_push_header_t) - cmd->header_sent;
+        // send push's header
 
-        ssize_t header_sent = yotta_tcp_send(
-            (yotta_socket_t *) yotta_tcp_cmd_queue(cmd),
-            ((uint8_t *) &cmd->header) + cmd->header_sent,
-            header_sending
+        uint64_t op = yotta_tcp_cmd_send(
+            (yotta_tcp_cmd_t *) cmd,
+            sizeof(yotta_whisper_push_header_t),
+            &cmd->header_sent,
+            &cmd->header
         );
 
-        if (header_sent == -1)
-        {
-            return;
-        }
-
-        cmd->header_sent += (uint64_t)header_sending;
-
-        if (cmd->header_sent != sizeof(yotta_whisper_push_header_t))
+        if (op != 0)
         {
             return;
         }
     }
 
-    ssize_t data_sending = cmd->header.data_size - cmd->data_sent;
-
-    ssize_t data_sent = yotta_tcp_send(
-        (yotta_socket_t *) yotta_tcp_cmd_queue(cmd),
-        ((uint8_t *) cmd->data) + cmd->data_sent,
-        data_sending
-    );
-
-    if (data_sent == -1)
     {
-        return;
+        // send push's data
+
+        uint64_t op = yotta_tcp_cmd_send(
+            (yotta_tcp_cmd_t *) cmd,
+            cmd->header.data_size,
+            &cmd->data_sent,
+            cmd->data
+        );
+
+        if (op != 0)
+        {
+            return;
+        }
     }
 
-    cmd->data_sent += (uint64_t)data_sent;
-
-    if (cmd->data_sent == cmd->header.data_size)
-    {
-        yotta_tcp_cmd_finish((yotta_tcp_cmd_t *) cmd);
-        yotta_tcp_cmd_release(cmd);
-    }
+    yotta_tcp_cmd_finish((yotta_tcp_cmd_t *) cmd);
+    yotta_tcp_cmd_release(cmd);
 }
 
 static
