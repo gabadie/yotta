@@ -6,6 +6,8 @@ yotta_command.c
 yotta_context.c
 yotta_init.c
 yotta_slave.c
+yotta_sync.c
+yotta_sem.private.c
 core/yotta_address_translation.c
 core/yotta_logger.c
 core/yotta_memory.c
