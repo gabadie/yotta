@@ -1,7 +1,6 @@
 
 #include <string.h>
 
-#include "testhelper_lorem.h"
 #include "testhelper_memory.h"
 #include "testhelper_whisper.h"
 #include "../src/whisper/yotta_whisper_push.private.h"

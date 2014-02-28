@@ -2,6 +2,7 @@
 #define _HELPER_WHISPER
 
 #include "testhelper_init.h"
+#include "testhelper_lorem.h"
 #include "../src/socket/yotta_socket_thread.h"
 #include "../src/whisper/yotta_whisper_queue.private.h"
 
@@ -33,6 +34,9 @@ testhelper_whisper_protocol_init(testhelper_whisper_protocol_t * testing_protoco
 {
     static uint16_t PORT = 8001;
     static int32_t const BACKLOG = 16;
+
+    // put some dirty content before to make sure there is no forgotten initialization
+    testhelper_lorem(testing_protocol, sizeof(testhelper_whisper_protocol_t));
 
     yotta_socket_t listening_socket;
 

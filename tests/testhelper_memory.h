@@ -2,6 +2,7 @@
 #define _HELPER_MEMORY
 
 #include "testhelper_init.h"
+#include "testhelper_lorem.h"
 
 
 /*
@@ -45,6 +46,9 @@ testhelper_memory_alloc(void * user_data, size_t size)
     memory->coins = 1;
 
     __sync_fetch_and_add(&testhelper_alloc_count, 1);
+
+    // put some dirty content before to make sure there is no forgotten initialization
+    testhelper_lorem(memory + 1, size);
 
     return memory;
 }
