@@ -83,6 +83,7 @@ yotta_tcp_queue_init(yotta_tcp_queue_t * cmd_queue)
     yotta_socket_event_set_send(cmd_queue, 0);
 
     cmd_queue->queue_first = 0;
+    cmd_queue->queue_stack = 0;
 }
 
 void
