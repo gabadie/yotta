@@ -64,17 +64,6 @@ yotta_slave_parse_parameters(yotta_slave_parameters_t * out_parameters, uint64_t
 
             argv += 2;
         }
-        else if (strcmp(param_name, "massive-function-offset") == 0)
-        {
-            yotta_slave_assert_arguments(1);
-
-            if (yotta_str_dec_to_ui64(&out_parameters->massive_function_offset, argv[1]) != 0)
-            {
-                yotta_slave_invalide_value();
-            }
-
-            argv += 2;
-        }
         else
         {
             return -1;
@@ -89,11 +78,11 @@ yotta_slave_parse_parameters(yotta_slave_parameters_t * out_parameters, uint64_t
 uint64_t
 yotta_slave_main(yotta_slave_parameters_t const * out_parameters)
 {
-    if (out_parameters->client_ip == 0)
-    {
-        yotta_crash_msg("missing client ip");
-        return -1;
-    }
+    yotta_assert(out_parameters != 0);
+    yotta_assert(out_parameters->client_ip != 0);
+    yotta_assert(out_parameters->client_port != 0);
+
+    (void) out_parameters;
 
     return 0;
 }

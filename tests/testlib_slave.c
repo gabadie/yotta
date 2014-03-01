@@ -44,16 +44,6 @@ test_slave_parse_parameters()
 
     {
         char const * const argv[] = {
-            "--yotta-massive-function-offset",
-            "8000"
-        };
-
-        test_assert(yotta_slave_parse_parameters(&parameters, 2, argv) == 0);
-        test_assert(parameters.massive_function_offset == 8000);
-    }
-
-    {
-        char const * const argv[] = {
             "--yotta-hello",
             "8000"
         };
