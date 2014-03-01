@@ -80,7 +80,7 @@ yotta_sem_fetch(sem_t ** out_sem)
                     if((chunk_idx * YOTTA_SEM_CHUNK_SIZE + i) >= sem_count)
                     {
                         // ... we initialize it
-                        if(sem_init(free_sem, 0, 1) == -1)
+                        if(sem_init(free_sem, 0, 0) == -1)
                         {
                             yotta_logger_error("sem_init failed\n");
                             pthread_mutex_unlock(&sem_pool_lock);
