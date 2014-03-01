@@ -2,7 +2,6 @@
 # List of the library's tests
 #
 
-testlib_01_compilation.c
 testlib_address_translation.c
 testlib_command.c
 testlib_file.c
