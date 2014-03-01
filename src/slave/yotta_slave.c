@@ -74,15 +74,3 @@ yotta_slave_parse_parameters(yotta_slave_parameters_t * out_parameters, uint64_t
 
     return 0;
 }
-
-uint64_t
-yotta_slave_main(yotta_slave_parameters_t const * out_parameters)
-{
-    yotta_assert(out_parameters != 0);
-    yotta_assert(out_parameters->client_ip != 0);
-    yotta_assert(out_parameters->client_port != 0);
-
-    (void) out_parameters;
-
-    return 0;
-}

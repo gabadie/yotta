@@ -5,7 +5,7 @@
 
 
 /*
- * @infos: yotta command parameters
+ * @infos: yotta slave parameters
  */
 typedef struct
 yotta_slave_parameters_s
@@ -33,17 +33,5 @@ yotta_slave_parameters_s
 // static: for testing (in ../tests/testlib_init.c)
 uint64_t
 yotta_slave_parse_parameters(yotta_slave_parameters_t * out_parameters, uint64_t argc, char const * const * argv);
-
-/*
- * @infos: Slave launching called if the --yotta parameters is given to yotta_init()
- *
- * @param <out_parameters>: yotta's slave parameters parsed by yotta_slave_parse_parameters()
- *
- * @returns:
- *  == <0> if succed
- *  != <0> if failed
- */
-uint64_t
-yotta_slave_main(yotta_slave_parameters_t const * out_parameters);
 
 #endif
