@@ -9,6 +9,10 @@
  * @infos: get a POSIX semaphore from a semaphore pool
  *
  * @param <out_sem>: retrieved POSIX semaphore
+ *
+ * @returns:
+ *  == <0> if succeed
+ *  != <0> if failed
  */
 uint64_t
 yotta_sem_fetch(sem_t ** out_sem);
