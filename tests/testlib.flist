@@ -16,4 +16,5 @@ testlib_str_utils.c
 testlib_sync.c
 testlib_whisper_fetch.c
 testlib_whisper_push.c
+testlib_sem_pool.c
 #testlib_context.c
