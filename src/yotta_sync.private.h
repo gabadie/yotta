@@ -5,9 +5,10 @@
 #include "core/yotta_debug.h"
 
 // The yotta sync object has not been triggered
-#define YOTTA_SYNC_UNTRIGGERED 0
+#define YOTTA_SYNC_UNTRIGGERED ((void *) 0)
+
 // The semaphore of the sync object has been triggered
-#define YOTTA_SYNC_TRIGGERED -1
+#define YOTTA_SYNC_TRIGGERED ((void *) -1)
 
 
 /*
