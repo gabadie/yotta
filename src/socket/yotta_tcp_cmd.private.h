@@ -65,6 +65,7 @@ yotta_tcp_cmd_s
 #ifdef YOTTA_DEBUG
 #define yotta_tcp_cmd_init(cmd) \
     {\
+        yotta_dirty_s((yotta_tcp_cmd_t *) (cmd)); \
         ((yotta_tcp_cmd_t *) (cmd))->queue = 0; \
         yotta_tcp_cmd_set_send(cmd, 0); \
         yotta_tcp_cmd_set_release(cmd, 0); \

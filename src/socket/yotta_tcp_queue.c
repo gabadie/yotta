@@ -77,6 +77,12 @@ yotta_tcp_queue_init(yotta_tcp_queue_t * cmd_queue)
 {
     yotta_assert(cmd_queue != 0);
 
+    yotta_dirty_offset(
+        cmd_queue,
+        sizeof(cmd_queue->socket_event),
+        sizeof(*cmd_queue) - sizeof(cmd_queue->socket_event)
+    );
+
     yotta_socket_nonblock((yotta_socket_t *) cmd_queue);
 
     yotta_socket_event_init(cmd_queue);

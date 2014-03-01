@@ -5,6 +5,10 @@
 
 #ifdef YOTTA_DEBUG
 #include <stdio.h>
+#include <string.h>
+
+#define YOTTA_DEBUG_DIRTY
+
 #endif
 
 
@@ -129,6 +133,40 @@
 #else
 #define yotta_not_implemented_yet
 #endif
+
+/*
+ * @infos: soils a memory block
+ *
+ * @param <dest>: the memory block to soil
+ * @param <size>: the memory block's size
+ *
+ */
+#ifdef YOTTA_DEBUG_DIRTY
+#define yotta_dirty(dest,size) \
+    memset((dest), 0xFF, (size))
+
+#else
+#define yotta_dirty(dest,size)
+
+#endif
+
+/*
+ * @infos: soils a memory block by its pointing type
+ *
+ * @param <dest>: the memory block to soil
+ * @param <offset>: the offset memory block's
+ * @param <size>: the memory block's size
+ */
+#define yotta_dirty_offset(dest,offset,size) \
+    yotta_dirty(((uint8_t *) (dest)) + (offset), (size))
+
+/*
+ * @infos: soils a memory block by its pointing type
+ *
+ * @param <dest>: the memory block to soil
+ */
+#define yotta_dirty_s(dest) \
+    yotta_dirty((dest), sizeof(*(dest)))
 
 /*
  * @infos: log a message

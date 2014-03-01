@@ -1,6 +1,10 @@
 
 #include <stdlib.h>
 
+#ifdef YOTTA_DEBUG_DIRTY
+#include <string.h>
+#endif
+
 #include "yotta_memory.h"
 #include "yotta_return.private.h"
 
@@ -47,6 +51,10 @@ yotta_alloc(size_t size)
     yotta_assert(memory->free_function != 0);
     yotta_assert(memory->size == size);
     yotta_assert(memory->coins == 1);
+
+#ifdef YOTTA_DEBUG_DIRTY
+    memset(memory + 1, 0xFE, size);
+#endif
 
     return memory + 1;
 }

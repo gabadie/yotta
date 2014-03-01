@@ -32,6 +32,8 @@ yotta_whisper_master_recv(yotta_whisper_master_t * master)
 
     yotta_whisper_queue_t * cmd_queue = yotta_alloc_s(yotta_whisper_queue_t);
 
+    yotta_dirty_s(cmd_queue);
+
     if (yotta_accept_socket(&master->socket, &slave_socket) != 0)
     {
         yotta_logger_debug("yotta_whisper_master_recv: connection has failed");
@@ -63,6 +65,8 @@ uint64_t
 yotta_whisper_master_init(yotta_whisper_master_t * master, uint16_t listening_port)
 {
     yotta_assert(master != 0);
+
+    yotta_dirty_s(master);
 
     if (yotta_tcp_socket_server(&master->socket, listening_port) != 0)
     {

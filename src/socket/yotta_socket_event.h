@@ -61,7 +61,12 @@ yotta_socket_event_s
  */
 #ifdef YOTTA_DEBUG
 #define yotta_socket_event_init(socket_event) \
-    ((yotta_socket_event_t *) (socket_event))->socket_thread = 0;
+    yotta_dirty_offset( \
+        socket_event, \
+        sizeof(yotta_socket_t), \
+        sizeof(yotta_socket_event_t) - sizeof(yotta_socket_t) \
+    ); \
+    ((yotta_socket_event_t *) (socket_event))->socket_thread = 0 \
 
 #else
 #define yotta_socket_event_init(socket_event)

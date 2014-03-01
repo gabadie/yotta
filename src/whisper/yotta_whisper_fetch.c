@@ -191,6 +191,8 @@ yotta_whisper_fetch_request_recv(
         yotta_whisper_fetch_answer_cmd_t * cmd =
             yotta_alloc_s(yotta_whisper_fetch_answer_cmd_t);
 
+        yotta_dirty_s(cmd);
+
         yotta_tcp_cmd_init(cmd);
         yotta_tcp_cmd_set_send(cmd, yotta_whisper_fetch_answer_send);
         yotta_tcp_cmd_set_release(cmd, yotta_whisper_fetch_release);
@@ -299,6 +301,8 @@ yotta_whisper_fetch(
 
     yotta_whisper_fetch_request_cmd_t * cmd =
         yotta_alloc_s(yotta_whisper_fetch_request_cmd_t);
+
+    yotta_dirty_s(cmd);
 
     yotta_tcp_cmd_init(cmd);
     yotta_tcp_cmd_set_send(cmd, yotta_whisper_fetch_request_send);

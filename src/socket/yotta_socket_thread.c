@@ -179,6 +179,8 @@ yotta_socket_thread_init(yotta_socket_thread_t * thread)
 {
     yotta_assert(thread != 0);
 
+    yotta_dirty_s(thread);
+
     thread->socket_head = 0;
     thread->current_socket = 0;
     thread->quit_status = YOTTA_SOCKET_THREAD_CONTINUE;
