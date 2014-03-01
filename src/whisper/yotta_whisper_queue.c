@@ -4,6 +4,7 @@
 
 #include "yotta_whisper_queue.private.h"
 #include "yotta_whisper_labels.private.h"
+#include "yotta_whisper_command.private.h"
 #include "yotta_whisper_fetch.private.h"
 #include "yotta_whisper_push.private.h"
 #include "../core/yotta_logger.private.h"
@@ -21,6 +22,8 @@ static
 yotta_whisper_recv_t const
 yotta_whisper_label_entries[YOTTA_WHISPER_LABELS_COUNT] =
 {
+    (yotta_whisper_recv_t) yotta_whisper_command_feedback_recv,
+    (yotta_whisper_recv_t) yotta_whisper_command_order_recv,
     (yotta_whisper_recv_t) yotta_whisper_fetch_answer_recv,
     (yotta_whisper_recv_t) yotta_whisper_fetch_request_recv,
     (yotta_whisper_recv_t) yotta_whisper_push_master_recv
