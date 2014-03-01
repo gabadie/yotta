@@ -5,7 +5,6 @@
 yotta_command.c
 yotta_context.c
 yotta_init.c
-yotta_slave.c
 yotta_sync.c
 yotta_sem.private.c
 core/yotta_address_translation.c
@@ -13,6 +12,7 @@ core/yotta_logger.c
 core/yotta_memory.c
 dictate/yotta_dictate_binary_send.c
 features/yotta_push.c
+slave/yotta_slave.c
 socket/yotta_socket.c
 socket/yotta_socket_event.c
 socket/yotta_socket_prefix.c

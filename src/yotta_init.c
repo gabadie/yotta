@@ -2,8 +2,8 @@
 #include <stdlib.h>
 
 #include "yotta_init.h"
-#include "yotta_slave.private.h"
 #include "core/yotta_return.private.h"
+#include "slave/yotta_slave.private.h"
 #include "socket/yotta_socket_prefix.h"
 
 char const *

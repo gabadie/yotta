@@ -2,7 +2,7 @@
 
 #include <string.h>
 #include "testhelper_init.h"
-#include "../src/yotta_slave.private.h"
+#include "../src/slave/yotta_slave.private.h"
 
 void
 test_slave_parse_parameters()
