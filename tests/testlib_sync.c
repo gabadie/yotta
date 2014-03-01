@@ -8,32 +8,31 @@
 
 sem_t synchro;
 
-void * producer_func(void * s)
+void producer_func(void * s)
 {
     yotta_sync_t * yotta_sync = (yotta_sync_t *) s;
 
     yotta_sync_init(yotta_sync);
 
-    yotta_assert(yotta_sync->sem == (sem_t *) YOTTA_SYNC_UNTRIGGERED);
+    test_assert(yotta_sync->sem == (sem_t *) YOTTA_SYNC_UNTRIGGERED);
 
     sem_post(&synchro);
 
-    yotta_assert(yotta_sync_wait(yotta_sync) == YOTTA_SUCCESS);
+    test_assert(yotta_sync_wait(yotta_sync) == YOTTA_SUCCESS);
 
-    yotta_assert(yotta_sync->sem == (sem_t *) YOTTA_SYNC_TRIGGERED);
-
-    return NULL;
+    test_assert(yotta_sync->sem == (sem_t *) YOTTA_SYNC_TRIGGERED);
 }
 
-void * consumer_func(void * s)
+void consumer_func(void * s)
 {
     sem_wait(&synchro);
+
+    // To "ensure" that the yotta_sync_post happens after the yotta_sync_wait
+    sleep(1);
 
     yotta_sync_t * yotta_sync = (yotta_sync_t *) s;
 
     yotta_sync_post(yotta_sync);
-
-    return NULL;
 }
 
 void test_post_wait()
@@ -45,15 +44,15 @@ void test_post_wait()
     // GCC output: warning: the comparison will always evaluate as ‘true’ for the address of ‘yotta_sync’ will never be NULL [-Waddress]
     yotta_sync_init(&yotta_sync);
 
-    yotta_assert(yotta_sync.sem == (sem_t *) YOTTA_SYNC_UNTRIGGERED);
+    test_assert(yotta_sync.sem == (sem_t *) YOTTA_SYNC_UNTRIGGERED);
 
     yotta_sync_post(&yotta_sync);
 
-    yotta_assert(yotta_sync.sem == (sem_t *) YOTTA_SYNC_TRIGGERED);
+    test_assert(yotta_sync.sem == (sem_t *) YOTTA_SYNC_TRIGGERED);
 
-    yotta_assert(yotta_sync_wait(&yotta_sync) == YOTTA_SUCCESS);
+    test_assert(yotta_sync_wait(&yotta_sync) == YOTTA_SUCCESS);
 
-    yotta_assert(yotta_sync.sem == (sem_t *) YOTTA_SYNC_TRIGGERED);
+    test_assert(yotta_sync.sem == (sem_t *) YOTTA_SYNC_TRIGGERED);
 }
 
 void test_wait_post()
@@ -65,8 +64,8 @@ void test_wait_post()
 
     yotta_sync_t yotta_sync;
 
-    pthread_create(&producer, NULL, producer_func, (void *) &yotta_sync);
-    pthread_create(&consumer, NULL, consumer_func, (void *) &yotta_sync);
+    pthread_create(&producer, NULL, (void *) producer_func, (void *) &yotta_sync);
+    pthread_create(&consumer, NULL, (void *) consumer_func, (void *) &yotta_sync);
 
     pthread_join(consumer, NULL);
     pthread_join(producer, NULL);
@@ -83,18 +82,18 @@ void test_post_post_wait()
     // GCC output: warning: the comparison will always evaluate as ‘true’ for the address of ‘yotta_sync’ will never be NULL [-Waddress]
     yotta_sync_init(&yotta_sync);
 
-    yotta_assert(yotta_sync.sem == (sem_t *) YOTTA_SYNC_UNTRIGGERED);
+    test_assert(yotta_sync.sem == (sem_t *) YOTTA_SYNC_UNTRIGGERED);
 
     //TODO: not handled yet -> assert failure
     yotta_sync_post(&yotta_sync);
     yotta_sync_post(&yotta_sync);
     yotta_sync_post(&yotta_sync);
 
-    yotta_assert(yotta_sync.sem == (sem_t *) YOTTA_SYNC_TRIGGERED);
+    test_assert(yotta_sync.sem == (sem_t *) YOTTA_SYNC_TRIGGERED);
 
-    yotta_assert(yotta_sync_wait(&yotta_sync) == YOTTA_SUCCESS);
+    test_assert(yotta_sync_wait(&yotta_sync) == YOTTA_SUCCESS);
 
-    yotta_assert(yotta_sync.sem == (sem_t *) YOTTA_SYNC_TRIGGERED);
+    test_assert(yotta_sync.sem == (sem_t *) YOTTA_SYNC_TRIGGERED);
 }
 
 int main()
