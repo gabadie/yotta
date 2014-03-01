@@ -6,9 +6,11 @@
 #include <semaphore.h>
 
 
-sem_t synchro;
+sem_t
+synchro;
 
-void producer_func(void * s)
+void
+producer_func(void * s)
 {
     yotta_sync_t * yotta_sync = (yotta_sync_t *) s;
 
@@ -23,7 +25,8 @@ void producer_func(void * s)
     /*test_assert(yotta_sync->sem == (sem_t *) YOTTA_SYNC_TRIGGERED);*/
 }
 
-void consumer_func(void * s)
+void
+consumer_func(void * s)
 {
     sem_wait(&synchro);
 
@@ -35,7 +38,8 @@ void consumer_func(void * s)
     yotta_sync_post(yotta_sync);
 }
 
-void test_post_wait()
+void
+test_post_wait()
 {
     yotta_sync_t yotta_sync;
 
@@ -55,7 +59,8 @@ void test_post_wait()
     test_assert(yotta_sync.sem == (sem_t *) YOTTA_SYNC_TRIGGERED);
 }
 
-void test_wait_post()
+void
+test_wait_post()
 {
     sem_init(&synchro, 0, 0);
 
@@ -73,7 +78,8 @@ void test_wait_post()
     sem_destroy(&synchro);
 }
 
-void test_post_post_wait()
+void
+test_post_post_wait()
 {
     yotta_sync_t yotta_sync;
 
@@ -96,7 +102,8 @@ void test_post_post_wait()
     test_assert(yotta_sync.sem == (sem_t *) YOTTA_SYNC_TRIGGERED);
 }
 
-int main()
+int
+main()
 {
     /*test_post_wait();*/
     test_wait_post();
