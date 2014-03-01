@@ -6,12 +6,12 @@ ifneq ($(config),debug)
     config=release
 endif
 
-PROJECT_CFLAGS := -Wall -Wextra -std=gnu11
+PROJECT_CFLAGS := -Wall -Wextra -std=gnu11 -m64
 PROJECT_LDFLAGS := -lpthread
 
 # ------------------------------------------------------------ release configuration
 ifeq ($(config),release)
-    PROJECT_CFLAGS += -O3 -Werror
+    PROJECT_CFLAGS += -O3 -Werror -mmmx -mavx2
 endif
 
 # ------------------------------------------------------------ debug configuration
