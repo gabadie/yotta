@@ -5,6 +5,7 @@
 #include "yotta_sem.private.h"
 #include "yotta_sync.h"
 #include "yotta_sync.private.h"
+#include "core/yotta_logger.private.h"
 
 void
 yotta_sync_post(yotta_sync_t * sync)
@@ -15,6 +16,10 @@ yotta_sync_post(yotta_sync_t * sync)
     if(!__sync_bool_compare_and_swap(&sync->sem, YOTTA_SYNC_UNTRIGGERED, YOTTA_SYNC_TRIGGERED))
     {
         sem_post(sync->sem);
+        if(!__sync_bool_compare_and_swap(&sync->sem, sync->sem, YOTTA_SYNC_TRIGGERED))
+        {
+            yotta_crash_msg("Semaphore post race issue");
+        }
     }
 }
 
