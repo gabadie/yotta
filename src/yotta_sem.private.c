@@ -113,6 +113,12 @@ yotta_sem_release(sem_t * sem)
     yotta_assert(sem != NULL);
     yotta_assert(sem_pool != NULL);
 
+    #ifdef YOTTA_DEBUG
+    int waiting_threads = 42;
+    sem_getvalue(sem, &waiting_threads);
+    yotta_assert(waiting_threads == 0);
+    #endif
+
     pthread_mutex_lock(&sem_pool_lock);
 
     {
@@ -126,6 +132,7 @@ yotta_sem_release(sem_t * sem)
                 if(sem == &current_chunk->sem[i])
                 {
                     current_chunk->used &= ~(1 << i);
+                    sem_init(sem, 0, 0); // Reinitialize semaphore
                     pthread_mutex_unlock(&sem_pool_lock);
                     return;
                 }
