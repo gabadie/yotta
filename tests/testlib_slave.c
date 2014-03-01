@@ -2,7 +2,7 @@
 
 #include <string.h>
 #include "testhelper_init.h"
-#include "../src/yotta_slave.private.h"
+#include "../src/slave/yotta_slave.private.h"
 
 void
 test_slave_parse_parameters()
@@ -40,16 +40,6 @@ test_slave_parse_parameters()
         };
 
         test_assert(yotta_slave_parse_parameters(&parameters, 2, argv) == -1ull);
-    }
-
-    {
-        char const * const argv[] = {
-            "--yotta-massive-function-offset",
-            "8000"
-        };
-
-        test_assert(yotta_slave_parse_parameters(&parameters, 2, argv) == 0);
-        test_assert(parameters.massive_function_offset == 8000);
     }
 
     {
