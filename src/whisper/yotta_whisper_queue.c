@@ -71,7 +71,7 @@ yotta_whisper_queue_recv(yotta_whisper_queue_t * cmd_queue)
         }
         else if (label_size == -1)
         {
-            errno_t errno_recv = errno;
+            int32_t errno_recv = errno;
 
             if (errno_recv == EAGAIN)
             {

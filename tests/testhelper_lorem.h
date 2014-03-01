@@ -2,6 +2,7 @@
 #define _TESTHELPER_LOREM
 
 #include <stdlib.h>
+#include <stdint.h>
 
 
 static
