@@ -3,12 +3,12 @@
 
 #include "testhelper_memory.h"
 #include "testhelper_whisper.h"
-#include "../src/whisper/yotta_whisper_push.private.h"
+#include "../src/whisper/yotta_whisper_fetch.private.h"
 
 
 static
 void
-test_whisper_push_stress()
+test_whisper_fetch_stress()
 {
     static uint64_t const data_size = 1024 * 1024;
     testhelper_whisper_protocol_t protocol;
@@ -19,7 +19,10 @@ test_whisper_push_stress()
     testhelper_whisper_protocol_init(&protocol);
     testhelper_lorem(src_data, data_size);
 
-    yotta_whisper_push(&protocol.queue0, (uint64_t) dest_data, data_size, src_data);
+    yotta_whisper_fetch(&protocol.queue1, (uint64_t) src_data, data_size, dest_data);
+
+    // TODO: Implements yotta_sync_t for determinisme
+    sleep(1);
 
     testhelper_whisper_protocol_destroy(&protocol);
 
@@ -37,7 +40,7 @@ main()
     testhelper_init();
     testhelper_memory_setup();
 
-    test_whisper_push_stress();
+    test_whisper_fetch_stress();
 
     return 0;
 }

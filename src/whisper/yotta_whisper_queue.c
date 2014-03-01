@@ -4,6 +4,7 @@
 
 #include "yotta_whisper_queue.private.h"
 #include "yotta_whisper_labels.private.h"
+#include "yotta_whisper_fetch.private.h"
 #include "yotta_whisper_push.private.h"
 #include "../core/yotta_logger.private.h"
 #include "../core/yotta_debug.h"
@@ -20,8 +21,8 @@ static
 yotta_whisper_recv_t const
 yotta_whisper_label_entries[YOTTA_WHISPER_LABELS_COUNT] =
 {
-    0,
-    0,
+    (yotta_whisper_recv_t) yotta_whisper_fetch_answer_recv,
+    (yotta_whisper_recv_t) yotta_whisper_fetch_request_recv,
     (yotta_whisper_recv_t) yotta_whisper_push_master_recv
 };
 
@@ -91,6 +92,8 @@ yotta_whisper_queue_except(yotta_whisper_queue_t * cmd_queue)
 
     yotta_logger_error("yotta_whisper_queue_except: received a TCP socket exception -> releasing");
 
+    yotta_socket_event_unlisten((yotta_socket_event_t *) cmd_queue);
+
     yotta_socket_event_release(cmd_queue);
 }
 
@@ -108,6 +111,19 @@ yotta_whisper_queue_init(yotta_whisper_queue_t * cmd_queue)
     cmd_queue->callback = 0;
 
     memset(&cmd_queue->recv_buffer, 0, YOTTA_WHISPER_RECV_BUFFER_SIZE);
+}
+
+uint64_t
+yotta_whisper_queue_connect(yotta_whisper_queue_t * cmd_queue, char const * ip, uint16_t port)
+{
+    if (yotta_tcp_socket_client((yotta_socket_t *) cmd_queue, ip, port) != 0)
+    {
+        return -1;
+    }
+
+    yotta_whisper_queue_init(cmd_queue);
+
+    return 0;
 }
 
 void

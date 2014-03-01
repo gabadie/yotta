@@ -255,34 +255,14 @@ yotta_socket_thread_kill(yotta_socket_thread_t * thread)
 
         thread->socket_head = socket_event->socket_next;
 
+#ifdef YOTTA_DEBUG
+        socket_event->socket_thread = 0;
+#endif
+
         yotta_socket_event_release(socket_event);
     }
 
     pthread_mutex_destroy(&thread->mutex);
 
     return 0;
-}
-
-
-
-uint64_t
-yotta_socket_thread_plumbing_init(yotta_socket_thread_t * thread,
-    yotta_thread_func_t func, yotta_thread_args_t args)
-{
-    yotta_assert(thread != NULL);
-    yotta_assert(func != NULL);
-
-    pthread_create(&thread->id, NULL, func, args);
-
-    return YOTTA_SUCCESS;
-}
-
-uint64_t
-yotta_socket_thread_join(yotta_socket_thread_t * thread)
-{
-    yotta_assert(thread != NULL);
-
-    pthread_join(thread->id, NULL);
-
-    return YOTTA_SUCCESS;
 }

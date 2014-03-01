@@ -23,6 +23,7 @@ socket/yotta_tcp_queue.c
 socket/yotta_udp.c
 utils/yotta_file.c
 utils/yotta_str_utils.c
+whisper/yotta_whisper_fetch.c
 whisper/yotta_whisper_master.c
 whisper/yotta_whisper_push.c
 whisper/yotta_whisper_queue.c
