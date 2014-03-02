@@ -9,7 +9,7 @@
 
 
 /*
- * Defines a dispatch thread
+ * Defines a dispatch threads' group
  */
 typedef struct
 yotta_dispatch_group_s
@@ -34,6 +34,9 @@ yotta_dispatch_group_s
 
     // group's semaphore
     yotta_semaphore_t * semaphore;
+
+    // number of threading waiting at a group barrier
+    uint64_t waiting_threads;
 }
 yotta_dispatch_group_t;
 
@@ -72,6 +75,7 @@ yotta_dispath_thread_entry(yotta_dispatch_thread_t * thread)
 {
     yotta_assert(thread != 0);
     yotta_assert(thread->group != 0);
+    yotta_assert(thread->group->waiting_threads == 0);
 
     yotta_semaphore_wait(thread->group->semaphore);
 
@@ -129,6 +133,7 @@ yotta_dispatch(yotta_dispatch_func_t user_function, void * user_param, uint64_t 
     group.global_offset = 0;
     group.global_count = group.thread_count;
     group.user_function = user_function;
+    group.waiting_threads = 0;
 
     /*
      * Creates threads
@@ -196,6 +201,43 @@ yotta_dispatch(yotta_dispatch_func_t user_function, void * user_param, uint64_t 
 }
 
 void
+yotta_group_barrier()
+{
+    if (yotta_dispatch_thread == 0)
+    {
+        /*
+         * The barrier is not blocking if not a dispatched thread
+         */
+        return;
+    }
+
+    yotta_assert(yotta_dispatch_thread->group != 0);
+
+    yotta_dispatch_group_t * group = yotta_dispatch_thread->group;
+
+    uint64_t waiting = __sync_fetch_and_add(&group->waiting_threads, 1) + 1;
+
+    if (waiting != group->thread_count)
+    {
+        /*
+         * This thread is not the last to arrive, then it is waiting
+         */
+        yotta_semaphore_wait(group->semaphore);
+        return;
+    }
+
+    /*
+     * This thread is the last to arrive, then it is releasing its friends
+     */
+    group->waiting_threads = 0;
+
+    for (uint64_t i = 1; i < waiting; i++)
+    {
+        yotta_semaphore_post(group->semaphore);
+    }
+}
+
+void
 yotta_get_local_id(uint64_t * out_id, uint64_t * out_count)
 {
     if (yotta_dispatch_thread == 0)
@@ -212,6 +254,8 @@ yotta_get_local_id(uint64_t * out_id, uint64_t * out_count)
 
         return;
     }
+
+    yotta_assert(yotta_dispatch_thread->group != 0);
 
     if (out_id != 0)
     {
@@ -242,6 +286,8 @@ yotta_get_group_id(uint64_t * out_id, uint64_t * out_count)
         return;
     }
 
+    yotta_assert(yotta_dispatch_thread->group != 0);
+
     if (out_id != 0)
     {
         *out_id = yotta_dispatch_thread->group->id;
@@ -270,6 +316,8 @@ yotta_get_global_id(uint64_t * out_id, uint64_t * out_count)
 
         return;
     }
+
+    yotta_assert(yotta_dispatch_thread->group != 0);
 
     if (out_id != 0)
     {

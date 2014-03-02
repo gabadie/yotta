@@ -30,6 +30,12 @@ uint64_t
 yotta_dispatch(yotta_dispatch_func_t user_function, void * user_param, uint64_t user_param_stride);
 
 /*
+ * @infos: barrier synchronisation between group's threads
+ */
+void
+yotta_group_barrier();
+
+/*
  * @infos: gets the local thread id and local threads count
  *
  * @param <out_id>: the current thread's id
