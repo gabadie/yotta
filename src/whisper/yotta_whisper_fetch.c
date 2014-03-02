@@ -22,6 +22,7 @@ yotta_whisper_fetch_request_cmd_s
         uint64_t master_address;
         uint64_t data_size;
         uint64_t data_dest;
+        uint64_t sync_finished;
     } __attribute__((packed))
     header;
 }
@@ -43,6 +44,7 @@ yotta_whisper_fetch_answer_cmd_s
         yotta_whisper_label_t label;
         uint64_t data_size;
         uint64_t data_dest;
+        uint64_t sync_finished;
     } __attribute__((packed))
     header;
 
@@ -160,6 +162,7 @@ yotta_whisper_fetch_request_recv(
             uint64_t data_address;
             uint64_t data_size;
             uint64_t data_dest;
+            uint64_t sync_finished;
         }
         header;
     }
@@ -201,6 +204,8 @@ yotta_whisper_fetch_request_recv(
         cmd->header.label = YOTTA_WHISPER_MEM_FETCH_ANSWER;
         cmd->header.data_size = buffer->header.data_size;
         cmd->header.data_dest = buffer->header.data_dest;
+        cmd->header.sync_finished = buffer->header.sync_finished;
+
         cmd->data_cursor = 0;
         cmd->data = (void *) buffer->header.data_address;
 
@@ -212,6 +217,7 @@ yotta_whisper_fetch_request_recv(
     buffer->header.data_address = 0;
     buffer->header.data_size = 0;
     buffer->header.data_dest = 0;
+    buffer->header.sync_finished = 0;
 
     yotta_whisper_queue_finish(cmd_queue);
 }
@@ -234,6 +240,7 @@ yotta_whisper_fetch_answer_recv(
         {
             uint64_t data_size;
             uint64_t data_dest;
+            uint64_t sync_finished;
         }
         header;
 
@@ -277,10 +284,16 @@ yotta_whisper_fetch_answer_recv(
         }
     }
 
-    // we clean up the tmp buffer
+    /*
+     * we trigger the sync_finished and clean up the tmp buffer
+     */
+    yotta_assert(buffer->header.sync_finished != 0);
+    yotta_sync_post((yotta_sync_t *) buffer->header.sync_finished);
+
     buffer->header_cursor = 0;
     buffer->header.data_size = 0;
     buffer->header.data_dest = 0;
+    buffer->header.sync_finished = 0;
     buffer->data_cursor = 0;
 
     yotta_whisper_queue_finish(cmd_queue);
@@ -291,14 +304,24 @@ yotta_whisper_fetch(
     yotta_whisper_queue_t * cmd_queue,
     uint64_t master_address,
     uint64_t data_size,
-    void * data_dest
+    void * data_dest,
+    yotta_sync_t * sync_finished
 )
 {
     yotta_assert(cmd_queue != 0);
     yotta_assert(master_address != 0);
     yotta_assert(data_size != 0);
     yotta_assert(data_dest != 0);
+    yotta_assert(sync_finished != 0);
 
+    /*
+     * Inits the finish sync object
+     */
+    yotta_sync_init(sync_finished);
+
+    /*
+     * Creates the YOTTA_WHISPER_MEM_FETCH_REQUEST command
+     */
     yotta_whisper_fetch_request_cmd_t * cmd =
         yotta_alloc_s(yotta_whisper_fetch_request_cmd_t);
 
@@ -313,6 +336,7 @@ yotta_whisper_fetch(
     cmd->header.master_address = master_address;
     cmd->header.data_size = data_size;
     cmd->header.data_dest = (uint64_t) data_dest;
+    cmd->header.sync_finished = (uint64_t) sync_finished;
 
     yotta_tcp_queue_append((yotta_tcp_queue_t *) cmd_queue, (yotta_tcp_cmd_t *) cmd);
 }

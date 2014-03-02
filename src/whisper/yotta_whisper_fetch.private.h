@@ -2,6 +2,7 @@
 #define _YOTTAPRIVATE_WHISPER_FETCH
 
 #include "yotta_whisper_queue.private.h"
+#include "../threading/yotta_sync.private.h"
 
 
 /*
@@ -31,13 +32,15 @@ yotta_whisper_fetch_answer_recv(
  * @param <master_address>: absolute address in the master memory
  * @param <data_size>: the data size
  * @param <data_dest>: the data destination
+ * @param <sync>: the sync object when finished
  */
 void
 yotta_whisper_fetch(
     yotta_whisper_queue_t * cmd_queue,
     uint64_t master_address,
     uint64_t data_size,
-    void * data_dest
+    void * data_dest,
+    yotta_sync_t * sync_finished
 );
 
 #endif

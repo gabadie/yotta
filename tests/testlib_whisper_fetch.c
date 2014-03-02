@@ -19,7 +19,9 @@ test_whisper_fetch_stress()
     testhelper_whisper_protocol_init(&protocol);
     testhelper_lorem(src_data, data_size);
 
-    yotta_whisper_fetch(&protocol.queue1, (uint64_t) src_data, data_size, dest_data);
+    yotta_sync_t sync;
+
+    yotta_whisper_fetch(&protocol.queue1, (uint64_t) src_data, data_size, dest_data, &sync);
 
     // TODO: Implements yotta_sync_t for determinisme
     sleep(1);
