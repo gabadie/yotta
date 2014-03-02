@@ -2,7 +2,6 @@
 # List of the library's C files
 #
 
-yotta_command.c
 yotta_context.c
 yotta_init.c
 core/yotta_addr_translation.c

@@ -3,7 +3,6 @@
 #
 
 testlib_addr_translation.c
-testlib_command.c
 testlib_file.c
 testlib_headers.sh
 testlib_logger.c
@@ -20,4 +19,3 @@ testlib_threading.c
 testlib_whisper_command.c
 testlib_whisper_fetch.c
 testlib_whisper_push.c
-#testlib_context.c

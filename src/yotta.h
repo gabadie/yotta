@@ -5,7 +5,6 @@
 
 #include "yotta_init.h"
 #include "yotta_context.h"
-#include "yotta_command.h"
 #include "core/yotta_logger.h"
 #include "core/yotta_memory.h"
 #include "core/yotta_return.h"
