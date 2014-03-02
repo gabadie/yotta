@@ -4,6 +4,7 @@
 #include "../core/yotta_addr_translation.private.h"
 #include "../core/yotta_debug.h"
 #include "../core/yotta_memory.h"
+#include "../massive/yotta_dispatch.private.h"
 #include "../threading/yotta_thread.h"
 
 
@@ -24,6 +25,10 @@ yotta_whisper_command_order_cmd_s
         yotta_rel_addr_t function_rel_addr;
         uint64_t param_size;
         uint64_t sync_finished;
+        uint64_t group_id;
+        uint64_t group_count;
+        uint64_t global_offset;
+        uint64_t global_count;
     } __attribute__((packed))
     header;
 
@@ -63,6 +68,9 @@ yotta_whisper_command_feedback_cmd_s
     // the thread
     yotta_thread_t thread;
 
+    // the thread's global pool
+    yotta_global_thread_pool_t thread_global_pool;
+
     // the TCP queue to send back the feedback when the thread has finished
     yotta_whisper_queue_t * queue;
 }
@@ -76,6 +84,11 @@ void *
 yotta_whisper_command_thread(yotta_whisper_command_feedback_cmd_t * cmd)
 {
     yotta_assert(cmd != 0);
+
+    /*
+     * Sets the thread's global pool
+     */
+    yotta_thread_global_pool = &cmd->thread_global_pool;
 
     /*
      * We call the thread entry with user parameters
@@ -231,6 +244,10 @@ yotta_whisper_command_order_recv(
             yotta_rel_addr_t function_rel_addr;
             uint64_t param_size;
             uint64_t sync_finished;
+            uint64_t group_id;
+            uint64_t group_count;
+            uint64_t global_offset;
+            uint64_t global_count;
         }
         header;
 
@@ -399,6 +416,10 @@ yotta_whisper_command(
     yotta_whisper_command_entry_t function_addr,
     uint64_t param_size,
     void const * param,
+    uint64_t group_id,
+    uint64_t group_count,
+    uint64_t global_offset,
+    uint64_t global_count,
     yotta_sync_t * sync_sent,
     yotta_sync_t * sync_finished
 )
@@ -425,6 +446,10 @@ yotta_whisper_command(
     cmd->header.function_rel_addr = yotta_address_absolute_to_relative((uint64_t) function_addr);
     cmd->header.param_size = param_size;
     cmd->header.sync_finished = (uint64_t) sync_finished;
+    cmd->header.group_id = group_id;
+    cmd->header.group_count = group_count;
+    cmd->header.global_offset = global_offset;
+    cmd->header.global_count = global_count;
     cmd->param_cursor = 0;
     cmd->param = param;
     cmd->sync_sent = sync_sent;

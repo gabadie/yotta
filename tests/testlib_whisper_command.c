@@ -41,6 +41,10 @@ test_whisper_command_invocation()
             (yotta_whisper_command_entry_t) test_thread_callback,
             sizeof(param),
             &param,
+            0,
+            1,
+            0,
+            1,
             &sync_sent,
             &sync_finished
         );

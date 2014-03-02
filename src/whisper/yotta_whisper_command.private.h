@@ -29,6 +29,10 @@ yotta_whisper_command(
     yotta_whisper_command_entry_t function_addr,
     uint64_t param_size,
     void const * param,
+    uint64_t group_id,
+    uint64_t group_count,
+    uint64_t global_offset,
+    uint64_t global_count,
     yotta_sync_t * sync_sent,
     yotta_sync_t * sync_finished
 );
