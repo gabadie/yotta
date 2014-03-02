@@ -96,6 +96,17 @@ yotta_alloc(size_t size);
     (struct_name *) yotta_alloc(sizeof(struct_name))
 
 /*
+ * @infos: allocate a struct array from its given name
+ *
+ * @param <struct_name>: the struct name
+ * @param <element_count>: the array size
+ *
+ * @returns: (struct_name *) pointer on the allocated memory array
+ */
+#define yotta_alloc_sa(struct_name,element_count) \
+    (struct_name *) yotta_alloc(sizeof(struct_name) * (element_count))
+
+/*
  * @infos: frees memory
  *
  * @param <ptr>: memory address to free
