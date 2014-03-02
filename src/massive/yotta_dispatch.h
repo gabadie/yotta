@@ -16,8 +16,10 @@ typedef void (* yotta_dispatch_func_t)(void *);
 /*
  * @infos: dispatches threads on all available cores
  *
- * @param <function>: the master address
- * @param <param>: the user param size
+ * @param <user_function>: the master address
+ * @param <user_param>: the user parameter
+ * @param <user_param_stride>: the user parameter pointer stride for each local
+ *  thread.
  *
  * @returns:
  *  <YOTTA_SUCESS> if successed
@@ -25,7 +27,7 @@ typedef void (* yotta_dispatch_func_t)(void *);
  *  <YOTTA_INVALID_OPERATION> if a dispatch has already been launched
  */
 uint64_t
-yotta_dispatch(yotta_dispatch_func_t function, void * param);
+yotta_dispatch(yotta_dispatch_func_t user_function, void * user_param, uint64_t user_param_stride);
 
 /*
  * @infos: gets the local thread id and local threads count

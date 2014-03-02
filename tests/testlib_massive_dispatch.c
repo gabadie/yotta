@@ -13,7 +13,7 @@ test_validity_callback(uint64_t * param)
     test_assert(param == &validity_parameter)
 
     {
-        uint64_t r = yotta_dispatch((void *) test_validity_callback, param);
+        uint64_t r = yotta_dispatch((void *) test_validity_callback, param, 0);
 
         test_assert(r == YOTTA_INVALID_OPERATION);
     }
@@ -32,13 +32,13 @@ test_dispatch_validity()
     test_assert(yotta_threading_cores(&cores) == YOTTA_SUCCESS);
 
     {
-        uint64_t r = yotta_dispatch(0, 0);
+        uint64_t r = yotta_dispatch(0, 0, 0);
 
         test_assert(r == YOTTA_INVALID_VALUE);
     }
 
     {
-        uint64_t r = yotta_dispatch((void *) test_validity_callback, &validity_parameter);
+        uint64_t r = yotta_dispatch((void *) test_validity_callback, &validity_parameter, 0);
 
         test_assert(r == YOTTA_SUCCESS);
     }
@@ -110,7 +110,7 @@ test_dispatch_id()
     testhelper_lorem(output_array, sizeof(*output_array) * cores);
 
     {
-        uint64_t r = yotta_dispatch((void *) test_id_callback, output_array);
+        uint64_t r = yotta_dispatch((void *) test_id_callback, output_array, 0);
 
         test_assert(r == YOTTA_SUCCESS);
     }
@@ -123,6 +123,28 @@ test_dispatch_id()
     yotta_free(output_array);
 }
 
+static
+void
+test_stride_callback(uint64_t * param)
+{
+    uint64_t local_id = 0;
+
+    yotta_get_local_id(&local_id, 0);
+
+    test_assert(param == (void *)(42 + local_id * 13));
+}
+
+static
+void
+test_dispatch_param_stride()
+{
+    {
+        uint64_t r = yotta_dispatch((void *) test_stride_callback, (void *) 42, 13);
+
+        test_assert(r == YOTTA_SUCCESS);
+    }
+}
+
 int
 main()
 {
@@ -132,6 +154,7 @@ main()
     test_dispatch_validity();
     test_default_id();
     test_dispatch_id();
+    test_dispatch_param_stride();
 
     return 0;
 }

@@ -44,12 +44,6 @@ yotta_dispatch_thread_t;
 
 
 /*
- * Checks if a dispatch is currently being executed
- */
-static
-uint64_t yotta_dispatched = 0;
-
-/*
  * Locals thread variables
  */
 static
@@ -69,13 +63,13 @@ yotta_dispath_thread_entry(yotta_dispatch_thread_t * thread)
 }
 
 uint64_t
-yotta_dispatch(yotta_dispatch_func_t user_function, void * user_param)
+yotta_dispatch(yotta_dispatch_func_t user_function, void * user_param, uint64_t user_param_stride)
 {
     if (user_function == 0)
     {
         yotta_return_inv_value(yotta_dispatch, user_function);
     }
-    else if (!__sync_bool_compare_and_swap(&yotta_dispatched, 0, 1))
+    else if (!__sync_bool_compare_and_swap(&yotta_dispatch_thread, 0, (yotta_dispatch_thread_t *) 1))
     {
         yotta_return_inv_op(yotta_dispatch);
     }
@@ -84,7 +78,7 @@ yotta_dispatch(yotta_dispatch_func_t user_function, void * user_param)
 
     if (yotta_threading_cores(&cores) != YOTTA_SUCCESS)
     {
-        yotta_assert_return(__sync_bool_compare_and_swap(&yotta_dispatched, 1, 0), 1);
+        yotta_dispatch_thread = 0;
 
         yotta_return_unexpect_fail(yotta_dispatch);
     }
@@ -111,6 +105,8 @@ yotta_dispatch(yotta_dispatch_func_t user_function, void * user_param)
         thread->global_count = cores;
 
         pthread_create(&thread->tid, 0, (void *) yotta_dispath_thread_entry, thread);
+
+        user_param = ((uint8_t *) user_param) + user_param_stride;
     }
 
     /*
@@ -121,9 +117,9 @@ yotta_dispatch(yotta_dispatch_func_t user_function, void * user_param)
         pthread_join(threads_array[i].tid, 0);
     }
 
-    yotta_free(threads_array);
+    yotta_dispatch_thread = 0;
 
-    yotta_assert_return(__sync_bool_compare_and_swap(&yotta_dispatched, 1, 0), 1);
+    yotta_free(threads_array);
 
     return YOTTA_SUCCESS;
 }
