@@ -7,25 +7,36 @@
 
 
 /*
- * Defines a dispatch threads' group
+ * Defines a threads global pool information attached to one thread
  */
 typedef struct
-yotta_dispatch_group_s
+yotta_global_thread_pool_s
 {
-    // threads' group id
-    uint64_t id;
+    // threads' group count
+    uint64_t group_id;
 
     // threads' group count
     uint64_t group_count;
-
-    // group's threads count
-    uint64_t thread_count;
 
     // threads group's global offset in the thread pool
     uint64_t global_offset;
 
     // global thread pool size
     uint64_t global_count;
+}
+yotta_global_thread_pool_t;
+
+/*
+ * Defines a dispatch threads' group
+ */
+typedef struct
+yotta_dispatch_group_s
+{
+    // group's global info
+    yotta_global_thread_pool_t * global;
+
+    // group's threads count
+    uint64_t thread_count;
 
     // thread function to execute
     yotta_dispatch_func_t user_function;
@@ -58,6 +69,13 @@ yotta_dispatch_thread_s
 }
 yotta_dispatch_thread_t;
 
+
+/*
+ * Thread's global pool
+ */
+extern
+yotta_thread_local
+yotta_global_thread_pool_t * yotta_thread_global_pool;
 
 /*
  * Locals dispached thread variables

@@ -7,6 +7,9 @@
 
 
 yotta_thread_local
+yotta_global_thread_pool_t * yotta_thread_global_pool = 0;
+
+yotta_thread_local
 yotta_dispatch_thread_t * yotta_dispatch_thread = 0;
 
 
@@ -16,11 +19,10 @@ yotta_dispath_thread_entry(yotta_dispatch_thread_t * thread)
 {
     yotta_assert(thread != 0);
     yotta_assert(thread->group != 0);
-    yotta_assert(thread->group->waiting_threads == 0);
 
     yotta_semaphore_wait(thread->group->semaphore);
 
-    if (thread->group->id == thread->group->group_count)
+    if (thread->group->thread_count == 0)
     {
         /*
          * We were not able to create all threads, then we do not launch one.
@@ -29,6 +31,7 @@ yotta_dispath_thread_entry(yotta_dispatch_thread_t * thread)
     }
 
     yotta_dispatch_thread = thread;
+    yotta_thread_global_pool = thread->group->global;
 
     (thread->group->user_function)(thread->user_param);
 
@@ -68,11 +71,7 @@ yotta_dispatch(yotta_dispatch_func_t user_function, void * user_param, uint64_t 
         yotta_return_unexpect_fail(yotta_dispatch);
     }
 
-    // TODO: lets yotta_dispatch() be compatible with yotta_command()
-    group.id = 0;
-    group.group_count = 1;
-    group.global_offset = 0;
-    group.global_count = group.thread_count;
+    group.global = yotta_thread_global_pool;
     group.user_function = user_function;
     group.waiting_threads = 0;
 
@@ -106,7 +105,7 @@ yotta_dispatch(yotta_dispatch_func_t user_function, void * user_param, uint64_t 
          * We were not able to create all threads
          */
 
-        group.id = group.group_count;
+        group.thread_count = 0;
     }
 
     /*
@@ -129,7 +128,7 @@ yotta_dispatch(yotta_dispatch_func_t user_function, void * user_param, uint64_t 
 
     yotta_free(threads_array);
 
-    if (thread_created != group.thread_count)
+    if (group.thread_count == 0)
     {
         /*
          * We were not able to create all threads
@@ -212,7 +211,7 @@ yotta_get_local_id(uint64_t * out_id, uint64_t * out_count)
 void
 yotta_get_group_id(uint64_t * out_id, uint64_t * out_count)
 {
-    if (yotta_dispatch_thread == 0)
+    if (yotta_thread_global_pool == 0)
     {
         if (out_id != 0)
         {
@@ -227,47 +226,50 @@ yotta_get_group_id(uint64_t * out_id, uint64_t * out_count)
         return;
     }
 
-    yotta_assert(yotta_dispatch_thread->group != 0);
-
     if (out_id != 0)
     {
-        *out_id = yotta_dispatch_thread->group->id;
+        *out_id = yotta_thread_global_pool->group_id;
     }
 
     if (out_count != 0)
     {
-        *out_count = yotta_dispatch_thread->group->group_count;
+        *out_count = yotta_thread_global_pool->group_count;
     }
 }
 
 void
 yotta_get_global_id(uint64_t * out_id, uint64_t * out_count)
 {
-    if (yotta_dispatch_thread == 0)
+    if (out_id != 0)
     {
-        if (out_id != 0)
+        if (yotta_dispatch_thread != 0)
+        {
+            *out_id = yotta_dispatch_thread->local_id;
+        }
+        else
         {
             *out_id = 0;
         }
 
-        if (out_count != 0)
+        if (yotta_thread_global_pool != 0)
         {
-            *out_count = 1;
+            *out_id += yotta_thread_global_pool->global_offset;
         }
-
-        return;
-    }
-
-    yotta_assert(yotta_dispatch_thread->group != 0);
-
-    if (out_id != 0)
-    {
-        *out_id = yotta_dispatch_thread->local_id +
-            yotta_dispatch_thread->group->global_offset;
     }
 
     if (out_count != 0)
     {
-        *out_count = yotta_dispatch_thread->group->global_count;
+        if (yotta_thread_global_pool != 0)
+        {
+            *out_count = yotta_thread_global_pool->global_count;
+        }
+        else if (yotta_dispatch_thread != 0)
+        {
+            *out_count = yotta_dispatch_thread->group->thread_count;
+        }
+        else
+        {
+            *out_count = 1;
+        }
     }
 }
