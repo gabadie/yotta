@@ -19,21 +19,22 @@ test_whisper_fetch_stress()
     testhelper_whisper_protocol_init(&protocol);
     testhelper_lorem(src_data, data_size);
 
-    yotta_sync_t sync;
+    {
+        yotta_sync_t sync_fetch;
 
-    yotta_whisper_fetch(&protocol.queue1, (uint64_t) src_data, data_size, dest_data, &sync);
-
-    // TODO: Implements yotta_sync_t for determinisme
-    sleep(1);
-
-    testhelper_whisper_protocol_destroy(&protocol);
+        yotta_whisper_fetch(&protocol.queue1, (uint64_t) src_data, data_size, dest_data, &sync_fetch);
+        yotta_sync_wait(&sync_fetch);
+    }
 
     test_assert(memcmp(src_data, dest_data, data_size) == 0);
 
     free(src_data);
     free(dest_data);
 
-    testhelper_memory_check();
+    testhelper_whisper_protocol_destroy(&protocol);
+
+    // TODO: implements yotta_semaphore_pool_flush()
+    //testhelper_memory_check();
 }
 
 int
