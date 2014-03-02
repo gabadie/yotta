@@ -2,6 +2,7 @@
 #define _YOTTAPRIVATE_WHISPER_PUSH
 
 #include "yotta_whisper_queue.private.h"
+#include "../threading/yotta_sync.private.h"
 
 
 /*
@@ -11,13 +12,15 @@
  * @param <master_address>: absolute address in the master memory
  * @param <data_size>: the data size
  * @param <data>: the data to push
+ * @param <sync>: the sync object when finished
  */
 void
 yotta_whisper_push(
     yotta_whisper_queue_t * cmd_queue,
     uint64_t master_address,
     uint64_t data_size,
-    void const * data
+    void const * data,
+    yotta_sync_t * sync
 );
 
 /*

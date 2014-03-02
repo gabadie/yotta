@@ -19,7 +19,7 @@ test_whisper_push_stress()
     testhelper_whisper_protocol_init(&protocol);
     testhelper_lorem(src_data, data_size);
 
-    yotta_whisper_push(&protocol.queue0, (uint64_t) dest_data, data_size, src_data);
+    yotta_whisper_push(&protocol.queue0, (uint64_t) dest_data, data_size, src_data, 0);
 
     testhelper_whisper_protocol_destroy(&protocol);
 

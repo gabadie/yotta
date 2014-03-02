@@ -7,7 +7,7 @@
 
 
 uint64_t
-yotta_push_package(uint64_t master_addr, uint64_t buffer_size, void const * buffer)
+yotta_push_package(uint64_t master_addr, uint64_t buffer_size, void const * buffer, yotta_sync_t * sync_finished)
 {
     if (master_addr == 0)
     {
@@ -26,7 +26,7 @@ yotta_push_package(uint64_t master_addr, uint64_t buffer_size, void const * buff
         yotta_return_inv_op(yotta_push_package);
     }
 
-    yotta_whisper_push(&yotta_slave_context->queue, master_addr, buffer_size, buffer);
+    yotta_whisper_push(&yotta_slave_context->queue, master_addr, buffer_size, buffer, sync_finished);
 
     return YOTTA_SUCCESS;
 }

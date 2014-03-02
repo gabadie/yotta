@@ -27,6 +27,9 @@ yotta_whisper_push_cmd_s
     // the data
     uint64_t data_cursor;
     void const * data;
+
+    // the finish sync object
+    yotta_sync_t * sync_finished;
 }
 yotta_whisper_push_cmd_t;
 
@@ -82,6 +85,14 @@ yotta_whisper_push_send(yotta_whisper_push_cmd_t * cmd)
         {
             return;
         }
+    }
+
+    /*
+     * We push the sync event and destroy this command
+     */
+    if (cmd->sync_finished)
+    {
+        yotta_sync_post(cmd->sync_finished);
     }
 
     yotta_tcp_cmd_finish((yotta_tcp_cmd_t *) cmd);
@@ -160,7 +171,8 @@ yotta_whisper_push(
     yotta_whisper_queue_t * cmd_queue,
     uint64_t master_address,
     uint64_t data_size,
-    void const * data
+    void const * data,
+    yotta_sync_t * sync_finished
 )
 {
     yotta_assert(cmd_queue != 0);
@@ -168,6 +180,17 @@ yotta_whisper_push(
     yotta_assert(data_size != 0);
     yotta_assert(data != 0);
 
+    /*
+     * Inits the finish sync object
+     */
+    if (sync_finished != 0)
+    {
+        yotta_sync_init(sync_finished);
+    }
+
+    /*
+     * Creates the YOTTA_WHISPER_MEM_PUSH command
+     */
     yotta_whisper_push_cmd_t * cmd = yotta_alloc_s(yotta_whisper_push_cmd_t);
 
     yotta_dirty_s(cmd);
@@ -182,6 +205,7 @@ yotta_whisper_push(
     cmd->header.data_size = data_size;
     cmd->data_cursor = 0;
     cmd->data = data;
+    cmd->sync_finished = sync_finished;
 
     yotta_tcp_queue_append((yotta_tcp_queue_t *) cmd_queue, (yotta_tcp_cmd_t *) cmd);
 }
