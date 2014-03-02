@@ -29,6 +29,28 @@ yotta_whisper_label_entries[YOTTA_WHISPER_LABELS_COUNT] =
     (yotta_whisper_recv_t) yotta_whisper_push_master_recv
 };
 
+#ifdef YOTTA_DEBUG
+
+/*
+ * @infos: verify that the receive buffer has been cleaned
+ *
+ * @param <cmd_queue>: the command queue to verify
+ */
+static
+void
+yotta_whisper_queue_assert_buffer(yotta_whisper_queue_t * cmd_queue)
+{
+    yotta_assert(cmd_queue != 0);
+
+    for (size_t i = 0; i < sizeof(cmd_queue->recv_buffer); i++)
+    {
+        yotta_assert(cmd_queue->recv_buffer[i] == 0);
+    }
+}
+
+#endif //YOTTA_DEBUG
+
+
 static
 void
 yotta_whisper_queue_recv(yotta_whisper_queue_t * cmd_queue)
@@ -46,6 +68,10 @@ yotta_whisper_queue_recv(yotta_whisper_queue_t * cmd_queue)
                 // the callback has not finished to receive all data
                 break;
             }
+
+#ifdef YOTTA_DEBUG
+            yotta_whisper_queue_assert_buffer(cmd_queue);
+#endif //YOTTA_DEBUG
         }
 
         yotta_whisper_label_t label = 0;

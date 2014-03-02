@@ -322,6 +322,10 @@ yotta_whisper_command_order_recv(
         cmd->header.label = YOTTA_WHISPER_COMMAND_FEEDBACK;
         cmd->header.sync_finished = buffer->header.sync_finished;
         cmd->param = buffer->param;
+        cmd->thread_global_pool.group_id = buffer->header.group_id;
+        cmd->thread_global_pool.group_count = buffer->header.group_count;
+        cmd->thread_global_pool.global_offset = buffer->header.global_offset;
+        cmd->thread_global_pool.global_count = buffer->header.global_count;
         cmd->thread_entry =
             (yotta_whisper_command_entry_t) yotta_address_relative_to_absolute(buffer->header.function_rel_addr);
         cmd->queue = cmd_queue;
@@ -344,6 +348,10 @@ yotta_whisper_command_order_recv(
     buffer->header.function_rel_addr = 0;
     buffer->header.param_size = 0;
     buffer->header.sync_finished = 0;
+    buffer->header.group_id = 0;
+    buffer->header.group_count = 0;
+    buffer->header.global_offset = 0;
+    buffer->header.global_count = 0;
     buffer->param_cursor = 0;
     buffer->param = 0;
 
