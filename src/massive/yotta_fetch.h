@@ -1,7 +1,6 @@
 #ifndef _YOTTA_FETCH
 #define _YOTTA_FETCH
 
-#include "../core/yotta_memory.h"
 #include "../threading/yotta_sync.h"
 
 

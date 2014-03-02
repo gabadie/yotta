@@ -1,6 +1,5 @@
 
 #include "yotta_push.h"
-#include "../core/yotta_debug.h"
 #include "../core/yotta_return.private.h"
 #include "../slave/yotta_slave_context.private.h"
 #include "../whisper/yotta_whisper_fetch.private.h"
