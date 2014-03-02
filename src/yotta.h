@@ -10,6 +10,7 @@
 #include "core/yotta_memory.h"
 #include "core/yotta_return.h"
 #include "dictate/yotta_dictate_binary_send.h"
+#include "massive/yotta_dispatch.h"
 #include "massive/yotta_fetch.h"
 #include "massive/yotta_push.h"
 #include "socket/yotta_socket.h"
