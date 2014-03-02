@@ -20,8 +20,8 @@ typedef void (* yotta_whisper_command_entry_t)(void *);
  * @param <function_addr>: the absolute function address
  * @param <param_size>: the parameter's size
  * @param <param>: the parameter
- * @param <sending_sync>: the sending sync object
- * @param <finish_sync>: the finish sync object
+ * @param <sync_sent>: the sending sync object
+ * @param <sync_finished>: the finish sync object
  */
 void
 yotta_whisper_command(
@@ -29,8 +29,8 @@ yotta_whisper_command(
     yotta_whisper_command_entry_t function_addr,
     uint64_t param_size,
     void const * param,
-    yotta_sync_t * sending_sync,
-    yotta_sync_t * finish_sync
+    yotta_sync_t * sync_sent,
+    yotta_sync_t * sync_finished
 );
 
 /*

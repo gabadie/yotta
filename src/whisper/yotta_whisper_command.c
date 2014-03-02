@@ -24,7 +24,7 @@ yotta_whisper_command_order_cmd_s
         yotta_whisper_label_t label;
         yotta_rel_addr_t function_rel_addr;
         uint64_t param_size;
-        uint64_t finish_sync;
+        uint64_t sync_finished;
     } __attribute__((packed))
     header;
 
@@ -33,7 +33,7 @@ yotta_whisper_command_order_cmd_s
     void const * param;
 
     // the sending_sync
-    yotta_sync_t * sending_sync;
+    yotta_sync_t * sync_sent;
 }
 yotta_whisper_command_order_cmd_t;
 
@@ -51,7 +51,7 @@ yotta_whisper_command_feedback_cmd_s
     struct
     {
         yotta_whisper_label_t label;
-        uint64_t finish_sync;
+        uint64_t sync_finished;
     } __attribute__((packed))
     header;
 
@@ -170,7 +170,7 @@ yotta_whisper_command_order_send(yotta_whisper_command_order_cmd_t * cmd)
      * We have finished to send the command order, then we post the sending
      * sync object and destroy the current command
      */
-    yotta_sync_post(cmd->sending_sync);
+    yotta_sync_post(cmd->sync_sent);
 
     yotta_tcp_cmd_finish((yotta_tcp_cmd_t *) cmd);
     yotta_tcp_cmd_release(cmd);
@@ -231,7 +231,7 @@ yotta_whisper_command_order_recv(
         {
             yotta_rel_addr_t function_rel_addr;
             uint64_t param_size;
-            uint64_t finish_sync;
+            uint64_t sync_finished;
         }
         header;
 
@@ -304,7 +304,7 @@ yotta_whisper_command_order_recv(
 
         cmd->header_cursor = 0;
         cmd->header.label = YOTTA_WHISPER_COMMAND_FEEDBACK;
-        cmd->header.finish_sync = buffer->header.finish_sync;
+        cmd->header.sync_finished = buffer->header.sync_finished;
         cmd->param = buffer->param;
         cmd->thread_entry =
             (yotta_whisper_command_entry_t) yotta_address_relative_to_absolute(buffer->header.function_rel_addr);
@@ -319,7 +319,7 @@ yotta_whisper_command_order_recv(
     buffer->header_cursor = 0;
     buffer->header.function_rel_addr = 0;
     buffer->header.param_size = 0;
-    buffer->header.finish_sync = 0;
+    buffer->header.sync_finished = 0;
     buffer->param_cursor = 0;
     buffer->param = 0;
 
@@ -342,7 +342,7 @@ yotta_whisper_command_feedback_recv(
         uint64_t header_cursor;
         struct
         {
-            uint64_t finish_sync;
+            uint64_t sync_finished;
         }
         header;
     }
@@ -374,14 +374,14 @@ yotta_whisper_command_feedback_recv(
     }
 
     /*
-     * we post the feedback in the finish_sync
+     * we post the feedback in the sync_finished
      */
-    yotta_assert(buffer->header.finish_sync != 0);
-    yotta_sync_post((yotta_sync_t *) buffer->header.finish_sync);
+    yotta_assert(buffer->header.sync_finished != 0);
+    yotta_sync_post((yotta_sync_t *) buffer->header.sync_finished);
 
     // we clean up the tmp buffer
     buffer->header_cursor = 0;
-    buffer->header.finish_sync = 0;
+    buffer->header.sync_finished = 0;
 
     yotta_whisper_queue_finish(cmd_queue);
 }
@@ -392,15 +392,15 @@ yotta_whisper_command(
     yotta_whisper_command_entry_t function_addr,
     uint64_t param_size,
     void const * param,
-    yotta_sync_t * sending_sync,
-    yotta_sync_t * finish_sync
+    yotta_sync_t * sync_sent,
+    yotta_sync_t * sync_finished
 )
 {
     yotta_assert(cmd_queue != 0);
     yotta_assert(function_addr != 0);
     yotta_assert((param_size == 0 && param == 0) || (param_size != 0 && param != 0));
-    yotta_assert(sending_sync != 0);
-    yotta_assert(finish_sync != 0);
+    yotta_assert(sync_sent != 0);
+    yotta_assert(sync_finished != 0);
 
     /*
      * creates the command order command and appends it to the given whisper queue
@@ -417,10 +417,10 @@ yotta_whisper_command(
     cmd->header.label = YOTTA_WHISPER_COMMAND_ORDER;
     cmd->header.function_rel_addr = yotta_address_absolute_to_relative((uint64_t) function_addr);
     cmd->header.param_size = param_size;
-    cmd->header.finish_sync = (uint64_t) finish_sync;
+    cmd->header.sync_finished = (uint64_t) sync_finished;
     cmd->param_cursor = 0;
     cmd->param = param;
-    cmd->sending_sync = sending_sync;
+    cmd->sync_sent = sync_sent;
 
     yotta_tcp_queue_append((yotta_tcp_queue_t *) cmd_queue, (yotta_tcp_cmd_t *) cmd);
 }
