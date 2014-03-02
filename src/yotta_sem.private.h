@@ -1,29 +1,28 @@
 #ifndef _YOTTA_SEM
 #define _YOTTA_SEM
 
-#include <semaphore.h>
+#include "threading/yotta_semaphore.h"
 
-#include "yotta_prefix.h"
 
 /*
- * @infos: get a POSIX semaphore from a semaphore pool
+ * @infos: get a yotta semaphore from a semaphore pool
  *
- * @param <out_sem>: retrieved POSIX semaphore
+ * @param <out_sem>: retrieved yotta semaphore
  *
  * @returns:
  *  == <0> if succeed
  *  != <0> if failed
  */
 uint64_t
-yotta_sem_fetch(sem_t ** out_sem);
+yotta_sem_fetch(yotta_semaphore_t ** out_sem);
 
 /*
- * @infos: release a POSIX semaphore into the pool
+ * @infos: release a yotta semaphore into the pool
  *
- * @param <sem>: POSIX semaphore to release
+ * @param <sem>: yotta semaphore to release
  */
 void
-yotta_sem_release(sem_t * sem);
+yotta_sem_release(yotta_semaphore_t * sem);
 
 
 #endif //_YOTTA_SEM

@@ -7,30 +7,42 @@
 #include "core/yotta_return.h"
 #include "yotta_sem.private.h"
 
-#define YOTTA_SEM_CHUNK_SIZE 64
 
 typedef struct
-yotta_sem_s
-yotta_sem_t;
+yotta_semaphore_deck_s
+yotta_semaphore_deck_t;
 
 /*
  * @infos Chunk of a deque of semaphores
  */
 struct
-yotta_sem_s
+yotta_semaphore_deck_s
 {
-    sem_t sem[64];      // List of POSIX semaphores
-    uint64_t used;      // Bitfield used to check if a semaphore is in use
-    yotta_sem_t * next; // Pointer to the next semaphores chunk
+    // List of semaphores
+    yotta_semaphore_t sem[sizeof(uint64_t) * 8];
+
+    // Bitfield used to check if a semaphore is in use
+    uint64_t used;
+
+    // Pointer to the next semaphores chunk
+    yotta_semaphore_deck_t * next;
 };
 
-// Semaphores pool used for thread synchronisation
+/*
+ * Semaphores pool used for thread synchronisation
+ */
 static
-yotta_sem_t * sem_pool = NULL;
+yotta_semaphore_deck_t * sem_pool = NULL;
 
-static uint64_t sem_count = 0;
+/*
+ * Counts semaphore in the pool
+ */
+static
+uint64_t sem_count = 0;
 
-// Mutex used to protect the semaphores pool
+/*
+ * Mutex used to protect the semaphores pool
+ */
 static
 pthread_mutex_t sem_pool_lock = PTHREAD_MUTEX_INITIALIZER;
 
@@ -43,7 +55,7 @@ pthread_mutex_t sem_pool_lock = PTHREAD_MUTEX_INITIALIZER;
 
 
 uint64_t
-yotta_sem_fetch(sem_t ** out_sem)
+yotta_sem_fetch(yotta_semaphore_t ** out_sem)
 {
     yotta_assert(out_sem != NULL);
 
@@ -52,45 +64,51 @@ yotta_sem_fetch(sem_t ** out_sem)
     {
         uint8_t sem_found = 0;
         uint64_t chunk_idx = 0;
-        yotta_sem_t ** current_chunk = &sem_pool;
+        yotta_semaphore_deck_t ** current_chunk = &sem_pool;
 
-        while(!sem_found)
+        // TODO: break down the skope pyramide
+
+        while (!sem_found)
         {
             // If the current chunk is empty, we allocate a new one
-            if(*current_chunk == NULL)
+            if (*current_chunk == NULL)
             {
-                *current_chunk = yotta_alloc_s(yotta_sem_t);
-                memset(*current_chunk, 0, sizeof(yotta_sem_t));
+                *current_chunk = yotta_alloc_s(yotta_semaphore_deck_t);
+
+                memset(*current_chunk, 0, sizeof(yotta_semaphore_deck_t));
             }
 
-            if(!yotta_sem_all_used(*current_chunk))
+            if (!yotta_sem_all_used(*current_chunk))
             {
                 // We search for the first free semaphore
-                for(int i = 0; i < YOTTA_SEM_CHUNK_SIZE; i++)
+                for (uint64_t i = 0; i < sizeof(uint64_t) * 8; i++)
                 {
                     // Skip if the semaphore is currently in use
-                    if(yotta_sem_used(*current_chunk, i))
+                    if (yotta_sem_used(*current_chunk, i))
                     {
                         continue;
                     }
 
-                    sem_t * free_sem = &(*current_chunk)->sem[i];
+                    yotta_semaphore_t * free_sem = (*current_chunk)->sem + i;
 
                     // If the free semphore has not been initialized, ...
-                    if((chunk_idx * YOTTA_SEM_CHUNK_SIZE + i) >= sem_count)
+                    if ((chunk_idx * sizeof(uint64_t) * 8 + i) >= sem_count)
                     {
                         // ... we initialize it
-                        if(sem_init(free_sem, 0, 0) == -1)
+                        if (yotta_semaphore_init(free_sem, 0) != 0)
                         {
                             yotta_logger_error("sem_init failed\n");
+
                             pthread_mutex_unlock(&sem_pool_lock);
+
                             return YOTTA_UNEXPECTED_FAIL;
                         }
+
                         sem_count++;
                     }
 
 
-                    (*current_chunk)->used |= i;
+                    (*current_chunk)->used |= (1ull << i);
                     *out_sem = free_sem;
                     sem_found = 1;
                     break;
@@ -108,32 +126,36 @@ yotta_sem_fetch(sem_t ** out_sem)
 }
 
 void
-yotta_sem_release(sem_t * sem)
+yotta_sem_release(yotta_semaphore_t * sem)
 {
     yotta_assert(sem != NULL);
     yotta_assert(sem_pool != NULL);
 
-    #ifdef YOTTA_DEBUG
+#if 0
+    // @Thierry: what is that for ????
     int waiting_threads = 42;
     sem_getvalue(sem, &waiting_threads);
     yotta_assert(waiting_threads == 0);
-    #endif
+#endif
 
     pthread_mutex_lock(&sem_pool_lock);
 
     {
-        yotta_sem_t * current_chunk = sem_pool;
+        yotta_semaphore_deck_t * current_chunk = sem_pool;
 
-        while(current_chunk != NULL)
+        while (current_chunk != NULL)
         {
             // We try to find the semaphore in the current chunk
-            for(int i = 0; i < YOTTA_SEM_CHUNK_SIZE; i++)
+
+            // TODO: We know the semaphore address -> we can find <i> by calculus
+            for (uint64_t i = 0; i < sizeof(uint64_t) * 8; i++)
             {
-                if(sem == &current_chunk->sem[i])
+                if (sem == &current_chunk->sem[i])
                 {
-                    current_chunk->used &= ~(1 << i);
-                    sem_init(sem, 0, 0); // Reinitialize semaphore
+                    current_chunk->used &= ~(1ull << i);
+
                     pthread_mutex_unlock(&sem_pool_lock);
+
                     return;
                 }
             }

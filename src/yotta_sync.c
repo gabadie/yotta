@@ -1,21 +1,20 @@
 #include <unistd.h>
-#include <pthread.h>
 
+#include "core/yotta_logger.private.h"
 #include "core/yotta_return.private.h"
 #include "yotta_sem.private.h"
-#include "yotta_sync.h"
 #include "yotta_sync.private.h"
-#include "core/yotta_logger.private.h"
 
 void
 yotta_sync_post(yotta_sync_t * sync)
 {
     yotta_assert(sync != NULL);
-    yotta_assert(sync->sem != (sem_t *) YOTTA_SYNC_TRIGGERED);
+    yotta_assert(sync->sem != YOTTA_SYNC_TRIGGERED);
 
     if(!__sync_bool_compare_and_swap(&sync->sem, YOTTA_SYNC_UNTRIGGERED, YOTTA_SYNC_TRIGGERED))
     {
-        sem_post(sync->sem);
+        yotta_semaphore_post((yotta_semaphore_t *) sync->sem);
+
         if(!__sync_bool_compare_and_swap(&sync->sem, sync->sem, YOTTA_SYNC_TRIGGERED))
         {
             yotta_crash_msg("Semaphore post race issue");
@@ -32,21 +31,22 @@ yotta_sync_wait(yotta_sync_t * sync)
     }
 
     // If the semaphore has already been triggered
-    if(sync->sem == (sem_t *) YOTTA_SYNC_TRIGGERED)
+    if(sync->sem == YOTTA_SYNC_TRIGGERED)
     {
         return YOTTA_SUCCESS;
     }
 
     // If the semaphore has been triggered between the previous call
     // and this call -> invalid operation
-    if(sync->sem != (sem_t *) YOTTA_SYNC_UNTRIGGERED)
+    if(sync->sem != YOTTA_SYNC_UNTRIGGERED)
     {
         yotta_return_inv_op(yotta_sync_wait);
     }
 
     // If the semaphore has not been triggered,
     // we fetch a semaphore from the pool
-    sem_t * new_sem;
+    yotta_semaphore_t * new_sem;
+
     if(yotta_sem_fetch(&new_sem) != YOTTA_SUCCESS)
     {
         yotta_return_unexpect_fail(yotta_sync_wait);
@@ -59,7 +59,7 @@ yotta_sync_wait(yotta_sync_t * sync)
     {
         yotta_sem_release(new_sem);
 
-        if(sync->sem != (sem_t *) YOTTA_SYNC_TRIGGERED)
+        if(sync->sem != YOTTA_SYNC_TRIGGERED)
         {
             yotta_return_inv_op(yotta_sync_wait);
         }
@@ -67,7 +67,7 @@ yotta_sync_wait(yotta_sync_t * sync)
         return YOTTA_SUCCESS;
     }
 
-    sem_wait(new_sem);
+    yotta_semaphore_wait((yotta_semaphore_t *) new_sem);
 
     yotta_sem_release(new_sem);
 
