@@ -22,6 +22,7 @@ socket/yotta_tcp_queue.c
 socket/yotta_udp.c
 threading/yotta_semaphore_pool.c
 threading/yotta_sync.c
+threading/yotta_threading.c
 utils/yotta_file.c
 utils/yotta_str_utils.c
 whisper/yotta_whisper_command.c

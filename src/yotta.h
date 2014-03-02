@@ -18,5 +18,6 @@
 #include "socket/yotta_socket_thread.h"
 #include "threading/yotta_semaphore.h"
 #include "threading/yotta_sync.h"
+#include "threading/yotta_threading.h"
 
 #endif
