@@ -1,8 +1,8 @@
 
 #include "yotta_sync.private.h"
-#include "core/yotta_logger.private.h"
-#include "core/yotta_return.private.h"
-#include "threading/yotta_semaphore_pool.private.h"
+#include "yotta_semaphore_pool.private.h"
+#include "../core/yotta_logger.private.h"
+#include "../core/yotta_return.private.h"
 
 
 void

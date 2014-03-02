@@ -2,7 +2,7 @@
 #define _YOTTAPRIVATE_WHISPER_COMMAND
 
 #include "yotta_whisper_queue.private.h"
-#include "../yotta_sync.private.h"
+#include "../threading/yotta_sync.private.h"
 
 
 /*

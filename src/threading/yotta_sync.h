@@ -1,7 +1,7 @@
 #ifndef _YOTTA_SYNC
 #define _YOTTA_SYNC
 
-#include "yotta_prefix.h"
+#include "../yotta_prefix.h"
 
 /*
  * @infos: Yotta synchronisation struct
@@ -26,5 +26,6 @@ yotta_sync_s
  */
 uint64_t
 yotta_sync_wait(yotta_sync_t * sync);
+
 
 #endif //_YOTTA_SYNC

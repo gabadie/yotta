@@ -16,6 +16,7 @@
 #include "socket/yotta_tcp.h"
 #include "socket/yotta_udp.h"
 #include "socket/yotta_socket_thread.h"
-#include "yotta_sync.h"
+#include "threading/yotta_semaphore.h"
+#include "threading/yotta_sync.h"
 
 #endif

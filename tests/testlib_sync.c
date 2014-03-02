@@ -1,9 +1,8 @@
-#include <yotta.h>
-#include <mk_test.h>
-#include "../src/yotta_sync.private.h"
 
 #include <pthread.h>
-#include <semaphore.h>
+#include <yotta.h>
+#include <mk_test.h>
+#include "../src/threading/yotta_sync.private.h"
 
 
 void
@@ -11,11 +10,11 @@ producer_func(void * s)
 {
     yotta_sync_t * yotta_sync = (yotta_sync_t *) s;
 
-    test_assert(yotta_sync->sem == (sem_t *) YOTTA_SYNC_UNTRIGGERED);
+    test_assert(yotta_sync->sem == YOTTA_SYNC_UNTRIGGERED);
 
     test_assert(yotta_sync_wait(yotta_sync) == YOTTA_SUCCESS);
 
-    test_assert(yotta_sync->sem == (sem_t *) YOTTA_SYNC_TRIGGERED);
+    test_assert(yotta_sync->sem == YOTTA_SYNC_TRIGGERED);
 }
 
 void
@@ -47,15 +46,15 @@ test_post_wait()
     yotta_sync_init(&yotta_sync);
     #pragma GCC diagnostic pop
 
-    test_assert(yotta_sync.sem == (sem_t *) YOTTA_SYNC_UNTRIGGERED);
+    test_assert(yotta_sync.sem == YOTTA_SYNC_UNTRIGGERED);
 
     yotta_sync_post(&yotta_sync);
 
-    test_assert(yotta_sync.sem == (sem_t *) YOTTA_SYNC_TRIGGERED);
+    test_assert(yotta_sync.sem == YOTTA_SYNC_TRIGGERED);
 
     test_assert(yotta_sync_wait(&yotta_sync) == YOTTA_SUCCESS);
 
-    test_assert(yotta_sync.sem == (sem_t *) YOTTA_SYNC_TRIGGERED);
+    test_assert(yotta_sync.sem == YOTTA_SYNC_TRIGGERED);
 }
 
 void
@@ -98,18 +97,18 @@ test_post_post_wait()
     yotta_sync_init(&yotta_sync);
     #pragma GCC diagnostic pop
 
-    test_assert(yotta_sync.sem == (sem_t *) YOTTA_SYNC_UNTRIGGERED);
+    test_assert(yotta_sync.sem == YOTTA_SYNC_UNTRIGGERED);
 
     //TODO: not handled yet -> assert failure
     yotta_sync_post(&yotta_sync);
     yotta_sync_post(&yotta_sync);
     yotta_sync_post(&yotta_sync);
 
-    test_assert(yotta_sync.sem == (sem_t *) YOTTA_SYNC_TRIGGERED);
+    test_assert(yotta_sync.sem == YOTTA_SYNC_TRIGGERED);
 
     test_assert(yotta_sync_wait(&yotta_sync) == YOTTA_SUCCESS);
 
-    test_assert(yotta_sync.sem == (sem_t *) YOTTA_SYNC_TRIGGERED);
+    test_assert(yotta_sync.sem == YOTTA_SYNC_TRIGGERED);
 }
 
 int

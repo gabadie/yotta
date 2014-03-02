@@ -2,7 +2,8 @@
 #define _YOTTAPRIVATE_SYNC
 
 #include "yotta_sync.h"
-#include "core/yotta_debug.h"
+#include "../core/yotta_debug.h"
+
 
 // The yotta sync object has not been triggered
 #define YOTTA_SYNC_UNTRIGGERED ((void *) 0)
@@ -33,5 +34,6 @@
  */
 void
 yotta_sync_post(yotta_sync_t * sync);
+
 
 #endif //_YOTTAPRIVATE_SYNC
