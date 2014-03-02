@@ -4,6 +4,7 @@
 #include "yotta_dispatch.h"
 #include "../core/yotta_memory.h"
 #include "../core/yotta_return.private.h"
+#include "../threading/yotta_semaphore_pool.private.h"
 #include "../threading/yotta_threading.h"
 
 
@@ -11,34 +12,48 @@
  * Defines a dispatch thread
  */
 typedef struct
-yotta_dispatch_thread_s
+yotta_dispatch_group_s
 {
+    // threads' group id
+    uint64_t id;
+
+    // threads' group count
+    uint64_t group_count;
+
+    // group's threads count
+    uint64_t thread_count;
+
+    // threads group's global offset in the thread pool
+    uint64_t global_offset;
+
+    // global thread pool size
+    uint64_t global_count;
+
     // thread function to execute
     yotta_dispatch_func_t user_function;
 
-    // thread parameter
-    void * user_param;
+    // group's semaphore
+    yotta_semaphore_t * semaphore;
+}
+yotta_dispatch_group_t;
+
+/*
+ * Defines a dispatch thread
+ */
+typedef struct
+yotta_dispatch_thread_s
+{
+    // POSIX thread id
+    pthread_t tid;
 
     // thread's local id in the group
     uint64_t local_id;
 
-    // thread's local group's size
-    uint64_t local_count;
+    // thread's group
+    yotta_dispatch_group_t * group;
 
-    // thread's group id
-    uint64_t group_id;
-
-    // thread's group's count in the pool
-    uint64_t group_count;
-
-    // thread's global id in the pool
-    uint64_t global_id;
-
-    // thread global pool size
-    uint64_t global_count;
-
-    // POSIX thread id
-    pthread_t tid;
+    // thread parameter
+    void * user_param;
 }
 yotta_dispatch_thread_t;
 
@@ -55,9 +70,22 @@ static
 void *
 yotta_dispath_thread_entry(yotta_dispatch_thread_t * thread)
 {
+    yotta_assert(thread != 0);
+    yotta_assert(thread->group != 0);
+
+    yotta_semaphore_wait(thread->group->semaphore);
+
+    if (thread->group->id == thread->group->group_count)
+    {
+        /*
+         * We were not able to create all threads, then we do not launch one.
+         */
+        return 0;
+    }
+
     yotta_dispatch_thread = thread;
 
-    (thread->user_function)(thread->user_param);
+    (thread->group->user_function)(thread->user_param);
 
     return 0;
 }
@@ -74,9 +102,15 @@ yotta_dispatch(yotta_dispatch_func_t user_function, void * user_param, uint64_t 
         yotta_return_inv_op(yotta_dispatch);
     }
 
-    uint64_t cores;
+    /*
+     * Creates the threads' group
+     */
+    yotta_dispatch_group_t group;
 
-    if (yotta_threading_cores(&cores) != YOTTA_SUCCESS)
+    /*
+     * Gets the number of available cores
+     */
+    if (yotta_threading_cores(&group.thread_count) != YOTTA_SUCCESS)
     {
         yotta_dispatch_thread = 0;
 
@@ -84,42 +118,85 @@ yotta_dispatch(yotta_dispatch_func_t user_function, void * user_param, uint64_t 
     }
 
     /*
+     * Gets the group's semaphore
+     */
+    if (yotta_sem_fetch(&group.semaphore) != 0)
+    {
+        yotta_dispatch_thread = 0;
+
+        yotta_return_unexpect_fail(yotta_dispatch);
+    }
+
+    // TODO: lets yotta_dispatch() be compatible with yotta_command()
+    group.id = 0;
+    group.group_count = 1;
+    group.global_offset = 0;
+    group.global_count = group.thread_count;
+    group.user_function = user_function;
+
+    /*
      * Creates threads
      */
     yotta_dispatch_thread_t * threads_array =
-        yotta_alloc_sa(yotta_dispatch_thread_t, cores);
+        yotta_alloc_sa(yotta_dispatch_thread_t, group.thread_count);
 
-    for (uint64_t i = 0; i < cores; i++)
+    uint64_t thread_created = 0;
+
+    for ( ; thread_created < group.thread_count; thread_created++)
     {
-        yotta_dispatch_thread_t * thread = threads_array + i;
+        yotta_dispatch_thread_t * thread = threads_array + thread_created;
 
-        thread->user_function = user_function;
         thread->user_param = user_param;
-        thread->local_id = i;
-        thread->local_count = cores;
+        thread->local_id = thread_created;
+        thread->group = &group;
 
-        // TODO: lets yotta_dispatch() be compatible with yotta_command()
-        thread->group_id = 0;
-        thread->group_count = 1;
-        thread->global_id = i;
-        thread->global_count = cores;
-
-        pthread_create(&thread->tid, 0, (void *) yotta_dispath_thread_entry, thread);
+        if (pthread_create(&thread->tid, 0, (void *) yotta_dispath_thread_entry, thread) != 0)
+        {
+            break;
+        }
 
         user_param = ((uint8_t *) user_param) + user_param_stride;
+    }
+
+    if (thread_created != group.thread_count)
+    {
+        /*
+         * We were not able to create all threads
+         */
+
+        group.id = group.group_count;
+    }
+
+    /*
+     * Launches all threads
+     */
+    for (uint64_t i = 0; i < thread_created; i++)
+    {
+        yotta_semaphore_post(group.semaphore);
     }
 
     /*
      * Waits threads
      */
-    for (uint64_t i = 0; i < cores; i++)
+    for (uint64_t i = 0; i < thread_created; i++)
     {
         pthread_join(threads_array[i].tid, 0);
     }
 
     yotta_dispatch_thread = 0;
 
+    yotta_sem_release(group.semaphore);
+
     yotta_free(threads_array);
+
+    if (thread_created != group.thread_count)
+    {
+        /*
+         * We were not able to create all threads
+         */
+
+        yotta_return_unexpect_fail(yotta_dispatch);
+    }
 
     return YOTTA_SUCCESS;
 }
@@ -149,7 +226,7 @@ yotta_get_local_id(uint64_t * out_id, uint64_t * out_count)
 
     if (out_count != 0)
     {
-        *out_count = yotta_dispatch_thread->local_count;
+        *out_count = yotta_dispatch_thread->group->thread_count;
     }
 }
 
@@ -173,12 +250,12 @@ yotta_get_group_id(uint64_t * out_id, uint64_t * out_count)
 
     if (out_id != 0)
     {
-        *out_id = yotta_dispatch_thread->group_id;
+        *out_id = yotta_dispatch_thread->group->id;
     }
 
     if (out_count != 0)
     {
-        *out_count = yotta_dispatch_thread->group_count;
+        *out_count = yotta_dispatch_thread->group->group_count;
     }
 }
 
@@ -202,11 +279,12 @@ yotta_get_global_id(uint64_t * out_id, uint64_t * out_count)
 
     if (out_id != 0)
     {
-        *out_id = yotta_dispatch_thread->global_id;
+        *out_id = yotta_dispatch_thread->local_id +
+            yotta_dispatch_thread->group->global_offset;
     }
 
     if (out_count != 0)
     {
-        *out_count = yotta_dispatch_thread->global_count;
+        *out_count = yotta_dispatch_thread->group->global_count;
     }
 }
