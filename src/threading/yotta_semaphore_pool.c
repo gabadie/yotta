@@ -1,11 +1,11 @@
 #include <string.h>
 #include <pthread.h>
 
-#include "core/yotta_debug.h"
-#include "core/yotta_logger.private.h"
-#include "core/yotta_memory.h"
-#include "core/yotta_return.h"
-#include "yotta_sem.private.h"
+#include "yotta_semaphore_pool.private.h"
+#include "../core/yotta_debug.h"
+#include "../core/yotta_logger.private.h"
+#include "../core/yotta_memory.h"
+#include "../core/yotta_return.h"
 
 
 typedef struct

@@ -6,7 +6,6 @@ yotta_command.c
 yotta_context.c
 yotta_init.c
 yotta_sync.c
-yotta_sem.private.c
 core/yotta_address_translation.c
 core/yotta_logger.c
 core/yotta_memory.c
@@ -22,6 +21,7 @@ socket/yotta_tcp.c
 socket/yotta_tcp_cmd.c
 socket/yotta_tcp_queue.c
 socket/yotta_udp.c
+threading/yotta_semaphore_pool.c
 utils/yotta_file.c
 utils/yotta_str_utils.c
 whisper/yotta_whisper_command.c

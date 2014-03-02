@@ -1,9 +1,9 @@
-#include <unistd.h>
 
+#include "yotta_sync.private.h"
 #include "core/yotta_logger.private.h"
 #include "core/yotta_return.private.h"
-#include "yotta_sem.private.h"
-#include "yotta_sync.private.h"
+#include "threading/yotta_semaphore_pool.private.h"
+
 
 void
 yotta_sync_post(yotta_sync_t * sync)

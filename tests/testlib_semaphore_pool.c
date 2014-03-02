@@ -3,7 +3,7 @@
 #include <yotta.h>
 #include <mk_test.h>
 
-#include "../src/yotta_sem.private.h"
+#include "../src/threading/yotta_semaphore_pool.private.h"
 
 void
 test_fetch_release()

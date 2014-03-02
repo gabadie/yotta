@@ -1,7 +1,7 @@
-#ifndef _YOTTA_SEM
-#define _YOTTA_SEM
+#ifndef _YOTTAPRIVATE_SEMAPHORE_POOL
+#define _YOTTAPRIVATE_SEMAPHORE_POOL
 
-#include "threading/yotta_semaphore.h"
+#include "yotta_semaphore.h"
 
 
 /*

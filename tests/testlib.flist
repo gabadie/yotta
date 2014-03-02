@@ -8,6 +8,7 @@ testlib_file.c
 testlib_headers.sh
 testlib_logger.c
 testlib_memory.c
+testlib_semaphore_pool.c
 testlib_slave.c
 testlib_socket.c
 testlib_socket_thread.c
@@ -15,5 +16,4 @@ testlib_str_utils.c
 testlib_sync.c
 testlib_whisper_fetch.c
 testlib_whisper_push.c
-testlib_sem_pool.c
 #testlib_context.c
