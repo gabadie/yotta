@@ -97,7 +97,7 @@ yotta_dispatch(yotta_dispatch_func_t user_function, void * user_param, uint64_t 
     {
         yotta_return_inv_value(yotta_dispatch, user_function);
     }
-    else if (!__sync_bool_compare_and_swap(&yotta_dispatch_thread, 0, (yotta_dispatch_thread_t *) 1))
+    else if (yotta_dispatch_thread != 0)
     {
         yotta_return_inv_op(yotta_dispatch);
     }
@@ -112,8 +112,6 @@ yotta_dispatch(yotta_dispatch_func_t user_function, void * user_param, uint64_t 
      */
     if (yotta_threading_cores(&group.thread_count) != YOTTA_SUCCESS)
     {
-        yotta_dispatch_thread = 0;
-
         yotta_return_unexpect_fail(yotta_dispatch);
     }
 
@@ -122,8 +120,6 @@ yotta_dispatch(yotta_dispatch_func_t user_function, void * user_param, uint64_t 
      */
     if (yotta_sem_fetch(&group.semaphore) != 0)
     {
-        yotta_dispatch_thread = 0;
-
         yotta_return_unexpect_fail(yotta_dispatch);
     }
 
@@ -182,8 +178,6 @@ yotta_dispatch(yotta_dispatch_func_t user_function, void * user_param, uint64_t 
     {
         pthread_join(threads_array[i].tid, 0);
     }
-
-    yotta_dispatch_thread = 0;
 
     yotta_sem_release(group.semaphore);
 
