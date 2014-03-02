@@ -7,10 +7,10 @@
 
 
 yotta_thread_local
-yotta_global_thread_pool_t * yotta_thread_global_pool = 0;
+yotta_global_thread_pool_t const * yotta_thread_global_pool = 0;
 
 yotta_thread_local
-yotta_dispatch_thread_t * yotta_dispatch_thread = 0;
+yotta_dispatch_thread_t const * yotta_dispatch_thread = 0;
 
 
 static

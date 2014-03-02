@@ -33,7 +33,7 @@ typedef struct
 yotta_dispatch_group_s
 {
     // group's global info
-    yotta_global_thread_pool_t * global;
+    yotta_global_thread_pool_t const * global;
 
     // group's threads count
     uint64_t thread_count;
@@ -75,14 +75,14 @@ yotta_dispatch_thread_t;
  */
 extern
 yotta_thread_local
-yotta_global_thread_pool_t * yotta_thread_global_pool;
+yotta_global_thread_pool_t const * yotta_thread_global_pool;
 
 /*
  * Locals dispached thread variables
  */
 extern
 yotta_thread_local
-yotta_dispatch_thread_t * yotta_dispatch_thread;
+yotta_dispatch_thread_t const * yotta_dispatch_thread;
 
 
 #endif
