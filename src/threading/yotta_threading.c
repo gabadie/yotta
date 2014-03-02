@@ -54,11 +54,13 @@ yotta_threading_cores(uint64_t * cores)
 #else
 
 uint64_t
-yotta_threading_cores()
+yotta_threading_cores(uint64_t * cores)
 {
-    yotta_todo("must implement it for linux");
+    // TODO: must implement it for linux
 
-    yotta_return_unexpect_fail(yotta_threading_cores);
+    *cores = 1;
+
+    return YOTTA_SUCCESS;
 }
 
 
