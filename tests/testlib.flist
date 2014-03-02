@@ -15,6 +15,7 @@ testlib_socket_thread.c
 testlib_str_utils.c
 testlib_sync.c
 testlib_threading.c
+testlib_whisper_command.c
 testlib_whisper_fetch.c
 testlib_whisper_push.c
 #testlib_context.c
