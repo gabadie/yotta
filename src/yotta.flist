@@ -9,6 +9,7 @@ core/yotta_addr_translation.c
 core/yotta_logger.c
 core/yotta_memory.c
 dictate/yotta_dictate_binary_send.c
+features/yotta_fetch.c
 features/yotta_push.c
 slave/yotta_slave.c
 slave/yotta_slave_context.c
