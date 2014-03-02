@@ -3,7 +3,7 @@
 
 #include "yotta_whisper_command.private.h"
 #include "yotta_whisper_labels.private.h"
-#include "../core/yotta_address_translation.h"
+#include "../core/yotta_addr_translation.private.h"
 #include "../core/yotta_debug.h"
 #include "../core/yotta_memory.h"
 

@@ -2,7 +2,7 @@
 # List of the library's tests
 #
 
-testlib_address_translation.c
+testlib_addr_translation.c
 testlib_command.c
 testlib_file.c
 testlib_headers.sh

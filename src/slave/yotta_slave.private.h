@@ -1,7 +1,7 @@
 #ifndef _YOTTAPRIVATE_SLAVE
 #define _YOTTAPRIVATE_SLAVE
 
-#include "../core/yotta_address_translation.h"
+#include "../yotta_prefix.h"
 
 
 /*

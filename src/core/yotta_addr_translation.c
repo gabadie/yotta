@@ -1,4 +1,4 @@
-#include "yotta_address_translation.h"
+#include "yotta_addr_translation.private.h"
 
 
 static void

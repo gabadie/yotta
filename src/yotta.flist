@@ -5,7 +5,7 @@
 yotta_command.c
 yotta_context.c
 yotta_init.c
-core/yotta_address_translation.c
+core/yotta_addr_translation.c
 core/yotta_logger.c
 core/yotta_memory.c
 dictate/yotta_dictate_binary_send.c

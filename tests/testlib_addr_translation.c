@@ -1,6 +1,10 @@
+
 #include <yotta.h>
 #include <mk_test.h>
 #include <inttypes.h>
+
+#include "../src/core/yotta_addr_translation.private.h"
+
 
 char
 func_a()
@@ -38,4 +42,3 @@ main(int argc, char const * const * argv)
 
     return 0;
 }
-

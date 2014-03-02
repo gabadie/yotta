@@ -1,5 +1,5 @@
-#ifndef _YOTTA_ADDRESS_TRANSLATION
-#define _YOTTA_ADDRESS_TRANSLATION
+#ifndef _YOTTA_ADDR_TRANSLATION
+#define _YOTTA_ADDR_TRANSLATION
 
 #include "../yotta_prefix.h"
 
