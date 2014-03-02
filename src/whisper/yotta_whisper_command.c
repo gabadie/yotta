@@ -1,11 +1,10 @@
 
-#include <pthread.h>
-
 #include "yotta_whisper_command.private.h"
 #include "yotta_whisper_labels.private.h"
 #include "../core/yotta_addr_translation.private.h"
 #include "../core/yotta_debug.h"
 #include "../core/yotta_memory.h"
+#include "../threading/yotta_thread.h"
 
 
 /*
@@ -62,7 +61,7 @@ yotta_whisper_command_feedback_cmd_s
     yotta_whisper_command_entry_t thread_entry;
 
     // the thread
-    pthread_t thread;
+    yotta_thread_t thread;
 
     // the TCP queue to send back the feedback when the thread has finished
     yotta_whisper_queue_t * queue;
@@ -310,7 +309,15 @@ yotta_whisper_command_order_recv(
             (yotta_whisper_command_entry_t) yotta_address_relative_to_absolute(buffer->header.function_rel_addr);
         cmd->queue = cmd_queue;
 
-        pthread_create(&cmd->thread, 0, (void *) yotta_whisper_command_thread, (void *) cmd);
+        if (yotta_thread_create(&cmd->thread, (void *) yotta_whisper_command_thread, (void *) cmd) != 0)
+        {
+            if (cmd->param)
+            {
+                yotta_free(cmd->param);
+            }
+
+            yotta_tcp_cmd_release(cmd);
+        }
     }
 
     /*

@@ -1,9 +1,8 @@
 #ifndef _YOTTA_SOCKET_THREAD
 #define _YOTTA_SOCKET_THREAD
 
-#include <pthread.h>
-
 #include "yotta_socket_event.h"
+#include "../threading/yotta_thread.h"
 
 
 /*
@@ -12,7 +11,7 @@
 typedef struct
 yotta_socket_thread_s
 {
-    pthread_t id;
+    yotta_thread_t id;
     pthread_mutex_t mutex;
     uint64_t quit_status;
     yotta_socket_event_t * socket_head;

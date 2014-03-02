@@ -89,7 +89,7 @@ testhelper_whisper_protocol_destroy(testhelper_whisper_protocol_t * testing_prot
     yotta_tcp_queue_finish((yotta_tcp_queue_t *) &testing_protocol->queue0);
 
     // cleans the sockets' thread
-    yotta_socket_thread_destroy(&testing_protocol->thread);
+    test_assert(yotta_socket_thread_destroy(&testing_protocol->thread) == 0);
 }
 
 

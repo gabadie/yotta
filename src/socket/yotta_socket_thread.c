@@ -190,7 +190,7 @@ yotta_socket_thread_init(yotta_socket_thread_t * thread)
         return -1;
     }
 
-    if (pthread_create(&thread->id, 0, (void *(*)(void *))yotta_socket_thread_main, thread) != 0)
+    if (yotta_thread_create(&thread->id, yotta_socket_thread_main, thread) != 0)
     {
         pthread_mutex_destroy(&thread->mutex);
         return -1;
@@ -227,7 +227,7 @@ yotta_socket_thread_destroy(yotta_socket_thread_t * thread)
 
     thread->quit_status = YOTTA_SOCKET_THREAD_STOP_ON_EMPTY;
 
-    if (pthread_join(thread->id, 0) != 0)
+    if (yotta_thread_join(thread->id) != 0)
     {
         return -1;
     }
@@ -246,7 +246,7 @@ yotta_socket_thread_kill(yotta_socket_thread_t * thread)
 
     thread->quit_status = YOTTA_SOCKET_THREAD_STOP_NOW;
 
-    if (pthread_join(thread->id, 0) != 0)
+    if (yotta_thread_join(thread->id) != 0)
     {
         return -1;
     }

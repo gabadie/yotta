@@ -1,10 +1,9 @@
 
-#include <pthread.h>
-
 #include "yotta_dispatch.h"
 #include "../core/yotta_memory.h"
 #include "../core/yotta_return.private.h"
 #include "../threading/yotta_semaphore_pool.private.h"
+#include "../threading/yotta_thread.h"
 #include "../threading/yotta_threading.h"
 
 
@@ -46,8 +45,8 @@ yotta_dispatch_group_t;
 typedef struct
 yotta_dispatch_thread_s
 {
-    // POSIX thread id
-    pthread_t tid;
+    // thread id
+    yotta_thread_t tid;
 
     // thread's local id in the group
     uint64_t local_id;
@@ -65,7 +64,7 @@ yotta_dispatch_thread_t;
  * Locals thread variables
  */
 static
-__thread
+yotta_thread_local
 yotta_dispatch_thread_t * yotta_dispatch_thread = 0;
 
 
@@ -151,7 +150,7 @@ yotta_dispatch(yotta_dispatch_func_t user_function, void * user_param, uint64_t 
         thread->local_id = thread_created;
         thread->group = &group;
 
-        if (pthread_create(&thread->tid, 0, (void *) yotta_dispath_thread_entry, thread) != 0)
+        if (yotta_thread_create(&thread->tid, yotta_dispath_thread_entry, thread) != 0)
         {
             break;
         }
@@ -181,7 +180,7 @@ yotta_dispatch(yotta_dispatch_func_t user_function, void * user_param, uint64_t 
      */
     for (uint64_t i = 0; i < thread_created; i++)
     {
-        pthread_join(threads_array[i].tid, 0);
+        yotta_thread_join(threads_array[i].tid);
     }
 
     yotta_sem_release(group.semaphore);
