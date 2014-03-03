@@ -48,10 +48,10 @@ pthread_mutex_t sem_pool_lock = PTHREAD_MUTEX_INITIALIZER;
 
 
 #define yotta_sem_all_used(sem_s) \
-    ((sem_s)->used & (~(0ull)))
+    ((sem_s)->used == ~(0ull))
 
 #define yotta_sem_used(sem_s, idx) \
-    ((sem_s)->used & (1 << (idx)))
+    ((sem_s)->used & (1ull << (idx)))
 
 
 uint64_t
@@ -66,8 +66,6 @@ yotta_sem_fetch(yotta_semaphore_t ** out_sem)
         uint64_t chunk_idx = 0;
         yotta_semaphore_deck_t ** current_chunk = &sem_pool;
 
-        // TODO: break down the skope pyramide
-
         while (!sem_found)
         {
             // If the current chunk is empty, we allocate a new one
@@ -78,41 +76,47 @@ yotta_sem_fetch(yotta_semaphore_t ** out_sem)
                 memset(*current_chunk, 0, sizeof(yotta_semaphore_deck_t));
             }
 
-            if (!yotta_sem_all_used(*current_chunk))
+            // If the current chunk is totally used, we skip it
+            if (yotta_sem_all_used(*current_chunk))
             {
-                // We search for the first free semaphore
-                for (uint64_t i = 0; i < sizeof(uint64_t) * 8; i++)
+                current_chunk = &(*current_chunk)->next;
+                chunk_idx++;
+                continue;
+            }
+
+            // We search for the first free semaphore
+            for (uint64_t i = 0; i < sizeof(uint64_t) * 8; i++)
+            {
+                // Skip if the semaphore is currently in use
+                if (yotta_sem_used(*current_chunk, i))
                 {
-                    // Skip if the semaphore is currently in use
-                    if (yotta_sem_used(*current_chunk, i))
-                    {
-                        continue;
-                    }
-
-                    yotta_semaphore_t * free_sem = (*current_chunk)->sem + i;
-
-                    // If the free semphore has not been initialized, ...
-                    if ((chunk_idx * sizeof(uint64_t) * 8 + i) >= sem_count)
-                    {
-                        // ... we initialize it
-                        if (yotta_semaphore_init(free_sem, 0) != 0)
-                        {
-                            yotta_logger_error("sem_init failed\n");
-
-                            pthread_mutex_unlock(&sem_pool_lock);
-
-                            return YOTTA_UNEXPECTED_FAIL;
-                        }
-
-                        sem_count++;
-                    }
-
-
-                    (*current_chunk)->used |= (1ull << i);
-                    *out_sem = free_sem;
-                    sem_found = 1;
-                    break;
+                    continue;
                 }
+
+                yotta_semaphore_t * free_sem = (*current_chunk)->sem + i;
+
+                yotta_assert((*current_chunk)->sem + i == &(*current_chunk)->sem[i]);
+
+                // If the free semphore has not been initialized, ...
+                if ((chunk_idx * sizeof(uint64_t) * 8 + i) >= sem_count)
+                {
+                    // ... we initialize it
+                    if (yotta_semaphore_init(free_sem, 0) != 0)
+                    {
+                        yotta_logger_error("sem_init failed\n");
+
+                        pthread_mutex_unlock(&sem_pool_lock);
+
+                        return YOTTA_UNEXPECTED_FAIL;
+                    }
+
+                    sem_count++;
+                }
+
+                (*current_chunk)->used |= (1ull << i);
+                *out_sem = free_sem;
+                sem_found = 1;
+                break;
             }
 
             current_chunk = &(*current_chunk)->next;
@@ -146,18 +150,12 @@ yotta_sem_release(yotta_semaphore_t * sem)
         while (current_chunk != NULL)
         {
             // We try to find the semaphore in the current chunk
-
-            // TODO: We know the semaphore address -> we can find <i> by calculus
-            for (uint64_t i = 0; i < sizeof(uint64_t) * 8; i++)
+            if (sem >= &current_chunk->sem[0] &&
+                sem <  &current_chunk->sem[0] + sizeof(uint64_t) * 8)
             {
-                if (sem == &current_chunk->sem[i])
-                {
-                    current_chunk->used &= ~(1ull << i);
-
-                    pthread_mutex_unlock(&sem_pool_lock);
-
-                    return;
-                }
+                current_chunk->used &= ~(1ull << (uint64_t)(sem - &current_chunk->sem[0]));
+                pthread_mutex_unlock(&sem_pool_lock);
+                return;
             }
 
             current_chunk = current_chunk->next;
