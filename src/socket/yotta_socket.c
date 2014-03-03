@@ -1,6 +1,7 @@
 #include "yotta_socket.h"
 #include "../core/yotta_debug.h"
 #include "../utils/yotta_str_utils.h"
+#include "../core/yotta_return.private.h"
 
 #include <string.h>
 #include <stdlib.h>
@@ -164,6 +165,24 @@ yotta_init_socket_client(yotta_socket_t * sock, char const * address,
     return 0;
 }
 
+uint64_t
+yotta_socket_port(yotta_socket_t * sock, uint16_t * port)
+{
+    yotta_assert(sock != NULL);
+    yotta_assert(port != NULL);
+
+    struct sockaddr_in sin;
+    socklen_t len = sizeof(sin);
+    if (getsockname(sock->fd, (struct sockaddr *) &sin, &len) == -1)
+    {
+        yotta_return_unexpect_fail(yotta_socket_port);
+    }
+    else
+    {
+        *port = ntohs(sin.sin_port);
+        return YOTTA_SUCCESS;
+    }
+}
 
 uint64_t
 yotta_listen_socket(yotta_socket_t * sock, int backlog)

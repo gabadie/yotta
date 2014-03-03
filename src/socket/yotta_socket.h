@@ -54,6 +54,19 @@ yotta_init_socket_client(yotta_socket_t * sock, char const * address,
     uint16_t port, int family, int type);
 
 /*
+ * @infos: gets the port of a yotta socket
+ *
+ * @param <sock>: yotta socket
+ * @param <port>: output port
+ *
+ * @returns:
+ *  == <0> if succeed
+ *  != <0> if failed
+ */
+uint64_t
+yotta_socket_port(yotta_socket_t * sock, uint16_t * port);
+
+/*
  * @infos: listen with a yotta socket
  *
  * @param <sock>: the listening yotta socket
