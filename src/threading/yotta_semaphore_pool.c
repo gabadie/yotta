@@ -95,8 +95,6 @@ yotta_sem_fetch(yotta_semaphore_t ** out_sem)
 
                 yotta_semaphore_t * free_sem = (*current_chunk)->sem + i;
 
-                yotta_assert((*current_chunk)->sem + i == &(*current_chunk)->sem[i]);
-
                 // If the free semphore has not been initialized, ...
                 if ((chunk_idx * sizeof(uint64_t) * 8 + i) >= sem_count)
                 {
