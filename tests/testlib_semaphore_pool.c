@@ -31,7 +31,7 @@ void
 test_many_sem()
 {
     // 256 semaphores <=> 4 chunks
-    uint64_t const NB_SEM = 256;
+    uint64_t const NB_SEM = 4;
 
     yotta_semaphore_t * sem[NB_SEM];
     memset(sem, 0, sizeof(sem));
@@ -61,13 +61,13 @@ test_many_sem()
     }
 
     // Release the semaphores in reverse order
-    for(uint64_t i = NB_SEM-1; i != 0; i--)
+    for(int64_t i = NB_SEM-1; i >= 0; i--)
     {
         yotta_sem_release(sem2[i]);
     }
 
     memset(sem2, 0, sizeof(sem2));
-    // Ask again for 128 semaphores and check we use the same
+    // Ask again for NB_SEM semaphores and check we use the same
     // semaphores as before
     for(uint64_t i = 0u; i < NB_SEM; i++)
     {
@@ -76,14 +76,14 @@ test_many_sem()
     }
 
     // Release the second half of the semaphores
-    for(uint64_t i = NB_SEM-1; i != NB_SEM/2; i--)
+    for(uint64_t i = NB_SEM-1; i != NB_SEM/2-1; i--)
     {
         yotta_sem_release(sem2[i]);
     }
 
     // Ask for the same number or semaphores as previously released
     // and check that we retrieve the same semaphores as before
-    for(uint64_t i = NB_SEM-1; i != NB_SEM/2; i--)
+    for(uint64_t i = NB_SEM-1; i != NB_SEM/2-1; i--)
     {
         test_assert(yotta_sem_fetch(&sem2[i]) == YOTTA_SUCCESS);
         test_assert(sem2[i] == sem[NB_SEM/2 + (NB_SEM-1-i)]);
@@ -101,9 +101,7 @@ int
 main()
 {
     test_fetch_release();
-
-    // TODO: reconsider test_many_sem()
-    //test_many_sem();
+    test_many_sem();
 
     return 0;
 }
