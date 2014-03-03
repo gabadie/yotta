@@ -39,6 +39,22 @@ test_socket_nonblocking()
     testhelper_tcp_clean(&sockets);
 }
 
+void
+test_socket_port()
+{
+    uint16_t const PORT = 8006;
+
+    yotta_socket_t sock;
+    yotta_tcp_socket_server(&sock, PORT);
+
+    uint16_t port = 0;
+    test_assert(yotta_socket_port(&sock, &port) == YOTTA_SUCCESS);
+
+    test_assert(port == PORT);
+
+    yotta_close_socket(&sock);
+}
+
 int
 main()
 {
@@ -46,6 +62,7 @@ main()
 
     test_socket();
     test_socket_nonblocking();
+    test_socket_port();
 
     return 0;
 }
