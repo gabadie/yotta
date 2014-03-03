@@ -49,16 +49,16 @@ testhelper_whisper_protocol_init(testhelper_whisper_protocol_t * testing_protoco
     test_assert(yotta_tcp_socket_server(&listening_socket, PORT) == 0);
 
     // Server socket listen
-    test_assert(yotta_listen_socket(&listening_socket, BACKLOG) == 0);
+    test_assert(yotta_socket_listen(&listening_socket, BACKLOG) == 0);
 
     // Create queue 0's socket
     test_assert(yotta_tcp_socket_client((yotta_socket_t *) &testing_protocol->queue0, "127.0.0.1", PORT) == 0);
 
     // Create queue 1's socket
-    test_assert(yotta_accept_socket(&listening_socket, (yotta_socket_t *) &testing_protocol->queue1) == 0);
+    test_assert(yotta_socket_accept(&listening_socket, (yotta_socket_t *) &testing_protocol->queue1) == 0);
 
     // Close server socket
-    test_assert(yotta_close_socket(&listening_socket) == 0);
+    test_assert(yotta_socket_close(&listening_socket) == 0);
 
     // inits queues
     yotta_whisper_queue_init(&testing_protocol->queue0);

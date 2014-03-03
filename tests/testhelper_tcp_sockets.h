@@ -39,13 +39,13 @@ testhelper_tcp_build(testhelper_tcp_sockets_t * testing_sockets)
     test_assert(yotta_tcp_socket_server(&testing_sockets->listening_socket, PORT) == 0);
 
     // Server socket listen
-    test_assert(yotta_listen_socket(&testing_sockets->listening_socket, BACKLOG) != (uint64_t) -1);
+    test_assert(yotta_socket_listen(&testing_sockets->listening_socket, BACKLOG) != (uint64_t) -1);
 
     // Create client socket
     test_assert(yotta_tcp_socket_client(&testing_sockets->client_socket, "127.0.0.1", PORT) == 0);
 
     // Accept connection
-    test_assert(yotta_accept_socket(&testing_sockets->listening_socket, &testing_sockets->sending_socket) == 0);
+    test_assert(yotta_socket_accept(&testing_sockets->listening_socket, &testing_sockets->sending_socket) == 0);
 }
 
 /*
@@ -59,9 +59,9 @@ testhelper_tcp_clean(testhelper_tcp_sockets_t * testing_sockets)
 {
     test_assert(testing_sockets != 0);
 
-    test_assert(yotta_close_socket(&testing_sockets->client_socket) == 0);
-    test_assert(yotta_close_socket(&testing_sockets->sending_socket) == 0);
-    test_assert(yotta_close_socket(&testing_sockets->listening_socket) == 0);
+    test_assert(yotta_socket_close(&testing_sockets->client_socket) == 0);
+    test_assert(yotta_socket_close(&testing_sockets->sending_socket) == 0);
+    test_assert(yotta_socket_close(&testing_sockets->listening_socket) == 0);
 }
 
 #endif
