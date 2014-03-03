@@ -52,7 +52,7 @@ test_socket_port()
 
     test_assert(port == PORT);
 
-    yotta_close_socket(&sock);
+    yotta_socket_close(&sock);
 }
 
 int

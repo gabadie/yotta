@@ -38,7 +38,7 @@ yotta_context_destroy(yotta_context_t * context)
         yotta_return_unexpect_fail(yotta_context_destroy);
     }
 
-    if (yotta_close_socket(&context->slave) != 0)
+    if (yotta_socket_close(&context->slave) != 0)
     {
         yotta_return_unexpect_fail(yotta_context_destroy);
     }

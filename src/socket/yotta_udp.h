@@ -15,7 +15,7 @@
  *  != <0> if failed
  */
 #define yotta_udp_socket_server(sock, port) \
-    yotta_init_socket_server((sock), (port), AF_UNSPEC, SOCK_DGRAM)
+    yotta_socket_server_init((sock), (port), AF_UNSPEC, SOCK_DGRAM)
 
 /*
  * @infos: init a yotta UDP socket client
@@ -29,7 +29,7 @@
  *  != <0> if failed
  */
 #define yotta_udp_socket_client(sock, address, port) \
-    yotta_init_socket_client((sock), (address), (port), AF_UNSPEC, SOCK_DGRAM)
+    yotta_socket_client_init((sock), (address), (port), AF_UNSPEC, SOCK_DGRAM)
 
 /*
  * @infos: send data via a yotta UDP socket

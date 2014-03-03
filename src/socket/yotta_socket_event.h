@@ -114,6 +114,6 @@ yotta_socket_event_unlisten(yotta_socket_event_t * socket_event);
  * @param <socket_event>: the socket event to destroy
  */
 #define yotta_socket_event_destroy(socket_event) \
-    yotta_close_socket(&((yotta_socket_event_t *) socket_event)->socket)
+    yotta_socket_close(&((yotta_socket_event_t *) socket_event)->socket)
 
 #endif

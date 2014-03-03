@@ -32,7 +32,7 @@ yotta_socket_s
  *  != <0> if failed
  */
 uint64_t
-yotta_init_socket_server(yotta_socket_t * sock, uint16_t port, int family, int type);
+yotta_socket_server_init(yotta_socket_t * sock, uint16_t port, int family, int type);
 
 /*
  * @infos: init a yotta socket client
@@ -50,7 +50,7 @@ yotta_init_socket_server(yotta_socket_t * sock, uint16_t port, int family, int t
  *  != <0> if failed
  */
 uint64_t
-yotta_init_socket_client(yotta_socket_t * sock, char const * address,
+yotta_socket_client_init(yotta_socket_t * sock, char const * address,
     uint16_t port, int family, int type);
 
 /*
@@ -77,7 +77,7 @@ yotta_socket_port(yotta_socket_t * sock, uint16_t * port);
  *  != <0> if failed
  */
 uint64_t
-yotta_listen_socket(yotta_socket_t * sock, int backlog);
+yotta_socket_listen(yotta_socket_t * sock, int backlog);
 
 /*
  * @infos: accept a new connection on a yotta socket
@@ -92,7 +92,7 @@ yotta_listen_socket(yotta_socket_t * sock, int backlog);
  *  != <0> if failed
  */
 uint64_t
-yotta_accept_socket(yotta_socket_t * sock, yotta_socket_t * new_sock);
+yotta_socket_accept(yotta_socket_t * sock, yotta_socket_t * new_sock);
 
 /*
  * @infos: close a yotta socket
@@ -104,7 +104,7 @@ yotta_accept_socket(yotta_socket_t * sock, yotta_socket_t * new_sock);
  *  != <0> if failed
  */
 uint64_t
-yotta_close_socket(yotta_socket_t * sock);
+yotta_socket_close(yotta_socket_t * sock);
 
 /*
  * @infos: switches socket mode to passing mode
