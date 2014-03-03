@@ -164,3 +164,18 @@ yotta_sem_release(yotta_semaphore_t * sem)
 
     yotta_crash_msg("Unknown semaphore: %p", (void *) sem);
 }
+
+void
+yotta_sem_pool_flush()
+{
+    yotta_semaphore_deck_t * deck = sem_pool;
+
+    while (deck != NULL)
+    {
+        yotta_semaphore_deck_t * tmp = deck;
+        deck = deck->next;
+        yotta_free(tmp);
+    }
+
+    sem_pool = NULL;
+}

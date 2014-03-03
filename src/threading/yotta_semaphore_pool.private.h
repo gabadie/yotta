@@ -24,5 +24,10 @@ yotta_sem_fetch(yotta_semaphore_t ** out_sem);
 void
 yotta_sem_release(yotta_semaphore_t * sem);
 
+/*
+ * @infos: flush the pool of semaphores
+ */
+void
+yotta_sem_pool_flush();
 
 #endif //_YOTTA_SEM
