@@ -114,7 +114,7 @@ test_post_post_wait()
 int
 main()
 {
-    /*test_post_wait();*/
+    test_post_wait();
     test_wait_post();
     /*test_post_post_wait();*/
 
