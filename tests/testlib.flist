@@ -6,7 +6,7 @@ testlib_addr_translation.c
 testlib_file.c
 testlib_headers.sh
 testlib_logger.c
-testlib_massive_barrier.c
+#testlib_massive_barrier.c
 testlib_massive_context.c
 testlib_massive_dispatch.c
 testlib_memory.c
