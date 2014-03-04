@@ -1,6 +1,8 @@
 
 #include "yotta_logger.h"
 #include "yotta_logger.private.h"
+#include "../massive/yotta_dispatch.h"
+#include "../threading/yotta_threading.h"
 
 
 // global logger's callback
@@ -18,11 +20,27 @@ void * yotta_logger_user_data;
  *
  * @returns: void
  */
-#define yotta_logger(msg_type,msg) \
-    if (yotta_logger_callback) \
-    { \
-        yotta_logger_callback(msg_type, msg, yotta_logger_user_data); \
+void
+yotta_logger(yotta_log_msg_type_t msg_type, char const * msg)
+{
+    if (yotta_logger_callback == 0)
+    {
+        return;
     }
+
+    yotta_logger_param_t logger_param;
+
+    logger_param.type = msg_type;
+    logger_param.msg = msg;
+    logger_param.process_id = yotta_threading_pid();
+    logger_param.thread_id = yotta_threading_tid();
+
+    yotta_get_local_id(&logger_param.local_id, &logger_param.local_count);
+    yotta_get_group_id(&logger_param.group_id, &logger_param.group_count);
+    yotta_get_global_id(&logger_param.global_id, &logger_param.global_count);
+
+    yotta_logger_callback(yotta_logger_user_data, &logger_param);
+}
 
 
 yotta_return_t
