@@ -19,7 +19,7 @@ get_addr(struct sockaddr *sa)
 }
 #endif
 
-uint64_t
+yotta_return_t
 yotta_socket_server_init(yotta_socket_t * sock, uint16_t port, int family, int type)
 {
     yotta_assert(sock != NULL);
@@ -95,7 +95,7 @@ yotta_socket_server_init(yotta_socket_t * sock, uint16_t port, int family, int t
     return 0;
 }
 
-uint64_t
+yotta_return_t
 yotta_socket_client_init(yotta_socket_t * sock, char const * address,
     uint16_t port, int family, int type)
 {
@@ -163,7 +163,7 @@ yotta_socket_client_init(yotta_socket_t * sock, char const * address,
     return 0;
 }
 
-uint64_t
+yotta_return_t
 yotta_socket_port(yotta_socket_t * sock, uint16_t * port)
 {
     yotta_assert(sock != NULL);
@@ -175,14 +175,12 @@ yotta_socket_port(yotta_socket_t * sock, uint16_t * port)
     {
         yotta_return_unexpect_fail(yotta_socket_port);
     }
-    else
-    {
-        *port = ntohs(sin.sin_port);
-        return YOTTA_SUCCESS;
-    }
+
+    *port = ntohs(sin.sin_port);
+    return YOTTA_SUCCESS;
 }
 
-uint64_t
+yotta_return_t
 yotta_socket_listen(yotta_socket_t * sock, int backlog)
 {
     yotta_assert(sock != NULL);
@@ -195,7 +193,7 @@ yotta_socket_listen(yotta_socket_t * sock, int backlog)
     return 0;
 }
 
-uint64_t
+yotta_return_t
 yotta_socket_accept(yotta_socket_t * sock, yotta_socket_t * new_sock)
 {
     yotta_assert(sock != NULL && new_sock != NULL);
@@ -241,7 +239,7 @@ yotta_socket_accept(yotta_socket_t * sock, yotta_socket_t * new_sock)
 }
 
 
-uint64_t
+yotta_return_t
 yotta_socket_close(yotta_socket_t * sock)
 {
     yotta_assert(sock != NULL);
