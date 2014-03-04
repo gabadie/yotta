@@ -18,16 +18,14 @@ yotta_return_t
 yotta_str_dec_to_ui64(uint64_t * out_number, char const * str);
 
 /*
- * @infos: get a string from a 16-bit decimal
+ * @infos: generates a string represantation from a given <number> and <basis>
  *
  * @param <out_str>: output string
- * @param <number>: number to convert in string
- *
- * @returns
- *  == <0> if succeed
- *  != <0> elsewhere
+ * @param <number>: number to convert to
+ * @param <basis>: number basis to convert to
  */
-yotta_return_t
-yotta_ui16_to_str(char * out_str, uint16_t number);
+void
+yotta_ui64_to_str(char * out_str, uint64_t number, uint64_t basis);
+
 
 #endif

@@ -1,9 +1,13 @@
 
-#include <stdio.h>
-
 #include "yotta_str_utils.h"
 #include "../core/yotta_debug.h"
 
+
+/*
+ * Stores all digits
+ */
+static
+char const yotta_str_digit[] = "0123456789abcdef";
 
 yotta_return_t
 yotta_str_dec_to_ui64(uint64_t * out_number, char const * str)
@@ -57,11 +61,44 @@ yotta_str_dec_to_ui64(uint64_t * out_number, char const * str)
     return YOTTA_SUCCESS;
 }
 
-yotta_return_t
-yotta_ui16_to_str(char * out_str, uint16_t number)
+void
+yotta_ui64_to_str(char * out_str, uint64_t number, uint64_t basis)
 {
-    yotta_assert(out_str != NULL);
-    /*itoa(number, out_str, 10);*/
-    sprintf(out_str, "%d", number);
-    return YOTTA_SUCCESS;
+    yotta_assert(out_str != 0);
+    yotta_assert(basis > 1 && basis <= sizeof(yotta_str_digit));
+
+    if (number == 0)
+    {
+        out_str[0] = '0';
+        out_str[1] = 0;
+        return;
+    }
+
+    uint64_t divisor = basis;
+
+    for ( ; ; )
+    {
+        if ((number / divisor) == 0)
+        {
+            break;
+        }
+
+        divisor *= basis;
+    }
+
+    divisor /= basis;
+
+    do
+    {
+        uint64_t digit = (number / divisor);
+
+        *out_str = yotta_str_digit[digit];
+        out_str++;
+
+        number -= digit * divisor;
+        divisor /= basis;
+    }
+    while (divisor != 0);
+
+    *out_str = 0;
 }

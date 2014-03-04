@@ -41,7 +41,7 @@ yotta_socket_server_init(yotta_socket_t * sock, uint16_t port, int family, int t
     hints.ai_next = NULL;
 
     char port_str[6];
-    yotta_ui16_to_str(port_str, port);
+    yotta_ui64_to_str(port_str, (uint64_t) port, 10);
 
     // Load address info structs
     if((rv = getaddrinfo(NULL, port_str, &hints, &results)) != 0)
@@ -109,9 +109,7 @@ yotta_socket_client_init(yotta_socket_t * sock, char const * address,
     hints.ai_socktype = type;
 
     char port_str[6];
-    yotta_ui16_to_str(port_str, port);
-
-    // Load address info structs
+    yotta_ui64_to_str(port_str, (uint64_t) port, 10);
 
     // Load address info structs
     if((rv = getaddrinfo(address, port_str, &hints, &results)) != 0)

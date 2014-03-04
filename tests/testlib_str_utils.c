@@ -27,20 +27,41 @@ test_str_dec_to_ui64()
 }
 
 void
-test_ui16_to_str()
+testhelper_ui64_to_str(char const * string, uint64_t number, uint64_t basis)
 {
-    char str[6]; // Max: "65535\0" -> 6 chars
+    char result[32];
 
-    test_assert(yotta_ui16_to_str(str, 0) == 0 && strcmp(str, "0") == 0);
-    test_assert(yotta_ui16_to_str(str, 42) == 0 && strcmp(str, "42") == 0);
-    test_assert(yotta_ui16_to_str(str, 65535) == 0 && strcmp(str, "65535") == 0);
+    yotta_ui64_to_str(result, number, basis);
+
+    test_assert(strcmp(string, result) == 0);
+}
+
+void
+test_ui64_to_str()
+{
+    testhelper_ui64_to_str("0", 0, 2);
+    testhelper_ui64_to_str("0", 0, 8);
+    testhelper_ui64_to_str("0", 0, 10);
+    testhelper_ui64_to_str("0", 0, 16);
+
+    testhelper_ui64_to_str("7", 7, 10);
+    testhelper_ui64_to_str("10", 10, 10);
+    testhelper_ui64_to_str("436", 436, 10);
+
+    testhelper_ui64_to_str("7", 07, 8);
+    testhelper_ui64_to_str("10", 010, 8);
+    testhelper_ui64_to_str("436", 0436, 8);
+
+    testhelper_ui64_to_str("7", 0x7, 16);
+    testhelper_ui64_to_str("10", 0x10, 16);
+    testhelper_ui64_to_str("436", 0x436, 16);
 }
 
 int
 main()
 {
     test_str_dec_to_ui64();
-    test_ui16_to_str();
+    test_ui64_to_str();
     return 0;
 }
 
