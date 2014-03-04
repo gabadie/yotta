@@ -9,13 +9,14 @@
  *
  * @param <out_number>: output number
  * @param <str>: string to parse from
+ * @param <basis>: the explicit basis to convert from (0 if we want to guess it)
  *
  * @returns
- *  == <0> if succeed
- *  != <0> elsewhere
+ *  == YOTTA_SUCCESS if succeed
+ *  == YOTTA_INVALID_VALUE if failed to parse <str>
  */
 yotta_return_t
-yotta_str_dec_to_ui64(uint64_t * out_number, char const * str);
+yotta_str_to_ui64(uint64_t * out_number, char const * str, uint64_t basis);
 
 /*
  * @infos: generates a string represantation from a given <number> and <basis>
