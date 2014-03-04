@@ -65,11 +65,11 @@ void
 yotta_ui64_to_str(char * out_str, uint64_t number, uint64_t basis)
 {
     yotta_assert(out_str != 0);
-    yotta_assert(basis > 1 && basis <= sizeof(yotta_str_digit));
+    yotta_assert(basis > 1 && basis < sizeof(yotta_str_digit));
 
     if (number == 0)
     {
-        out_str[0] = '0';
+        out_str[0] = yotta_str_digit[0];
         out_str[1] = 0;
         return;
     }
