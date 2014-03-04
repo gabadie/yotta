@@ -19,7 +19,7 @@
         return -1; \
     }
 
-uint64_t
+yotta_return_t
 yotta_slave_parse_parameters(yotta_slave_parameters_t * out_parameters, uint64_t argc, char const * const * argv)
 {
     char const * const parameter_prefix = "--yotta-";
@@ -37,7 +37,7 @@ yotta_slave_parse_parameters(yotta_slave_parameters_t * out_parameters, uint64_t
     {
         if (memcmp(*argv, parameter_prefix, parameter_prefix_length) != 0)
         {
-            return -1;
+            return YOTTA_INVALID_ENUM;
         }
 
         char const * const param_name = *argv + parameter_prefix_length;
@@ -66,11 +66,11 @@ yotta_slave_parse_parameters(yotta_slave_parameters_t * out_parameters, uint64_t
         }
         else
         {
-            return -1;
+            return YOTTA_INVALID_ENUM;
         }
     }
 
     yotta_assert(argv <= argv_end);
 
-    return 0;
+    return YOTTA_SUCCESS;
 }

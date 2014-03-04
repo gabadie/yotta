@@ -7,7 +7,7 @@
 
 #include <sys/sysctl.h>
 
-uint64_t
+yotta_return_t
 yotta_threading_cores(uint64_t * cores)
 {
     static int32_t cores_cache = 0;
@@ -53,7 +53,7 @@ yotta_threading_cores(uint64_t * cores)
 
 #else
 
-uint64_t
+yotta_return_t
 yotta_threading_cores(uint64_t * cores)
 {
     // TODO: must implement it for linux

@@ -13,7 +13,7 @@
  *  == <0> if succeed
  *  != <0> if failed
  */
-uint64_t
+yotta_return_t
 yotta_sem_fetch(yotta_semaphore_t ** out_sem);
 
 /*

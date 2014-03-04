@@ -17,7 +17,7 @@
  *  <YOTTA_INVALID_VALUE> if <master_addr>, <buffer_size>, <buffer_dest> or <sync> are null
  *  <YOTTA_INVALID_OPERATION> if not executed on a slave
  */
-uint64_t
+yotta_return_t
 yotta_fetch_package(uint64_t master_addr, uint64_t buffer_size, void * buffer_dest, yotta_sync_t * sync);
 
 

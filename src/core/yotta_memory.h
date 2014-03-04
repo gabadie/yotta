@@ -124,7 +124,7 @@ yotta_free(void * ptr);
  *  <YOTTA_SUCESS> if successed
  *  <YOTTA_INVALID_VALUE> if <allocator> is null
  */
-uint64_t
+yotta_return_t
 yotta_memory_set_allocator(yotta_memory_alloc_func_t allocator, void * user_data);
 
 

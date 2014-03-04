@@ -26,7 +26,7 @@ typedef void (* yotta_dispatch_func_t)(void *);
  *  <YOTTA_INVALID_VALUE> if <function> is null
  *  <YOTTA_INVALID_OPERATION> if a dispatch has already been launched
  */
-uint64_t
+yotta_return_t
 yotta_dispatch(yotta_dispatch_func_t user_function, void * user_param, uint64_t user_param_stride);
 
 /*

@@ -37,7 +37,7 @@ typedef void (* yotta_logger_entry_t)(yotta_log_msg_type_t, char const *, void *
  *  == <0> if succed
  *  != <0> if failed
  */
-uint64_t
+yotta_return_t
 yotta_set_logger_entry(yotta_logger_entry_t callback, void * user_data);
 
 #endif

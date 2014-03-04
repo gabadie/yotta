@@ -9,7 +9,7 @@
  *
  * @returns: the number of core on this computer
  */
-uint64_t
+yotta_return_t
 yotta_threading_cores();
 
 

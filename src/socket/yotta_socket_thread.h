@@ -27,7 +27,7 @@ yotta_socket_thread_s
  *  == <0> if succeed
  *  != <0> if failed
  */
-uint64_t
+yotta_return_t
 yotta_socket_thread_init(yotta_socket_thread_t * thread);
 
 /*
@@ -41,7 +41,7 @@ yotta_socket_thread_init(yotta_socket_thread_t * thread);
  *  == <0> if succeed
  *  != <0> if failed
  */
-uint64_t
+yotta_return_t
 yotta_socket_thread_listen(yotta_socket_thread_t * thread, yotta_socket_event_t * socket_event);
 
 /*
@@ -53,7 +53,7 @@ yotta_socket_thread_listen(yotta_socket_thread_t * thread, yotta_socket_event_t 
  *  == <0> if succeed
  *  != <0> if failed
  */
-uint64_t
+yotta_return_t
 yotta_socket_thread_destroy(yotta_socket_thread_t * thread);
 
 /*
@@ -65,7 +65,7 @@ yotta_socket_thread_destroy(yotta_socket_thread_t * thread);
  *  == <0> if succeed
  *  != <0> if failed
  */
-uint64_t
+yotta_return_t
 yotta_socket_thread_kill(yotta_socket_thread_t * thread);
 
 

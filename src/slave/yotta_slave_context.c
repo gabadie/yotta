@@ -15,7 +15,7 @@ static
 yotta_slave_context_t yotta_slave_context_plain;
 
 
-uint64_t
+yotta_return_t
 yotta_slave_context_main(yotta_slave_parameters_t const * out_parameters)
 {
     yotta_assert(out_parameters != 0);
@@ -27,7 +27,7 @@ yotta_slave_context_main(yotta_slave_parameters_t const * out_parameters)
 
     if (yotta_socket_thread_init(&yotta_slave_context_plain.thread) != 0)
     {
-        return -1;
+        return YOTTA_UNEXPECTED_FAIL;
     }
 
     uint64_t error = yotta_whisper_queue_connect(
@@ -39,7 +39,7 @@ yotta_slave_context_main(yotta_slave_parameters_t const * out_parameters)
     if (error != 0)
     {
         yotta_socket_thread_destroy(&yotta_slave_context_plain.thread);
-        return -1;
+        return YOTTA_UNEXPECTED_FAIL;
     }
 
     /*
@@ -58,5 +58,5 @@ yotta_slave_context_main(yotta_slave_parameters_t const * out_parameters)
      */
     yotta_socket_thread_destroy(&yotta_slave_context_plain.thread);
 
-    return 0;
+    return YOTTA_SUCCESS;
 }

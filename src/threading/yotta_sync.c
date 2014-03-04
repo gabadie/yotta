@@ -22,7 +22,7 @@ yotta_sync_post(yotta_sync_t * sync)
     }
 }
 
-uint64_t
+yotta_return_t
 yotta_sync_wait(yotta_sync_t * sync)
 {
     if(sync == NULL)

@@ -6,7 +6,7 @@
 #include "../whisper/yotta_whisper_push.private.h"
 
 
-uint64_t
+yotta_return_t
 yotta_push_package(uint64_t master_addr, uint64_t buffer_size, void const * buffer, yotta_sync_t * sync_finished)
 {
     if (master_addr == 0)

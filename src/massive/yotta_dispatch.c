@@ -38,7 +38,7 @@ yotta_dispath_thread_entry(yotta_dispatch_thread_t * thread)
     return 0;
 }
 
-uint64_t
+yotta_return_t
 yotta_dispatch(yotta_dispatch_func_t user_function, void * user_param, uint64_t user_param_stride)
 {
     if (user_function == 0)

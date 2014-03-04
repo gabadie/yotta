@@ -31,7 +31,7 @@ yotta_socket_s
  *  == <0> if succeed
  *  != <0> if failed
  */
-uint64_t
+yotta_return_t
 yotta_socket_server_init(yotta_socket_t * sock, uint16_t port, int family, int type);
 
 /*
@@ -49,7 +49,7 @@ yotta_socket_server_init(yotta_socket_t * sock, uint16_t port, int family, int t
  *  == <0> if succeed
  *  != <0> if failed
  */
-uint64_t
+yotta_return_t
 yotta_socket_client_init(yotta_socket_t * sock, char const * address,
     uint16_t port, int family, int type);
 
@@ -63,7 +63,7 @@ yotta_socket_client_init(yotta_socket_t * sock, char const * address,
  *  == <0> if succeed
  *  != <0> if failed
  */
-uint64_t
+yotta_return_t
 yotta_socket_port(yotta_socket_t * sock, uint16_t * port);
 
 /*
@@ -76,7 +76,7 @@ yotta_socket_port(yotta_socket_t * sock, uint16_t * port);
  *  == <0> if succeed
  *  != <0> if failed
  */
-uint64_t
+yotta_return_t
 yotta_socket_listen(yotta_socket_t * sock, int backlog);
 
 /*
@@ -91,7 +91,7 @@ yotta_socket_listen(yotta_socket_t * sock, int backlog);
  *  == <0> if succeed
  *  != <0> if failed
  */
-uint64_t
+yotta_return_t
 yotta_socket_accept(yotta_socket_t * sock, yotta_socket_t * new_sock);
 
 /*
@@ -103,7 +103,7 @@ yotta_socket_accept(yotta_socket_t * sock, yotta_socket_t * new_sock);
  *  == <0> if succeed
  *  != <0> if failed
  */
-uint64_t
+yotta_return_t
 yotta_socket_close(yotta_socket_t * sock);
 
 /*

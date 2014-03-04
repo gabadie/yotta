@@ -72,7 +72,7 @@ yotta_free(void * ptr)
     memory->free_function(memory);
 }
 
-uint64_t
+yotta_return_t
 yotta_memory_set_allocator(yotta_memory_alloc_func_t allocator, void * user_data)
 {
     if (allocator == 0)

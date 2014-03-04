@@ -24,7 +24,7 @@ yotta_sync_s
  *  == <0> if succeed
  *  != <0> if failed
  */
-uint64_t
+yotta_return_t
 yotta_sync_wait(yotta_sync_t * sync);
 
 

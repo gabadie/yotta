@@ -148,7 +148,7 @@ yotta_whisper_queue_init(yotta_whisper_queue_t * cmd_queue)
     memset(&cmd_queue->recv_buffer, 0, YOTTA_WHISPER_RECV_BUFFER_SIZE);
 }
 
-uint64_t
+yotta_return_t
 yotta_whisper_queue_connect(yotta_whisper_queue_t * cmd_queue, char const * ip, uint16_t port)
 {
     yotta_assert(cmd_queue != 0);
@@ -159,12 +159,12 @@ yotta_whisper_queue_connect(yotta_whisper_queue_t * cmd_queue, char const * ip, 
 
     if (yotta_tcp_socket_client((yotta_socket_t *) cmd_queue, ip, port) != 0)
     {
-        return -1;
+        return YOTTA_UNEXPECTED_FAIL;
     }
 
     yotta_whisper_queue_init(cmd_queue);
 
-    return 0;
+    return YOTTA_SUCCESS;
 }
 
 void

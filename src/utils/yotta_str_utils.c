@@ -5,7 +5,7 @@
 #include "../core/yotta_debug.h"
 
 
-uint64_t
+yotta_return_t
 yotta_str_dec_to_ui64(uint64_t * out_number, char const * str)
 {
     yotta_assert(out_number != 0);
@@ -16,7 +16,7 @@ yotta_str_dec_to_ui64(uint64_t * out_number, char const * str)
 
     if (c == 0)
     {
-        return -1;
+        return YOTTA_INVALID_VALUE;
     }
 
     if (c == '0')
@@ -27,7 +27,7 @@ yotta_str_dec_to_ui64(uint64_t * out_number, char const * str)
             return 0;
         }
 
-        return -1;
+        return YOTTA_INVALID_VALUE;
     }
 
     do
@@ -42,7 +42,7 @@ yotta_str_dec_to_ui64(uint64_t * out_number, char const * str)
         if (new_number < number)
         {
             // overflow
-            return -1;
+            return YOTTA_INVALID_VALUE;
         }
 
         number = new_number;
@@ -54,14 +54,14 @@ yotta_str_dec_to_ui64(uint64_t * out_number, char const * str)
 
     *out_number = number;
 
-    return 0;
+    return YOTTA_SUCCESS;
 }
 
-uint64_t
+yotta_return_t
 yotta_ui16_to_str(char * out_str, uint16_t number)
 {
     yotta_assert(out_str != NULL);
     /*itoa(number, out_str, 10);*/
     sprintf(out_str, "%d", number);
-    return 0;
+    return YOTTA_SUCCESS;
 }

@@ -4,5 +4,7 @@
 #include <stdint.h>
 #include <stdlib.h>
 
+#include "core/yotta_return.h"
+
 
 #endif

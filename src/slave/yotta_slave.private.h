@@ -31,7 +31,7 @@ yotta_slave_parameters_s
  *  != <0> if failed
  */
 // static: for testing (in ../tests/testlib_init.c)
-uint64_t
+yotta_return_t
 yotta_slave_parse_parameters(yotta_slave_parameters_t * out_parameters, uint64_t argc, char const * const * argv);
 
 #endif

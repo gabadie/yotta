@@ -5,6 +5,11 @@
 
 
 /*
+ * Defines the yotta return type
+ */
+typedef uint64_t yotta_return_t;
+
+/*
  * @infos: returned when a yotta function has successed
  */
 #define YOTTA_SUCCESS 0

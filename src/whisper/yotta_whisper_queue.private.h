@@ -60,7 +60,7 @@ yotta_whisper_queue_init(yotta_whisper_queue_t * cmd_queue);
  *  == <0> if succeed
  *  != <0> if failed
  */
-uint64_t
+yotta_return_t
 yotta_whisper_queue_connect(yotta_whisper_queue_t * cmd_queue, char const * ip, uint16_t port);
 
 /*

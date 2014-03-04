@@ -22,7 +22,7 @@ yotta_whisper_master_t;
  *  == <0> if succeed
  *  != <0> if failed
  */
-uint64_t
+yotta_return_t
 yotta_whisper_master_init(yotta_whisper_master_t * master, uint16_t listening_port);
 
 /*
@@ -34,7 +34,7 @@ yotta_whisper_master_init(yotta_whisper_master_t * master, uint16_t listening_po
  *  == <0> if succeed
  *  != <0> if failed
  */
-uint64_t
+yotta_return_t
 yotta_whisper_master_destroy(yotta_whisper_master_t * master);
 
 #endif

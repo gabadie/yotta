@@ -61,7 +61,7 @@ yotta_whisper_master_except(yotta_whisper_master_t * master)
     yotta_socket_event_release(master);
 }
 
-uint64_t
+yotta_return_t
 yotta_whisper_master_init(yotta_whisper_master_t * master, uint16_t listening_port)
 {
     yotta_assert(master != 0);
@@ -85,7 +85,7 @@ yotta_whisper_master_init(yotta_whisper_master_t * master, uint16_t listening_po
     return 0;
 }
 
-uint64_t
+yotta_return_t
 yotta_whisper_master_destroy(yotta_whisper_master_t * master)
 {
     yotta_assert(master != 0);

@@ -54,7 +54,7 @@ pthread_mutex_t sem_pool_lock = PTHREAD_MUTEX_INITIALIZER;
     ((sem_s)->used & (1ull << (idx)))
 
 
-uint64_t
+yotta_return_t
 yotta_sem_fetch(yotta_semaphore_t ** out_sem)
 {
     yotta_assert(out_sem != NULL);

@@ -38,7 +38,7 @@ yotta_slave_context_t * yotta_slave_context;
  *  == <0> if succed
  *  != <0> if failed
  */
-uint64_t
+yotta_return_t
 yotta_slave_context_main(yotta_slave_parameters_t const * out_parameters);
 
 #endif

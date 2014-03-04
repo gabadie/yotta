@@ -25,7 +25,7 @@ void * yotta_logger_user_data;
     }
 
 
-uint64_t
+yotta_return_t
 yotta_set_logger_entry(yotta_logger_entry_t callback, void * user_data)
 {
     yotta_logger_callback = callback;
