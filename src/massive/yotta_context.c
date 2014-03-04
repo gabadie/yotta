@@ -1,11 +1,10 @@
-#include <stdio.h>
+
 #include <string.h>
 
 #include "yotta_context.h"
-#include "core/yotta_debug.h"
-#include "core/yotta_return.private.h"
-#include "dictate/yotta_dictate_binary_send.h"
-#include "socket/yotta_socket.h"
+#include "../core/yotta_debug.h"
+#include "../core/yotta_return.private.h"
+#include "../dictate/yotta_dictate_binary_send.h"
 
 uint64_t
 yotta_context_init(yotta_context_t * context, uint16_t incoming_port)

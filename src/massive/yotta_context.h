@@ -1,9 +1,9 @@
 #ifndef _YOTTA_CONTEXT
 #define _YOTTA_CONTEXT
 
-#include "yotta_prefix.h"
-#include "socket/yotta_socket.h"
-#include "socket/yotta_socket_thread.h"
+#include "../yotta_prefix.h"
+#include "../socket/yotta_socket.h"
+#include "../socket/yotta_socket_thread.h"
 
 /*
  * @infos: store all context's information

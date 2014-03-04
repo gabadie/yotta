@@ -2,12 +2,12 @@
 # List of the library's C files
 #
 
-yotta_context.c
 yotta_init.c
 core/yotta_addr_translation.c
 core/yotta_logger.c
 core/yotta_memory.c
 dictate/yotta_dictate_binary_send.c
+massive/yotta_context.c
 massive/yotta_dispatch.c
 massive/yotta_fetch.c
 massive/yotta_push.c
