@@ -2,8 +2,8 @@
 #define _YOTTA_CONTEXT
 
 #include "../yotta_prefix.h"
-#include "../socket/yotta_socket.h"
 #include "../socket/yotta_socket_thread.h"
+#include "../whisper/yotta_whisper_master.h"
 
 /*
  * @infos: store all context's information
@@ -14,8 +14,8 @@ struct yotta_context_s
     // Port used for incoming connections
     uint16_t incoming_port;
 
-    // Socket used for slave connections
-    yotta_socket_t slave;
+    // Whisper master
+    yotta_whisper_master_t whisper_master;
 
     // Socket thread
     yotta_socket_thread_t worker_thread;
@@ -32,11 +32,11 @@ struct yotta_context_s
  *  == <0> if succeed
  *  != <0> if failed
  */
-uint64_t
+yotta_return_t
 yotta_context_init(yotta_context_t * context, uint16_t incoming_port);
 
 /*
- * @infos: connection to the yotta's server
+ * @infos: connection to a yotta deamon
  *
  * @param <context>: the yotta context to initialize
  * @param <ip>: the yotta server's ip
@@ -46,7 +46,7 @@ yotta_context_init(yotta_context_t * context, uint16_t incoming_port);
  *  == <0> if succeed
  *  != <0> if failed
  */
-uint64_t
+yotta_return_t
 yotta_context_connect(yotta_context_t * context, const char * ip, uint16_t port);
 
 /*
@@ -58,7 +58,7 @@ yotta_context_connect(yotta_context_t * context, const char * ip, uint16_t port)
  *  == <0> if succeed
  *  != <0> if failed
  */
-uint64_t
+yotta_return_t
 yotta_context_destroy(yotta_context_t * context);
 
 #endif

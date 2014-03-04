@@ -1,6 +1,6 @@
 
 
-#include "yotta_whisper_master.private.h"
+#include "yotta_whisper_master.h"
 #include "yotta_whisper_queue.private.h"
 #include "../core/yotta_debug.h"
 #include "../core/yotta_logger.private.h"
