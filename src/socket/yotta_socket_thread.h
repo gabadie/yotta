@@ -2,6 +2,7 @@
 #define _YOTTA_SOCKET_THREAD
 
 #include "yotta_socket_event.h"
+#include "../threading/yotta_mutex.h"
 #include "../threading/yotta_thread.h"
 
 
@@ -12,7 +13,7 @@ typedef struct
 yotta_socket_thread_s
 {
     yotta_thread_t id;
-    pthread_mutex_t mutex;
+    yotta_mutex_t mutex;
     uint64_t quit_status;
     yotta_socket_event_t * socket_head;
     yotta_socket_event_t * current_socket;

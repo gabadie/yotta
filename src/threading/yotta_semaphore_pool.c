@@ -1,11 +1,12 @@
+
 #include <string.h>
-#include <pthread.h>
 
 #include "yotta_semaphore_pool.private.h"
 #include "../core/yotta_debug.h"
 #include "../core/yotta_logger.private.h"
 #include "../core/yotta_memory.h"
 #include "../core/yotta_return.h"
+#include "../threading/yotta_mutex.h"
 
 
 typedef struct
@@ -44,7 +45,7 @@ uint64_t sem_count = 0;
  * Mutex used to protect the semaphores pool
  */
 static
-pthread_mutex_t sem_pool_lock = PTHREAD_MUTEX_INITIALIZER;
+yotta_mutex_t sem_pool_lock = YOTTA_MUTEX_INITIALIZER;
 
 
 #define yotta_sem_all_used(sem_s) \
@@ -59,7 +60,7 @@ yotta_sem_fetch(yotta_semaphore_t ** out_sem)
 {
     yotta_assert(out_sem != NULL);
 
-    pthread_mutex_lock(&sem_pool_lock);
+    yotta_mutex_lock(&sem_pool_lock);
 
     {
         uint8_t sem_found = 0;
@@ -103,7 +104,7 @@ yotta_sem_fetch(yotta_semaphore_t ** out_sem)
                     {
                         yotta_logger_error("sem_init failed\n");
 
-                        pthread_mutex_unlock(&sem_pool_lock);
+                        yotta_mutex_unlock(&sem_pool_lock);
 
                         return YOTTA_UNEXPECTED_FAIL;
                     }
@@ -122,7 +123,7 @@ yotta_sem_fetch(yotta_semaphore_t ** out_sem)
         }
     }
 
-    pthread_mutex_unlock(&sem_pool_lock);
+    yotta_mutex_unlock(&sem_pool_lock);
 
     return YOTTA_SUCCESS;
 }
@@ -140,7 +141,7 @@ yotta_sem_release(yotta_semaphore_t * sem)
     yotta_assert(waiting_threads == 0);
 #endif
 
-    pthread_mutex_lock(&sem_pool_lock);
+    yotta_mutex_lock(&sem_pool_lock);
 
     {
         yotta_semaphore_deck_t * current_chunk = sem_pool;
@@ -152,7 +153,7 @@ yotta_sem_release(yotta_semaphore_t * sem)
                 sem <  &current_chunk->sem[0] + sizeof(uint64_t) * 8)
             {
                 current_chunk->used &= ~(1ull << (uint64_t)(sem - &current_chunk->sem[0]));
-                pthread_mutex_unlock(&sem_pool_lock);
+                yotta_mutex_unlock(&sem_pool_lock);
                 return;
             }
 
@@ -160,7 +161,7 @@ yotta_sem_release(yotta_semaphore_t * sem)
         }
     }
 
-    pthread_mutex_unlock(&sem_pool_lock);
+    yotta_mutex_unlock(&sem_pool_lock);
 
     yotta_crash_msg("Unknown semaphore: %p", (void *) sem);
 }

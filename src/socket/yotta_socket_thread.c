@@ -39,13 +39,13 @@ yotta_socket_thread_main(yotta_socket_thread_t * thread)
         FD_ZERO(&fd_set_send);
         FD_ZERO(&fd_set_except);
 
-        pthread_mutex_lock(&thread->mutex);
+        yotta_mutex_lock(&thread->mutex);
         {
             yotta_socket_event_t * socket_cursor = thread->socket_head;
 
             if (socket_cursor == 0 && thread->quit_status == YOTTA_SOCKET_THREAD_STOP_ON_EMPTY)
             {
-                pthread_mutex_unlock(&thread->mutex);
+                yotta_mutex_unlock(&thread->mutex);
                 break;
             }
 
@@ -72,7 +72,7 @@ yotta_socket_thread_main(yotta_socket_thread_t * thread)
                 socket_cursor = socket_cursor->socket_next;
             }
         }
-        pthread_mutex_unlock(&thread->mutex);
+        yotta_mutex_unlock(&thread->mutex);
 
         int32_t event_counts = select(fd_max + 1, &fd_set_recv, &fd_set_send, &fd_set_except, &timer);
 
@@ -83,7 +83,7 @@ yotta_socket_thread_main(yotta_socket_thread_t * thread)
             return 0;
         }
 
-        pthread_mutex_lock(&thread->mutex);
+        yotta_mutex_lock(&thread->mutex);
 
         yotta_socket_event_t * socket_it = thread->socket_head;
         thread->current_socket = socket_it;
@@ -92,7 +92,7 @@ yotta_socket_thread_main(yotta_socket_thread_t * thread)
         {
             int32_t fd = (int32_t)socket_it->socket.fd;
 
-            pthread_mutex_unlock(&thread->mutex);
+            yotta_mutex_unlock(&thread->mutex);
 
             if (FD_ISSET(fd, &fd_set_except))
             {
@@ -109,7 +109,7 @@ yotta_socket_thread_main(yotta_socket_thread_t * thread)
                     event_counts -= 1;
                 }
 
-                pthread_mutex_lock(&thread->mutex);
+                yotta_mutex_lock(&thread->mutex);
 
                 /*
                  * Makes sure that the iterator has been changed because of its
@@ -133,7 +133,7 @@ yotta_socket_thread_main(yotta_socket_thread_t * thread)
                  */
                 if (thread->current_socket != socket_it)
                 {
-                    pthread_mutex_lock(&thread->mutex);
+                    yotta_mutex_lock(&thread->mutex);
 
                     socket_it = thread->current_socket;
 
@@ -152,7 +152,7 @@ yotta_socket_thread_main(yotta_socket_thread_t * thread)
                  */
                 if (thread->current_socket != socket_it)
                 {
-                    pthread_mutex_lock(&thread->mutex);
+                    yotta_mutex_lock(&thread->mutex);
 
                     socket_it = thread->current_socket;
 
@@ -160,7 +160,7 @@ yotta_socket_thread_main(yotta_socket_thread_t * thread)
                 }
             }
 
-            pthread_mutex_lock(&thread->mutex);
+            yotta_mutex_lock(&thread->mutex);
 
             socket_it = socket_it->socket_next;
             thread->current_socket = socket_it;
@@ -168,7 +168,7 @@ yotta_socket_thread_main(yotta_socket_thread_t * thread)
 
         thread->current_socket = 0;
 
-        pthread_mutex_unlock(&thread->mutex);
+        yotta_mutex_unlock(&thread->mutex);
     }
 
     return 0;
@@ -185,14 +185,14 @@ yotta_socket_thread_init(yotta_socket_thread_t * thread)
     thread->current_socket = 0;
     thread->quit_status = YOTTA_SOCKET_THREAD_CONTINUE;
 
-    if (pthread_mutex_init(&thread->mutex, 0) != 0)
+    if (yotta_mutex_init(&thread->mutex) != 0)
     {
         return YOTTA_UNEXPECTED_FAIL;
     }
 
     if (yotta_thread_create(&thread->id, yotta_socket_thread_main, thread) != 0)
     {
-        pthread_mutex_destroy(&thread->mutex);
+        yotta_mutex_destroy(&thread->mutex);
         return YOTTA_UNEXPECTED_FAIL;
     }
 
@@ -210,12 +210,12 @@ yotta_socket_thread_listen(yotta_socket_thread_t * thread, yotta_socket_event_t 
 
     socket_event->socket_thread = thread;
 
-    pthread_mutex_lock(&thread->mutex);
+    yotta_mutex_lock(&thread->mutex);
     {
         socket_event->socket_next = thread->socket_head;
         thread->socket_head = socket_event;
     }
-    pthread_mutex_unlock(&thread->mutex);
+    yotta_mutex_unlock(&thread->mutex);
 
     return YOTTA_SUCCESS;
 }
@@ -232,7 +232,7 @@ yotta_socket_thread_destroy(yotta_socket_thread_t * thread)
         return YOTTA_UNEXPECTED_FAIL;
     }
 
-    pthread_mutex_destroy(&thread->mutex);
+    yotta_mutex_destroy(&thread->mutex);
 
     yotta_assert(thread->socket_head == 0);
 
@@ -264,7 +264,9 @@ yotta_socket_thread_kill(yotta_socket_thread_t * thread)
         yotta_socket_event_release(socket_event);
     }
 
-    pthread_mutex_destroy(&thread->mutex);
+    yotta_mutex_destroy(&thread->mutex);
+
+    yotta_assert(thread->socket_head == 0);
 
     return YOTTA_SUCCESS;
 }

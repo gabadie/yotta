@@ -12,7 +12,7 @@ yotta_socket_event_unlisten(yotta_socket_event_t * socket_event)
 
     yotta_socket_thread_t * thread = socket_event->socket_thread;
 
-    pthread_mutex_lock(&thread->mutex);
+    yotta_mutex_lock(&thread->mutex);
     {
         yotta_socket_event_t ** parent_ptr = &thread->socket_head;
 
@@ -37,7 +37,7 @@ yotta_socket_event_unlisten(yotta_socket_event_t * socket_event)
             }
         }
     }
-    pthread_mutex_unlock(&thread->mutex);
+    yotta_mutex_unlock(&thread->mutex);
 
 #ifdef YOTTA_DEBUG
     socket_event->socket_thread = 0;
