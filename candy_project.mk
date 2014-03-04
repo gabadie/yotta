@@ -2,7 +2,7 @@
 # ------------------------------------------------------------------------------ Yotta library's headers directory
 
 # ------------------------------------------------------------ default configuration
-ifneq ($(config),debug)
+ifeq ($(filter debug nightly,$(config)),)
     config=release
 endif
 
@@ -12,6 +12,11 @@ PROJECT_LDFLAGS := -lpthread
 # ------------------------------------------------------------ release configuration
 ifeq ($(config),release)
     PROJECT_CFLAGS += -O3 -Werror -mmmx -mavx2
+endif
+
+# ------------------------------------------------------------ nightly configuration
+ifeq ($(config),nightly)
+    PROJECT_CFLAGS += -g
 endif
 
 # ------------------------------------------------------------ debug configuration
