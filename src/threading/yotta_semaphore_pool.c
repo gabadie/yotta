@@ -185,7 +185,7 @@ yotta_sem_pool_flush()
         // If all the semaphore of the deck are free, we destroy it..
         if(yotta_sem_all_free(tmp))
         {
-            uint64_t nb_sem = (deck == NULL && sem_count != 64) ? (sem_count % 64) : 64;
+            uint64_t nb_sem = (deck == NULL && (sem_count % 64)) ? (sem_count % 64) : 64;
             for(uint64_t i = 0; i < nb_sem; i++)
             {
                 yotta_semaphore_destroy(&tmp->sem[i]);
