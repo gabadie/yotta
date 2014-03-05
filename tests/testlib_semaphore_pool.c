@@ -3,6 +3,7 @@
 #include <yotta.h>
 #include <mk_test.h>
 
+#include "testhelper_memory.h"
 #include "../src/threading/yotta_semaphore_pool.private.h"
 
 void
@@ -25,6 +26,8 @@ test_fetch_release()
     }
 
     yotta_sem_release(sem);
+
+    test_assert(yotta_sem_pool_flush() == 0);
 }
 
 void
@@ -94,6 +97,8 @@ test_many_sem()
     {
         yotta_sem_release(sem2[i]);
     }
+
+    test_assert(yotta_sem_pool_flush() == 0);
 }
 
 void
@@ -174,9 +179,17 @@ test_sem_pool_flush()
 int
 main()
 {
+    testhelper_init();
+    testhelper_memory_setup();
+
     test_fetch_release();
+    testhelper_memory_check();
+
     test_many_sem();
+    testhelper_memory_check();
+
     test_sem_pool_flush();
+    testhelper_memory_check();
 
     return 0;
 }
