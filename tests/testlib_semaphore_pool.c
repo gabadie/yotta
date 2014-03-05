@@ -176,6 +176,39 @@ test_sem_pool_flush()
     test_assert(yotta_sem_pool_flush() == 0);
 }
 
+void test_guillaume()
+{
+    uint64_t const NB_SEM = 20;
+
+    yotta_semaphore_t * sem[NB_SEM];
+    memset(sem, 0, sizeof(sem));
+
+    for(uint64_t i = 0u; i < NB_SEM; i++)
+    {
+        test_assert(yotta_sem_fetch(&sem[i]) == YOTTA_SUCCESS);
+        test_assert(sem[i] != NULL);
+    }
+
+    yotta_semaphore_t * first = sem[0];
+    yotta_semaphore_t * last  = sem[NB_SEM-1];
+
+    yotta_sem_release(first);
+
+    test_assert(yotta_sem_pool_flush() == NB_SEM - 1);
+
+    test_assert(yotta_sem_fetch(&sem[0]) == YOTTA_SUCCESS);
+
+    test_assert(sem[0] == first);
+    test_assert(sem[NB_SEM-1] == last);
+
+    for(uint64_t i = 0u; i < NB_SEM; i++)
+    {
+        yotta_sem_release(sem[i]);
+    }
+
+    test_assert(yotta_sem_pool_flush() == 0);
+}
+
 int
 main()
 {
@@ -189,6 +222,9 @@ main()
     testhelper_memory_check();
 
     test_sem_pool_flush();
+    testhelper_memory_check();
+
+    test_guillaume();
     testhelper_memory_check();
 
     return 0;

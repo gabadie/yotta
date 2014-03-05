@@ -25,6 +25,9 @@ yotta_semaphore_deck_s
     // Bitfield used to check if a semaphore is in use
     uint64_t used;
 
+    // Number of semaphores initialized
+    uint64_t init_count;
+
     // Pointer to the next semaphores chunk
     yotta_semaphore_deck_t * next;
 };
@@ -34,12 +37,6 @@ yotta_semaphore_deck_s
  */
 static
 yotta_semaphore_deck_t * sem_pool = NULL;
-
-/*
- * Counts semaphore in the pool
- */
-static
-uint64_t sem_count = 0;
 
 /*
  * Mutex used to protect the semaphores pool
@@ -100,7 +97,7 @@ yotta_sem_fetch(yotta_semaphore_t ** out_sem)
                 yotta_semaphore_t * free_sem = (*current_chunk)->sem + i;
 
                 // If the free semphore has not been initialized, ...
-                if ((chunk_idx * sizeof(uint64_t) * 8 + i) >= sem_count)
+                if (i >= (*current_chunk)->init_count)
                 {
                     // ... we initialize it
                     if (yotta_semaphore_init(free_sem, 0) != 0)
@@ -112,7 +109,7 @@ yotta_sem_fetch(yotta_semaphore_t ** out_sem)
                         return YOTTA_UNEXPECTED_FAIL;
                     }
 
-                    sem_count++;
+                    (*current_chunk)->init_count++;
                 }
 
                 (*current_chunk)->used |= (1ull << i);
@@ -176,10 +173,10 @@ yotta_sem_pool_flush()
 
     yotta_semaphore_deck_t * deck = sem_pool;
 
-    yotta_semaphore_deck_t * first_non_free = NULL;
+    sem_pool = NULL;
     yotta_semaphore_deck_t * last_non_free = NULL;
 
-    sem_count = 0;
+    uint64_t sem_used = 0;
 
     while (deck != NULL)
     {
@@ -189,6 +186,10 @@ yotta_sem_pool_flush()
         // If all the semaphore of the deck are free, we destroy it..
         if(yotta_sem_all_free(tmp))
         {
+            for(uint64_t i = 0; i < tmp->init_count; i++)
+            {
+                yotta_sem_destroy(&tmp->sem[i]);
+            }
             yotta_free(tmp);
             continue;
         }
@@ -202,10 +203,9 @@ yotta_sem_pool_flush()
         }
         else
         {
-            first_non_free = tmp;
+            sem_pool = tmp;
             last_non_free  = tmp;
         }
-
 
         // Count the remaining used semaphore in this deck
         uint64_t c = 0ull;
@@ -213,12 +213,10 @@ yotta_sem_pool_flush()
 
         for (c = 0ull; u; u &= u - 1, c++);
 
-        sem_count += c;
+        sem_used += c;
     }
-
-    sem_pool = first_non_free;
 
     yotta_mutex_unlock(&sem_pool_lock);
 
-    return sem_count;
+    return sem_used;
 }
