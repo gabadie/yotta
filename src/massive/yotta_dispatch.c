@@ -20,7 +20,7 @@ yotta_dispath_thread_entry(yotta_dispatch_thread_t * thread)
     yotta_assert(thread != 0);
     yotta_assert(thread->group != 0);
 
-    yotta_semaphore_wait(thread->group->semaphore);
+    yotta_semaphore_wait(thread->group->semaphore[0]);
 
     if (thread->group->thread_count == 0)
     {
@@ -64,15 +64,25 @@ yotta_dispatch(yotta_dispatch_func_t user_function, void * user_param, uint64_t 
     }
 
     /*
-     * Gets the group's semaphore
+     * Gets the first group's semaphore
      */
-    if (yotta_sem_fetch(&group.semaphore) != 0)
+    if (yotta_sem_fetch(&group.semaphore[0]) != 0)
     {
+        yotta_return_unexpect_fail(yotta_dispatch);
+    }
+
+    /*
+     * Gets the second group's semaphore
+     */
+    if (yotta_sem_fetch(&group.semaphore[1]) != 0)
+    {
+        yotta_sem_release(group.semaphore[0]);
         yotta_return_unexpect_fail(yotta_dispatch);
     }
 
     group.global = yotta_thread_global_pool;
     group.user_function = user_function;
+    group.waiting_semaphore = 1;
     group.waiting_threads = 0;
 
     /*
@@ -113,7 +123,7 @@ yotta_dispatch(yotta_dispatch_func_t user_function, void * user_param, uint64_t 
      */
     for (uint64_t i = 0; i < thread_created; i++)
     {
-        yotta_semaphore_post(group.semaphore);
+        yotta_semaphore_post(group.semaphore[0]);
     }
 
     /*
@@ -124,7 +134,9 @@ yotta_dispatch(yotta_dispatch_func_t user_function, void * user_param, uint64_t 
         yotta_thread_join(threads_array[i].tid);
     }
 
-    yotta_sem_release(group.semaphore);
+    yotta_sem_release(group.semaphore[0]);
+    yotta_sem_release(group.semaphore[1]);
+
 
     yotta_free(threads_array);
 
@@ -155,25 +167,26 @@ yotta_group_barrier()
 
     yotta_dispatch_group_t * group = yotta_dispatch_thread->group;
 
-    uint64_t waiting = __sync_fetch_and_add(&group->waiting_threads, 1) + 1;
+    uint64_t waiting = __sync_add_and_fetch(&group->waiting_threads, 1);
 
     if (waiting != group->thread_count)
     {
         /*
          * This thread is not the last to arrive, then it is waiting
          */
-        yotta_semaphore_wait(group->semaphore);
+        yotta_semaphore_wait(group->semaphore[group->waiting_semaphore]);
         return;
     }
 
     /*
      * This thread is the last to arrive, then it is releasing its friends
      */
+    group->waiting_semaphore = !group->waiting_semaphore;
     group->waiting_threads = 0;
 
     for (uint64_t i = 1; i < waiting; i++)
     {
-        yotta_semaphore_post(group->semaphore);
+        yotta_semaphore_post(group->semaphore[!group->waiting_semaphore]);
     }
 }
 

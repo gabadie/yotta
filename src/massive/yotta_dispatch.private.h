@@ -28,6 +28,9 @@ yotta_global_thread_pool_t;
 
 /*
  * Defines a dispatch threads' group
+ *
+ * The group is using two semaphores to implements barriers to garentee the
+ * the deterministic behavior regardless the semaphores' queue policies.
  */
 typedef struct
 yotta_dispatch_group_s
@@ -41,8 +44,11 @@ yotta_dispatch_group_s
     // thread function to execute
     yotta_dispatch_func_t user_function;
 
-    // group's semaphore
-    yotta_semaphore_t * semaphore;
+    // group's semaphores
+    yotta_semaphore_t * semaphore[2];
+
+    // waiting semaphore id
+    uint64_t waiting_semaphore;
 
     // number of threading waiting at a group barrier
     uint64_t waiting_threads;
