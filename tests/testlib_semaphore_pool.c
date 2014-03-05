@@ -140,7 +140,7 @@ test_sem_pool_flush()
     test_assert2("The number of sem to release must be lower than 64 "
         "for the test to work", nb_r < 64);
 
-    // Release NB_SEM/10 semaphores into the pool
+    // Release nb_r semaphores into the pool
     for (uint64_t i = 0u; i < nb_r; i++)
     {
         yotta_sem_release(sem[i]);
@@ -148,7 +148,7 @@ test_sem_pool_flush()
 
     test_assert(yotta_sem_pool_flush() == NB_SEM - nb_r);
 
-    // Ask for NB_SEM/10 semaphores
+    // Ask for nb_r semaphores
     for (uint64_t i = 0u; i < nb_r; i++)
     {
         yotta_semaphore_t * old = sem[i];
