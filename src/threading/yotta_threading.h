@@ -16,12 +16,29 @@
 
 
 /*
- * @infos: gets the number of availables core
+ * @infos: gets the maximum number of cores
  *
- * @returns: the number of core on this computer
+ * @param <cores>[out]: the maximum number of cores on this computer
+ *
+ * @returns:
+ *  == YOTTA_SUCCES if succeed
+ *  != YOTTA_SUCCES if failed
  */
 yotta_return_t
-yotta_threading_cores();
+yotta_threading_max_cores(uint64_t * cores);
+
+
+/*
+ * @infos: gets the number of online cores
+ *
+ * @param <cores>[out]: the number of online cores on this computer
+ *
+ * @returns:
+ *  == YOTTA_SUCCES if succeed
+ *  != YOTTA_SUCCES if failed
+ */
+yotta_return_t
+yotta_threading_online_cores(uint64_t * cores);
 
 /*
  * @infos: gets the process's ID
