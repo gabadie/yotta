@@ -58,7 +58,7 @@ yotta_dispatch(yotta_dispatch_func_t user_function, void * user_param, uint64_t 
     /*
      * Gets the number of available cores
      */
-    if (yotta_threading_online_cores(&group.thread_count) != YOTTA_SUCCESS)
+    if (yotta_threading_cores(&group.thread_count) != YOTTA_SUCCESS)
     {
         yotta_return_unexpect_fail(yotta_dispatch);
     }
