@@ -93,6 +93,12 @@ $(TEST_SCRIPT_TARGETS): $(LIB_BINARIES_TARGET)
 $(TEST_SCRIPT_TARGETS): TESTFLAGS = $(BUILD_DIR)
 
 
+# ------------------------------------------------------------------------------ Yotta deamon's tests
+
+TEST_DEAMON_FILES := $(call filelist,src_deamon/test_deamon.flist)
+TEST_DEAMON_TARGETS := $(call test_scripts,$(TEST_DEAMON_FILES),py.test)
+
+
 # ------------------------------------------------------------------------------ Yotta's hook
 
 $(call hook_precommit_configs, debug release)
