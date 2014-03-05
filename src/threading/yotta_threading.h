@@ -57,7 +57,7 @@ yotta_threading_online_cores(uint64_t * cores);
  * @returns: (uint64_t) the process's ID
  */
 #define yotta_threading_pid() \
-    (uint64_t) getpid();
+    (uint64_t) getpid()
 
 /*
  * @infos: gets the thread's ID
@@ -65,7 +65,7 @@ yotta_threading_online_cores(uint64_t * cores);
  * @returns: (uint64_t) the thread's ID
  */
 #define yotta_threading_tid() \
-    (uint64_t) pthread_self();
+    (uint64_t) pthread_self()
 
 
 #endif //_YOTTA_THREADING
