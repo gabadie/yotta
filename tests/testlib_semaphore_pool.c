@@ -151,7 +151,7 @@ test_sem_pool_flush()
     // Ask for NB_SEM/10 semaphores
     for (uint64_t i = 0u; i < nb_r; i++)
     {
-        sem_t * old = sem[i];
+        yotta_semaphore_t * old = sem[i];
         test_assert(yotta_sem_fetch(&sem[i]) == YOTTA_SUCCESS);
         test_assert(sem[i] != NULL);
         test_assert(old == sem[i]);
