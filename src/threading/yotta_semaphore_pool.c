@@ -54,6 +54,9 @@ yotta_mutex_t sem_pool_lock = YOTTA_MUTEX_INITIALIZER;
 #define yotta_sem_used(sem_s, idx) \
     ((sem_s)->used & (1ull << (idx)))
 
+#define yotta_sem_all_free(sem_s) \
+    ((sem_s)->used == 0ull)
+
 
 yotta_return_t
 yotta_sem_fetch(yotta_semaphore_t ** out_sem)
@@ -169,14 +172,25 @@ yotta_sem_release(yotta_semaphore_t * sem)
 void
 yotta_sem_pool_flush()
 {
+    yotta_mutex_lock(&sem_pool_lock);
+
     yotta_semaphore_deck_t * deck = sem_pool;
 
     while (deck != NULL)
     {
         yotta_semaphore_deck_t * tmp = deck;
         deck = deck->next;
+
+        if(!yotta_sem_all_free(tmp))
+        {
+            yotta_crash_msg("Semaphore still in use in this deck: %p", (void *) deck);
+        }
+
         yotta_free(tmp);
     }
 
     sem_pool = NULL;
+    sem_count = 0;
+
+    yotta_mutex_unlock(&sem_pool_lock);
 }
