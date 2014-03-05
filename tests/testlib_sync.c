@@ -44,15 +44,7 @@ test_post_wait()
 {
     yotta_sync_t yotta_sync;
 
-    #pragma GCC diagnostic push
-    #pragma GCC diagnostic ignored "-Waddress"
-    /*
-     * This call check if the yotta_sync_t is not null
-     * GCC output: warning: the comparison will always evaluate as ‘true’ for
-     * the address of ‘yotta_sync’ will never be NULL [-Waddress]
-     */
     yotta_sync_init(&yotta_sync);
-    #pragma GCC diagnostic pop
 
     test_assert(yotta_sync.sem == YOTTA_SYNC_UNTRIGGERED);
 
@@ -73,15 +65,7 @@ test_wait_post()
 
     yotta_sync_t yotta_sync;
 
-    #pragma GCC diagnostic push
-    #pragma GCC diagnostic ignored "-Waddress"
-    /*
-     * This call check if the yotta_sync_t is not null
-     * GCC output: warning: the comparison will always evaluate as ‘true’ for
-     * the address of ‘yotta_sync’ will never be NULL [-Waddress]
-     */
     yotta_sync_init(&yotta_sync);
-    #pragma GCC diagnostic pop
 
     pthread_create(&producer, NULL, (void *) producer_func, (void *) &yotta_sync);
     pthread_create(&consumer, NULL, (void *) consumer_func, (void *) &yotta_sync);
@@ -95,15 +79,7 @@ test_post_post_wait()
 {
     yotta_sync_t yotta_sync;
 
-    #pragma GCC diagnostic push
-    #pragma GCC diagnostic ignored "-Waddress"
-    /*
-     * This call check if the yotta_sync_t is not null
-     * GCC output: warning: the comparison will always evaluate as ‘true’ for
-     * the address of ‘yotta_sync’ will never be NULL [-Waddress]
-     */
     yotta_sync_init(&yotta_sync);
-    #pragma GCC diagnostic pop
 
     test_assert(yotta_sync.sem == YOTTA_SYNC_UNTRIGGERED);
 
