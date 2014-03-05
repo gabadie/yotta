@@ -3,7 +3,7 @@
 
 # ------------------------------------------------------------ default configuration
 ifeq ($(filter debug nightly,$(config)),)
-    config=release
+    override config=release
 endif
 
 PROJECT_CFLAGS := -Wall -Wextra -std=gnu11 -m64
@@ -23,6 +23,9 @@ endif
 ifeq ($(config),debug)
     PROJECT_CFLAGS += -g -DYOTTA_DEBUG
 endif
+
+
+$(call trash_configs, debug nightly release)
 
 
 # ------------------------------------------------------------------------------ Yotta library's headers directory
