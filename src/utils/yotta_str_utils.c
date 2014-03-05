@@ -14,7 +14,7 @@ yotta_str_to_ui64(uint64_t * out_number, char const * str, uint64_t basis)
 {
     yotta_assert(out_number != 0);
     yotta_assert(str != 0);
-    yotta_assert(basis == 0 || basis > 1 && basis < sizeof(yotta_str_digit));
+    yotta_assert(basis == 0 || (basis > 1 && basis < sizeof(yotta_str_digit)));
 
     uint64_t number = 0;
     char c = *str;
