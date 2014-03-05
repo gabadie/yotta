@@ -4,6 +4,10 @@
 #include <mk_test.h>
 #include "../src/threading/yotta_sync.private.h"
 
+#ifdef YOTTA_UNIX
+#include <unistd.h>
+#endif
+
 
 void
 producer_func(void * s)
@@ -25,7 +29,11 @@ consumer_func(void * s)
     // To "ensure" that the yotta_sync_post happens after the yotta_sync_wait
     while(yotta_sync->sem == NULL)
     {
+#ifdef YOTTA_UNIX
+        test_assert(usleep(10000) == 0);
+#else
         sleep(1);
+#endif
     }
 
     yotta_sync_post(yotta_sync);
