@@ -3,6 +3,7 @@
 #include <yotta.h>
 #include <mk_test.h>
 
+#include "testhelper_memory.h"
 #include "../src/threading/yotta_semaphore_pool.private.h"
 
 void
@@ -25,6 +26,8 @@ test_fetch_release()
     }
 
     yotta_sem_release(sem);
+
+    test_assert(yotta_sem_pool_flush() == 0);
 }
 
 void
@@ -94,6 +97,8 @@ test_many_sem()
     {
         yotta_sem_release(sem2[i]);
     }
+
+    test_assert(yotta_sem_pool_flush() == 0);
 }
 
 void
@@ -119,15 +124,72 @@ test_sem_pool_flush()
     }
 
     // Flush the pool of semaphore
-    yotta_sem_pool_flush();
+    test_assert(yotta_sem_pool_flush() == 0);
+
+
+    // Ask for NB_SEM semaphores
+    for (uint64_t i = 0u; i < NB_SEM; i++)
+    {
+        test_assert(yotta_sem_fetch(&sem[i]) == YOTTA_SUCCESS);
+        test_assert(sem[i] != NULL);
+    }
+
+    test_assert(yotta_sem_pool_flush() == NB_SEM);
+
+    uint64_t nb_r = NB_SEM/10; // Number of sem to release
+    test_assert2("The number of sem to release must be lower than 64 "
+        "for the test to work", nb_r < 64);
+
+    // Release NB_SEM/10 semaphores into the pool
+    for (uint64_t i = 0u; i < nb_r; i++)
+    {
+        yotta_sem_release(sem[i]);
+    }
+
+    test_assert(yotta_sem_pool_flush() == NB_SEM - nb_r);
+
+    // Ask for NB_SEM/10 semaphores
+    for (uint64_t i = 0u; i < nb_r; i++)
+    {
+        sem_t * old = sem[i];
+        test_assert(yotta_sem_fetch(&sem[i]) == YOTTA_SUCCESS);
+        test_assert(sem[i] != NULL);
+        test_assert(old == sem[i]);
+    }
+
+    uint64_t rest = 42;
+
+    // Release NB_SEM - rest semaphores into the pool
+    for (uint64_t i = 0u; i < NB_SEM - rest; i++)
+    {
+        yotta_sem_release(sem[i]);
+    }
+
+    test_assert(yotta_sem_pool_flush() == rest);
+
+    // Release the rest of the semaphores into the pool
+    for (uint64_t i = NB_SEM - rest; i < NB_SEM; i++)
+    {
+        yotta_sem_release(sem[i]);
+    }
+
+    test_assert(yotta_sem_pool_flush() == 0);
 }
 
 int
 main()
 {
+    testhelper_init();
+    testhelper_memory_setup();
+
     test_fetch_release();
+    testhelper_memory_check();
+
     test_many_sem();
+    testhelper_memory_check();
+
     test_sem_pool_flush();
+    testhelper_memory_check();
 
     return 0;
 }

@@ -29,7 +29,7 @@ test_dispatch_validity()
 
     validity_parameter = 0;
 
-    test_assert(yotta_threading_online_cores(&cores) == YOTTA_SUCCESS);
+    test_assert(yotta_threading_cores(&cores) == YOTTA_SUCCESS);
 
     {
         uint64_t r = yotta_dispatch(0, 0, 0);
@@ -83,7 +83,7 @@ test_id_callback(uint64_t * output_array)
 
     test_assert(output_array != 0);
 
-    test_assert(yotta_threading_online_cores(&cores) == YOTTA_SUCCESS);
+    test_assert(yotta_threading_cores(&cores) == YOTTA_SUCCESS);
 
     yotta_get_local_id(&local_id, &local_count);
     yotta_get_group_id(&group_id, &group_count);
@@ -103,7 +103,7 @@ test_dispatch_id()
 {
     uint64_t cores;
 
-    test_assert(yotta_threading_online_cores(&cores) == YOTTA_SUCCESS);
+    test_assert(yotta_threading_cores(&cores) == YOTTA_SUCCESS);
 
     uint64_t * output_array = yotta_alloc_sa(uint64_t, cores);
 

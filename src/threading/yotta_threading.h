@@ -14,6 +14,17 @@
 
 #endif
 
+/*
+ * @infos: gets the maximum number of cores
+ *
+ * @param <cores>[out]: the maximum number of cores on this computer
+ *
+ * @returns:
+ *  == YOTTA_SUCCESS if succeed
+ *  != YOTTA_SUCCESS if failed
+ */
+#define yotta_threading_cores(cores) \
+    yotta_threading_max_cores(cores)
 
 /*
  * @infos: gets the maximum number of cores

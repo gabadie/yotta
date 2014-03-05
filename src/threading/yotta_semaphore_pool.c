@@ -169,28 +169,56 @@ yotta_sem_release(yotta_semaphore_t * sem)
     yotta_crash_msg("Unknown semaphore: %p", (void *) sem);
 }
 
-void
+uint64_t
 yotta_sem_pool_flush()
 {
     yotta_mutex_lock(&sem_pool_lock);
 
     yotta_semaphore_deck_t * deck = sem_pool;
 
+    yotta_semaphore_deck_t * first_non_free = NULL;
+    yotta_semaphore_deck_t * last_non_free = NULL;
+
+    sem_count = 0;
+
     while (deck != NULL)
     {
         yotta_semaphore_deck_t * tmp = deck;
         deck = deck->next;
 
-        if(!yotta_sem_all_free(tmp))
+        // If all the semaphore of the deck are free, we destroy it..
+        if(yotta_sem_all_free(tmp))
         {
-            yotta_crash_msg("Semaphore still in use in this deck: %p", (void *) deck);
+            yotta_free(tmp);
+            continue;
         }
 
-        yotta_free(tmp);
+        // .. Otherwise we rebuild a new semaphore pool with the
+        // remaining decks
+        if(last_non_free != NULL)
+        {
+            last_non_free->next = tmp;
+            last_non_free = last_non_free->next;
+        }
+        else
+        {
+            first_non_free = tmp;
+            last_non_free  = tmp;
+        }
+
+
+        // Count the remaining used semaphore in this deck
+        uint64_t c = 0ull;
+        uint64_t u = last_non_free->used;
+
+        for (c = 0ull; u; u &= u - 1, c++);
+
+        sem_count += c;
     }
 
-    sem_pool = NULL;
-    sem_count = 0;
+    sem_pool = first_non_free;
 
     yotta_mutex_unlock(&sem_pool_lock);
+
+    return sem_count;
 }

@@ -26,8 +26,12 @@ yotta_sem_release(yotta_semaphore_t * sem);
 
 /*
  * @infos: flush the pool of semaphores
+ *
+ * The semaphores in use are not freed.
+ *
+ * @returns: the remaining number of semaphores
  */
-void
+uint64_t
 yotta_sem_pool_flush();
 
 #endif //_YOTTA_SEM
