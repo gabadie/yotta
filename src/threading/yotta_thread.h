@@ -1,6 +1,8 @@
 #ifndef _YOTTA_THREAD
 #define _YOTTA_THREAD
 
+#include "../yotta_prefix.h"
+
 
 /*
  * Defines the yotta thread local prefix
@@ -10,7 +12,7 @@
 #if defined(__GNUC__) // GCC, clang ...
 #define yotta_thread_local __thread
 
-#elif defined(_WIN32) || defined(_WIN64) // Visual studio
+#elif defined(YOTTA_WINDOWS) // Visual studio
 #define yotta_thread_local __declspec(thread)
 
 #else // unknown compilor
@@ -44,7 +46,19 @@
  */
 // yotta_thread_join(thread)
 
-#if defined(_WIN32) || defined(_WIN64) // Windows threads
+#if defined(YOTTA_POSIX) // POSIX threads
+#include <pthread.h>
+
+typedef pthread_t yotta_thread_t;
+
+#define yotta_thread_create(thread_ptr,funct_ptr,param_ptr) \
+    pthread_create((thread_ptr), 0, (void *(*)(void *)) (funct_ptr), (void *) (param_ptr))
+
+#define yotta_thread_join(thread) \
+    pthread_join((thread), 0)
+
+
+#elif defined(YOTTA_WINDOWS) // Windows threads
 #include <windows.h>
 
 typedef HANDLE yotta_thread_t;
@@ -58,18 +72,8 @@ typedef HANDLE yotta_thread_t;
         CloseHandle((thread)); \
     }
 
-
-#else // POSIX threads
-#include <pthread.h>
-
-typedef pthread_t yotta_thread_t;
-
-#define yotta_thread_create(thread_ptr,funct_ptr,param_ptr) \
-    pthread_create((thread_ptr), 0, (void *(*)(void *)) (funct_ptr), (void *) (param_ptr))
-
-#define yotta_thread_join(thread) \
-    pthread_join((thread), 0)
-
+#else
+#error "unknown yotta_thread.h configuration"
 
 #endif
 

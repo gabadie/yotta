@@ -4,10 +4,7 @@
 
 #include "../yotta_prefix.h"
 
-#if defined(_WIN32) || defined(_WIN64)
-#error "yotta_mutex.h not supported on windows yet"
-
-#else
+#ifdef YOTTA_POSIX
 
 #include <pthread.h>
 
@@ -81,6 +78,12 @@ typedef pthread_mutex_t yotta_mutex_t;
 #define yotta_mutex_destroy(mutex) \
     pthread_mutex_destroy(mutex)
 
+
+#elif defined(YOTTA_WINDOWS)
+#error "yotta_mutex.h not supported on windows yet"
+
+#else
+#error "unknown yotta_mutex.h configuration"
 
 #endif
 

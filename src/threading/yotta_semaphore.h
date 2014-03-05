@@ -4,7 +4,7 @@
 
 #include "../yotta_prefix.h"
 
-#if defined(__APPLE__) && defined(__MACH__)
+#if defined(YOTTA_OSX)
 /*
  * Mac OS X doesn't implements unnamed posix semaphores
  */
@@ -67,7 +67,7 @@ typedef semaphore_t yotta_semaphore_t;
     semaphore_destroy(current_task(), *(semaphore))
 
 
-#else
+#elif defined(YOTTA_POSIX)
 
 #include <semaphore.h>
 
@@ -125,6 +125,12 @@ typedef sem_t yotta_semaphore_t;
 #define yotta_semaphore_destroy(semaphore) \
     sem_destroy(semaphore)
 
+
+#elif defined(YOTTA_WINDOWS)
+#error "yotta_semaphore.h not supported on windows yet"
+
+#else
+#error "unknown yotta_semaphore.h configuration"
 
 #endif
 

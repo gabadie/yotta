@@ -21,6 +21,15 @@
 #define YOTTA_WINDOWS
 #endif
 
+
+/*
+ * We uses the POSIX standart on UNIX compatible system
+ */
+#ifdef YOTTA_UNIX
+#define YOTTA_POSIX
+#endif
+
+
 #include "core/yotta_return.h"
 
 
