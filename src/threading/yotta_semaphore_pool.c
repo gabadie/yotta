@@ -188,7 +188,7 @@ yotta_sem_pool_flush()
         {
             for(uint64_t i = 0; i < tmp->init_count; i++)
             {
-                yotta_sem_destroy(&tmp->sem[i]);
+                yotta_semaphore_destroy(&tmp->sem[i]);
             }
             yotta_free(tmp);
             continue;
