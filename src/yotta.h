@@ -12,6 +12,7 @@
 #include "massive/yotta_dispatch.h"
 #include "massive/yotta_fetch.h"
 #include "massive/yotta_push.h"
+#include "massive/yotta_shared_counter.h"
 #include "socket/yotta_socket.h"
 #include "socket/yotta_tcp.h"
 #include "socket/yotta_udp.h"

@@ -11,6 +11,7 @@ massive/yotta_context.c
 massive/yotta_dispatch.c
 massive/yotta_fetch.c
 massive/yotta_push.c
+massive/yotta_shared_counter.c
 slave/yotta_slave.c
 slave/yotta_slave_context.c
 socket/yotta_socket.c
