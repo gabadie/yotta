@@ -6,7 +6,7 @@
 
 
 yotta_return_t
-yotta_fetch_package(uint64_t master_addr, uint64_t buffer_size, void * dest_buffer, yotta_sync_t * sync_finished)
+yotta_fetch_package(yotta_addr_t master_addr, uint64_t buffer_size, void * dest_buffer, yotta_sync_t * sync_finished)
 {
     if (master_addr == 0)
     {

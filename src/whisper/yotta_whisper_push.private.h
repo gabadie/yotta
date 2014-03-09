@@ -2,6 +2,7 @@
 #define _YOTTAPRIVATE_WHISPER_PUSH
 
 #include "yotta_whisper_queue.private.h"
+#include "../core/yotta_addr.h"
 #include "../threading/yotta_sync.private.h"
 
 
@@ -17,7 +18,7 @@
 void
 yotta_whisper_push(
     yotta_whisper_queue_t * cmd_queue,
-    uint64_t master_address,
+    yotta_addr_t master_address,
     uint64_t data_size,
     void const * data,
     yotta_sync_t * sync

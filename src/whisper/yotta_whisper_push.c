@@ -19,7 +19,7 @@ yotta_whisper_push_cmd_s
     struct
     {
         yotta_whisper_label_t label;
-        uint64_t master_address;
+        yotta_addr_t master_address;
         uint64_t data_size;
     } __attribute__((packed))
     header;
@@ -112,7 +112,7 @@ yotta_whisper_push_master_recv(
         uint64_t header_cursor;
         struct
         {
-            uint64_t data_address;
+            yotta_addr_t data_address;
             uint64_t data_size;
         }
         header;
@@ -169,7 +169,7 @@ yotta_whisper_push_master_recv(
 void
 yotta_whisper_push(
     yotta_whisper_queue_t * cmd_queue,
-    uint64_t master_address,
+    yotta_addr_t master_address,
     uint64_t data_size,
     void const * data,
     yotta_sync_t * sync_finished

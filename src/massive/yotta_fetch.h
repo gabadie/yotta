@@ -1,6 +1,7 @@
 #ifndef _YOTTA_FETCH
 #define _YOTTA_FETCH
 
+#include "../core/yotta_addr.h"
 #include "../threading/yotta_sync.h"
 
 
@@ -18,7 +19,7 @@
  *  <YOTTA_INVALID_OPERATION> if not executed on a slave
  */
 yotta_return_t
-yotta_fetch_package(uint64_t master_addr, uint64_t buffer_size, void * buffer_dest, yotta_sync_t * sync);
+yotta_fetch_package(yotta_addr_t master_addr, uint64_t buffer_size, void * buffer_dest, yotta_sync_t * sync);
 
 
 #endif

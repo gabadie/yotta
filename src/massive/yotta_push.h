@@ -1,6 +1,7 @@
 #ifndef _YOTTA_PUSH
 #define _YOTTA_PUSH
 
+#include "../core/yotta_addr.h"
 #include "../core/yotta_memory.h"
 #include "../threading/yotta_sync.h"
 
@@ -19,7 +20,7 @@
  *  <YOTTA_INVALID_OPERATION> if not executed on a slave
  */
 yotta_return_t
-yotta_push_package(uint64_t master_addr, uint64_t buffer_size, void const * buffer, yotta_sync_t * sync);
+yotta_push_package(yotta_addr_t master_addr, uint64_t buffer_size, void const * buffer, yotta_sync_t * sync);
 
 /*
  * @infos: pushs a memory buffer to the master memory

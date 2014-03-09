@@ -19,10 +19,10 @@ yotta_whisper_fetch_request_cmd_s
     struct
     {
         yotta_whisper_label_t label;
-        uint64_t master_address;
+        yotta_addr_t master_address;
         uint64_t data_size;
-        uint64_t data_dest;
-        uint64_t sync_finished;
+        yotta_addr_t data_dest;
+        yotta_addr_t sync_finished;
     } __attribute__((packed))
     header;
 }
@@ -43,8 +43,8 @@ yotta_whisper_fetch_answer_cmd_s
     {
         yotta_whisper_label_t label;
         uint64_t data_size;
-        uint64_t data_dest;
-        uint64_t sync_finished;
+        yotta_addr_t data_dest;
+        yotta_addr_t sync_finished;
     } __attribute__((packed))
     header;
 
@@ -159,10 +159,10 @@ yotta_whisper_fetch_request_recv(
         uint64_t header_received;
         struct
         {
-            uint64_t data_address;
+            yotta_addr_t data_address;
             uint64_t data_size;
-            uint64_t data_dest;
-            uint64_t sync_finished;
+            yotta_addr_t data_dest;
+            yotta_addr_t sync_finished;
         }
         header;
     }
@@ -239,8 +239,8 @@ yotta_whisper_fetch_answer_recv(
         struct
         {
             uint64_t data_size;
-            uint64_t data_dest;
-            uint64_t sync_finished;
+            yotta_addr_t data_dest;
+            yotta_addr_t sync_finished;
         }
         header;
 
@@ -302,7 +302,7 @@ yotta_whisper_fetch_answer_recv(
 void
 yotta_whisper_fetch(
     yotta_whisper_queue_t * cmd_queue,
-    uint64_t master_address,
+    yotta_addr_t master_address,
     uint64_t data_size,
     void * data_dest,
     yotta_sync_t * sync_finished
@@ -335,8 +335,8 @@ yotta_whisper_fetch(
     cmd->header.label = YOTTA_WHISPER_MEM_FETCH_REQUEST;
     cmd->header.master_address = master_address;
     cmd->header.data_size = data_size;
-    cmd->header.data_dest = (uint64_t) data_dest;
-    cmd->header.sync_finished = (uint64_t) sync_finished;
+    cmd->header.data_dest = yotta_addr(data_dest);
+    cmd->header.sync_finished = yotta_addr(sync_finished);
 
     yotta_tcp_queue_append((yotta_tcp_queue_t *) cmd_queue, (yotta_tcp_cmd_t *) cmd);
 }
