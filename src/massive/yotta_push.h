@@ -17,7 +17,6 @@
  * @returns:
  *  <YOTTA_SUCESS> if successed
  *  <YOTTA_INVALID_VALUE> if <master_addr>, <buffer_size>, or <buffer> is null
- *  <YOTTA_INVALID_OPERATION> if not executed on a slave
  */
 yotta_return_t
 yotta_push_package(yotta_addr_t master_addr, uint64_t buffer_size, void const * buffer, yotta_sync_t * sync);
@@ -33,7 +32,6 @@ yotta_push_package(yotta_addr_t master_addr, uint64_t buffer_size, void const * 
  * @returns:
  *  <YOTTA_SUCESS> if successed
  *  <YOTTA_INVALID_VALUE> if <master_addr>, or <buffer> is null
- *  <YOTTA_INVALID_OPERATION> if not executed on a slave
  *
  * @assert <buffer> allocated by the yotta library
  */

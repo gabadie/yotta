@@ -1,4 +1,6 @@
 
+#include <string.h>
+
 #include "yotta_push.h"
 #include "../core/yotta_debug.h"
 #include "../core/yotta_return.private.h"
@@ -23,7 +25,15 @@ yotta_push_package(yotta_addr_t master_addr, uint64_t buffer_size, void const * 
     }
     else if (yotta_slave_context == 0)
     {
-        yotta_return_inv_op(yotta_push_package);
+        memcpy((void *) master_addr, buffer, buffer_size);
+
+        if (sync_finished != 0)
+        {
+            yotta_sync_init(sync_finished);
+            yotta_sync_post(sync_finished);
+        }
+
+        return YOTTA_SUCCESS;
     }
 
     yotta_whisper_push(&yotta_slave_context->queue, master_addr, buffer_size, buffer, sync_finished);
