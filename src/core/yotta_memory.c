@@ -63,6 +63,7 @@ yotta_alloc(size_t size, size_t alignment)
     yotta_assert(memory->free_function != 0);
     yotta_assert(memory->size == size);
     yotta_assert(memory->coins == 1);
+    yotta_assert((((size_t) memory) & 0xF) == 0);
 
 #ifdef YOTTA_DEBUG_DIRTY
     memset(memory + 1, 0xFE, size);
@@ -75,6 +76,7 @@ void
 yotta_free(void * ptr)
 {
     yotta_assert(ptr != 0);
+    yotta_assert((((size_t) ptr) & 0xF) == 0);
 
     yotta_memory_prefix_t * memory = yotta_memory_prefix(ptr);
 

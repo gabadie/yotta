@@ -89,7 +89,8 @@ yotta_memory_prefix_s
      * The number of coins for the retain/release mechanism
      */
     size_t coins;
-};
+}
+yotta_default_align;
 
 /*
  * @infos: gets memory prefix's address
@@ -115,7 +116,7 @@ yotta_memory_prefix_s
  *
  * @returns: pointer on the allocated memory
  */
-void *
+void * yotta_default_align
 yotta_alloc(size_t size, size_t alignment);
 
 /*
