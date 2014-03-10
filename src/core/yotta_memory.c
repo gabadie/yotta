@@ -18,11 +18,17 @@ yotta_memory_default_free(yotta_memory_prefix_t * memory)
 
 static
 yotta_memory_prefix_t *
-yotta_memory_default_alloc(void * user_data, size_t size)
+yotta_memory_default_alloc(void * user_data, size_t size, size_t alignment)
 {
-    yotta_memory_prefix_t * memory = (yotta_memory_prefix_t *) malloc(
+    yotta_memory_prefix_t * memory = 0;
+
+    yotta_assert_return(posix_memalign(
+        (void **) &memory,
+        alignment,
         size + sizeof(yotta_memory_prefix_t)
-    );
+    ), 0);
+
+    yotta_assert(memory != 0);
 
     memory->free_function = yotta_memory_default_free;
     memory->user_data = user_data;
@@ -41,12 +47,18 @@ void * yotta_memory_user_data = 0;
 
 
 void *
-yotta_alloc(size_t size)
+yotta_alloc(size_t size, size_t alignment)
 {
     yotta_assert(size != 0);
     yotta_assert(yotta_memory_allocator != 0);
+    yotta_assert(alignment >= YOTTA_DEFAULT_ALIGNMENT);
+    yotta_assert((alignment & (alignment - 1)) == 0); // alignment must be a power of two
 
-    yotta_memory_prefix_t * memory = yotta_memory_allocator(yotta_memory_user_data, size);
+    yotta_memory_prefix_t * memory = yotta_memory_allocator(
+        yotta_memory_user_data,
+        size,
+        alignment
+    );
 
     yotta_assert(memory->free_function != 0);
     yotta_assert(memory->size == size);

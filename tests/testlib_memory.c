@@ -9,7 +9,7 @@ main()
         static const
         size_t hello_size = 16;
 
-        void * hello = yotta_alloc(hello_size);
+        void * hello = yotta_alloc_d(hello_size);
 
         test_assert(hello != 0);
 
@@ -34,7 +34,7 @@ main()
         static const
         size_t hello_size = 128;
 
-        void * hello = yotta_alloc(hello_size);
+        void * hello = yotta_alloc_d(hello_size);
 
         test_assert(hello != 0);
 
@@ -60,7 +60,7 @@ main()
 
         test_assert(testhelper_memory_tracker() == 0);
 
-        void * hello = yotta_alloc(hello_size);
+        void * hello = yotta_alloc_d(hello_size);
 
         test_assert(hello != 0);
 

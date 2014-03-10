@@ -31,14 +31,15 @@ testhelper_memory_free(yotta_memory_prefix_t * memory)
  */
 static
 yotta_memory_prefix_t *
-testhelper_memory_alloc(void * user_data, size_t size)
+testhelper_memory_alloc(void * user_data, size_t size, size_t alignment)
 {
     test_assert((uint64_t *) user_data == &testhelper_alloc_count);
     test_assert(size > 0);
 
-    yotta_memory_prefix_t * memory = (yotta_memory_prefix_t *) malloc(
-        size + sizeof(yotta_memory_prefix_t)
-    );
+    yotta_memory_prefix_t * memory = 0;
+
+    test_assert(posix_memalign((void **) &memory, alignment, size + sizeof(yotta_memory_prefix_t)) == 0);
+    test_assert(memory != 0);
 
     memory->free_function = testhelper_memory_free;
     memory->user_data = user_data;

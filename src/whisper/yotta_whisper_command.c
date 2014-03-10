@@ -283,7 +283,7 @@ yotta_whisper_command_order_recv(
 
         if (buffer->header.param_size != 0)
         {
-            buffer->param = yotta_alloc(buffer->header.param_size);
+            buffer->param = yotta_alloc_d(buffer->header.param_size);
         }
     }
 

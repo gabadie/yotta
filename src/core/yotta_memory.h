@@ -48,12 +48,13 @@ yotta_memory_prefix_t;
  * The tcp command entry received 2 parameters:
  *  - void * user_data: the user data
  *  - size_t size: the size to allocates
+ *  - size_t alignment: the alignment to allocates
  *
  * returns:
  *  properly initialized yotta_memory_prefix_t directly followed by the memory
  *  block itself.
  */
-typedef yotta_memory_prefix_t * (*yotta_memory_alloc_func_t)(void *, size_t);
+typedef yotta_memory_prefix_t * (*yotta_memory_alloc_func_t)(void *, size_t, size_t);
 
 /*
  * @infos: defines yotta memory free function pointer type
@@ -110,11 +111,22 @@ yotta_memory_prefix_s
  * @infos: allocate a memory block from its given size
  *
  * @param <size>: the memory size to allocate
+ * @param <alignment>: the memory alignment
  *
  * @returns: pointer on the allocated memory
  */
 void *
-yotta_alloc(size_t size);
+yotta_alloc(size_t size, size_t alignment);
+
+/*
+ * @infos: allocate a memory block from its given size with the default alignment
+ *
+ * @param <size>: the memory block's size
+ *
+ * @returns: pointer on the allocated memory
+ */
+#define yotta_alloc_d(size) \
+    yotta_alloc(size, YOTTA_DEFAULT_ALIGNMENT)
 
 /*
  * @infos: allocate a struct from its given name
@@ -124,7 +136,7 @@ yotta_alloc(size_t size);
  * @returns: (struct_name *) pointer on the allocated memory
  */
 #define yotta_alloc_s(struct_name) \
-    (struct_name *) yotta_alloc(sizeof(struct_name))
+    (struct_name *) yotta_alloc(sizeof(struct_name), yotta_alignof(struct_name))
 
 /*
  * @infos: allocate a struct array from its given name
@@ -135,7 +147,7 @@ yotta_alloc(size_t size);
  * @returns: (struct_name *) pointer on the allocated memory array
  */
 #define yotta_alloc_sa(struct_name,element_count) \
-    (struct_name *) yotta_alloc(sizeof(struct_name) * (element_count))
+    (struct_name *) yotta_alloc(sizeof(struct_name) * (element_count), yotta_alignof(struct_name))
 
 /*
  * @infos: frees memory
