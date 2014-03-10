@@ -6,10 +6,10 @@
 
 
 // The yotta sync object has not been triggered
-#define YOTTA_SYNC_UNTRIGGERED ((void *) -2)
+#define YOTTA_SYNC_UNTRIGGERED ((void *) -3)
 
 // The semaphore of the sync object has been triggered
-#define YOTTA_SYNC_TRIGGERED ((void *) -1)
+#define YOTTA_SYNC_TRIGGERED ((void *) -2)
 
 
 /*
