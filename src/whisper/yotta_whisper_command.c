@@ -6,6 +6,7 @@
 #include "../core/yotta_memory.h"
 #include "../massive/yotta_dispatch.private.h"
 #include "../threading/yotta_thread.h"
+#include "../threading/yotta_sync.private.h"
 
 
 /*
@@ -437,6 +438,9 @@ yotta_whisper_command(
     yotta_assert((param_size == 0 && param == 0) || (param_size != 0 && param != 0));
     yotta_assert(sync_sent != 0);
     yotta_assert(sync_finished != 0);
+
+    yotta_sync_init(sync_sent);
+    yotta_sync_init(sync_finished);
 
     /*
      * creates the command order command and appends it to the given whisper queue
