@@ -5,6 +5,37 @@
 
 
 /*
+ * Defines the yotta's default memory alignement
+ */
+#define YOTTA_DEFAULT_ALIGNMENT 16
+
+/*
+ * Compilor specific binding for the alignof keyword
+ */
+#define _yotta_alignof(type) \
+    __alignof(type)
+
+/*
+ * Gets the yotta alignment for a given type
+ */
+#define yotta_alignof(type) \
+    ( \
+        (_yotta_alignof(type) < (YOTTA_DEFAULT_ALIGNMENT)) \
+            ? (YOTTA_DEFAULT_ALIGNMENT) \
+            : _yotta_alignof(type) \
+    )
+
+/*
+ * Defines the yotta_align() keyword
+ */
+#define yotta_align(align) __attribute__((aligned(align)))
+
+/*
+ * Defines the yotta_default_align keyword
+ */
+#define yotta_default_align yotta_align(YOTTA_DEFAULT_ALIGNMENT)
+
+/*
  * @infso: forward declaration of yotta_memory_prefix_t
  */
 typedef struct
