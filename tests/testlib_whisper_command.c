@@ -36,6 +36,9 @@ test_whisper_command_invocation()
         yotta_sync_t sync_sent;
         yotta_sync_t sync_finished;
 
+        yotta_dirty_s(&sync_sent);
+        yotta_dirty_s(&sync_finished);
+
         yotta_whisper_command(
             &protocol.queue0,
             (yotta_whisper_command_entry_t) test_thread_callback,

@@ -22,6 +22,8 @@ test_whisper_fetch_stress()
     {
         yotta_sync_t sync_fetch;
 
+        yotta_dirty_s(&sync_fetch);
+
         yotta_whisper_fetch(&protocol.queue1, (uint64_t) src_data, data_size, dest_data, &sync_fetch);
         yotta_sync_wait(&sync_fetch);
     }
