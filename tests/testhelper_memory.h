@@ -1,8 +1,11 @@
 #ifndef _HELPER_MEMORY
 #define _HELPER_MEMORY
 
-#include "testhelper_init.h"
+#include <yotta.h>
+#include <mk_test.h>
+
 #include "testhelper_lorem.h"
+#include "../src/threading/yotta_semaphore_pool.private.h"
 
 
 /*
@@ -61,6 +64,8 @@ static
 void
 testhelper_memory_setup()
 {
+    yotta_sem_pool_flush();
+
     test_assert(yotta_memory_set_allocator(testhelper_memory_alloc, &testhelper_alloc_count) == YOTTA_SUCCESS);
 }
 
@@ -74,7 +79,10 @@ testhelper_memory_setup()
  * @infos: checks up if there is memory leak
  */
 #define testhelper_memory_check() \
-    test_assert2("memory leak detected", testhelper_memory_tracker() == 0)
+    { \
+        yotta_sem_pool_flush(); \
+        test_assert2("memory leak detected", testhelper_memory_tracker() == 0); \
+    }
 
 
 #endif

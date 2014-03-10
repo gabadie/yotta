@@ -1,7 +1,7 @@
 
 #include <pthread.h>
-#include <yotta.h>
-#include <mk_test.h>
+
+#include "testhelper_memory.h"
 #include "../src/threading/yotta_sync.private.h"
 
 #ifdef YOTTA_UNIX
@@ -55,6 +55,8 @@ test_post_wait()
     test_assert(yotta_sync_wait(&yotta_sync) == YOTTA_SUCCESS);
 
     test_assert(yotta_sync.sem == YOTTA_SYNC_TRIGGERED);
+
+    testhelper_memory_check();
 }
 
 void
@@ -72,6 +74,8 @@ test_wait_post()
 
     pthread_join(consumer, NULL);
     pthread_join(producer, NULL);
+
+    testhelper_memory_check();
 }
 
 void
@@ -93,11 +97,15 @@ test_post_post_wait()
     test_assert(yotta_sync_wait(&yotta_sync) == YOTTA_SUCCESS);
 
     test_assert(yotta_sync.sem == YOTTA_SYNC_TRIGGERED);
+
+    testhelper_memory_check();
 }
 
 int
 main()
 {
+    testhelper_memory_setup();
+
     test_post_wait();
     test_wait_post();
     /*test_post_post_wait();*/

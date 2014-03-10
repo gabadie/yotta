@@ -1,5 +1,5 @@
 
-//#include "testhelper_memory.h"
+#include "testhelper_memory.h"
 #include "testhelper_init.h"
 #include "testhelper_lorem.h"
 
@@ -44,6 +44,8 @@ test_dispatch_validity()
     }
 
     test_assert(validity_parameter == cores);
+
+    testhelper_memory_check();
 }
 
 static
@@ -67,6 +69,8 @@ test_default_id()
     test_assert(group_count == 1);
     test_assert(global_id == 0);
     test_assert(global_count == 1);
+
+    testhelper_memory_check();
 }
 
 static
@@ -121,6 +125,8 @@ test_dispatch_id()
     }
 
     yotta_free(output_array);
+
+    testhelper_memory_check();
 }
 
 static
@@ -143,13 +149,15 @@ test_dispatch_param_stride()
 
         test_assert(r == YOTTA_SUCCESS);
     }
+
+    testhelper_memory_check();
 }
 
 int
 main()
 {
     testhelper_init();
-    //testhelper_memory_setup();
+    testhelper_memory_setup();
 
     test_dispatch_validity();
     test_default_id();

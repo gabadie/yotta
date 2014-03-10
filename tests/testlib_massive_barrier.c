@@ -1,5 +1,5 @@
 
-//#include "testhelper_memory.h"
+#include "testhelper_memory.h"
 #include "testhelper_init.h"
 #include "testhelper_lorem.h"
 
@@ -14,6 +14,8 @@ test_group_barrier_lonely()
     yotta_group_barrier();
 
     test_passed("group barrier on a lonely thread is not blocking");
+
+    testhelper_memory_check();
 }
 
 /*
@@ -72,6 +74,8 @@ test_group_barrier()
     }
 
     yotta_free(output_array);
+
+    testhelper_memory_check();
 }
 
 
@@ -79,7 +83,7 @@ int
 main()
 {
     testhelper_init();
-    //testhelper_memory_setup();
+    testhelper_memory_setup();
 
     test_group_barrier_lonely();
     test_group_barrier();

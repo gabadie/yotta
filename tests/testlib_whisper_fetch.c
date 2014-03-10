@@ -35,8 +35,7 @@ test_whisper_fetch_stress()
 
     testhelper_whisper_protocol_destroy(&protocol);
 
-    // TODO: implements yotta_semaphore_pool_flush()
-    //testhelper_memory_check();
+    testhelper_memory_check();
 }
 
 int

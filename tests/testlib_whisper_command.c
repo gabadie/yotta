@@ -1,7 +1,7 @@
 
 #include <string.h>
 
-//#include "testhelper_memory.h"
+#include "testhelper_memory.h"
 #include "testhelper_whisper.h"
 #include "../src/whisper/yotta_whisper_command.private.h"
 
@@ -66,15 +66,14 @@ test_whisper_command_invocation()
 
     testhelper_whisper_protocol_destroy(&protocol);
 
-    // TODO: implements yotta_semaphore_pool_flush()
-    //testhelper_memory_check();
+    testhelper_memory_check();
 }
 
 int
 main()
 {
     testhelper_init();
-    //testhelper_memory_setup();
+    testhelper_memory_setup();
 
     test_whisper_command_invocation();
 

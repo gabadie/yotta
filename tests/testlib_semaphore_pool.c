@@ -3,6 +3,7 @@
 #include <yotta.h>
 #include <mk_test.h>
 
+#include "testhelper_init.h"
 #include "testhelper_memory.h"
 #include "../src/threading/yotta_semaphore_pool.private.h"
 
