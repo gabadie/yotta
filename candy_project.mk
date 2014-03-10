@@ -11,7 +11,7 @@ PROJECT_LDFLAGS := -lpthread
 
 # ------------------------------------------------------------ release configuration
 ifeq ($(config),release)
-    PROJECT_CFLAGS += -O3 -Werror -mmmx -mavx2
+    PROJECT_CFLAGS += -O3 -Werror -mmmx -mavx
 endif
 
 # ------------------------------------------------------------ nightly configuration
