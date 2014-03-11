@@ -32,3 +32,4 @@ whisper/yotta_whisper_fetch.c
 whisper/yotta_whisper_master.c
 whisper/yotta_whisper_push.c
 whisper/yotta_whisper_queue.c
+whisper/yotta_whisper_shared_counter.c
