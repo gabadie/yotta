@@ -2,21 +2,34 @@
 # List of the library's C files
 #
 
-yotta_address_translation.c
-yotta_command.c
-yotta_context.c
 yotta_init.c
-yotta_logger.c
-yotta_slave.c
-dictate/yotta_dictate_binary_send.c
+core/yotta_addr_translation.c
+core/yotta_logger.c
+core/yotta_memory.c
+#dictate/yotta_dictate_binary_send.c TODO: implement dictate protocol
+massive/yotta_context.c
+massive/yotta_dispatch.c
+massive/yotta_fetch.c
+massive/yotta_push.c
+massive/yotta_shared_counter.c
+slave/yotta_slave.c
+slave/yotta_slave_context.c
 socket/yotta_socket.c
+socket/yotta_socket_event.c
 socket/yotta_socket_prefix.c
-socket/yotta_tcp.c
-socket/yotta_tcp_cmd_queue.c
-socket/yotta_udp.c
 socket/yotta_socket_thread.c
+socket/yotta_tcp.c
+socket/yotta_tcp_cmd.c
+socket/yotta_tcp_queue.c
+socket/yotta_udp.c
+threading/yotta_semaphore_pool.c
+threading/yotta_sync.c
+threading/yotta_threading.c
 utils/yotta_file.c
 utils/yotta_str_utils.c
+whisper/yotta_whisper_command.c
+whisper/yotta_whisper_fetch.c
 whisper/yotta_whisper_master.c
 whisper/yotta_whisper_push.c
 whisper/yotta_whisper_queue.c
+whisper/yotta_whisper_shared_counter.c

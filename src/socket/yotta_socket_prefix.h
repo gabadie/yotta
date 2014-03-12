@@ -2,6 +2,8 @@
 #define _YOTTA_CLIB_SOCKET
 
 
+#include "../yotta_prefix.h"
+
 #ifdef _WIN32 // Windows (x64 and x86)
 
 #define NOMINMAX
@@ -47,7 +49,7 @@ typedef struct sockaddr SOCKADDR;
  *  == <0> if succeed
  *  != <0> if failed
  */
-uint64_t
+yotta_return_t
 yotta_init_csocket();
 
 /*
@@ -57,7 +59,7 @@ yotta_init_csocket();
  *  == <0> if succeed
  *  != <0> if failed
  */
-uint64_t
+yotta_return_t
 yotta_clean_csocket();
 
 

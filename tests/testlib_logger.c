@@ -1,20 +1,20 @@
 
 
 #include <mk_test.h>
-#include "../src/yotta_logger.h"
-#include "../src/yotta_logger.private.h"
+#include "../src/core/yotta_logger.h"
+#include "../src/core/yotta_logger.private.h"
 
 static yotta_log_msg_type_t g_msg_type;
 
 
 void
-test_slave_parse_parameters(yotta_log_msg_type_t msg_type, char const * msg, void * user_data)
+test_slave_parse_parameters(void * user_data, yotta_logger_param_t const * param)
 {
     test_assert(((uint64_t)g_msg_type) == 0xABC);
     test_assert(user_data == (void *)&g_msg_type);
-    test_assert(msg != 0);
+    test_assert(param != 0);
 
-    g_msg_type = msg_type;
+    g_msg_type = param->type;
 }
 
 

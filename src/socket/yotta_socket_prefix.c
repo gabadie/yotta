@@ -6,41 +6,41 @@
 
 static WSADATA WSAData;
 
-uint64_t
+yotta_return_t
 yotta_init_csocket()
 {
 	if (WSAStartup(MAKEWORD(2, 2), &WSAData))
 	{
-		return -1;
+		return YOTTA_UNEXPECTED_FAIL;
 	}
 
-	return 0;
+	return YOTTA_SUCCESS;
 }
 
-uint64_t
+yotta_return_t
 yotta_clean_csocket()
 {
 	if (WSACleanup())
 	{
-		return -1;
+		return YOTTA_UNEXPECTED_FAIL;
 	}
 
-	return 0;
+	return YOTTA_SUCCESS;
 }
 
 
 #else // unix
 
-uint64_t
+yotta_return_t
 yotta_init_csocket()
 {
-	return 0;
+	return YOTTA_SUCCESS;
 }
 
-uint64_t
+yotta_return_t
 yotta_clean_csocket()
 {
-	return 0;
+	return YOTTA_SUCCESS;
 }
 
 

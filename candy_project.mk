@@ -2,22 +2,30 @@
 # ------------------------------------------------------------------------------ Yotta library's headers directory
 
 # ------------------------------------------------------------ default configuration
-ifneq ($(config),debug)
-    config=release
+ifeq ($(filter debug nightly,$(config)),)
+    override config=release
 endif
 
-PROJECT_CFLAGS := -Wall -Wextra -std=gnu11
+PROJECT_CFLAGS := -Wall -Wextra -std=gnu11 -m64
 PROJECT_LDFLAGS := -lpthread
 
 # ------------------------------------------------------------ release configuration
 ifeq ($(config),release)
-    PROJECT_CFLAGS += -O3 -Werror
+    PROJECT_CFLAGS += -O3 -Werror -mmmx -mavx
+endif
+
+# ------------------------------------------------------------ nightly configuration
+ifeq ($(config),nightly)
+    PROJECT_CFLAGS += -g
 endif
 
 # ------------------------------------------------------------ debug configuration
 ifeq ($(config),debug)
     PROJECT_CFLAGS += -g -DYOTTA_DEBUG
 endif
+
+
+$(call trash_configs, debug nightly release)
 
 
 # ------------------------------------------------------------------------------ Yotta library's headers directory
@@ -83,6 +91,12 @@ TEST_SCRIPT_TARGETS := $(call test_scripts,$(TEST_LIB_SCRIPTS))
 
 $(TEST_SCRIPT_TARGETS): $(LIB_BINARIES_TARGET)
 $(TEST_SCRIPT_TARGETS): TESTFLAGS = $(BUILD_DIR)
+
+
+# ------------------------------------------------------------------------------ Yotta deamon's tests
+
+TEST_DEAMON_FILES := $(call filelist,src_deamon/test_deamon.flist)
+TEST_DEAMON_TARGETS := $(call test_scripts,$(TEST_DEAMON_FILES),py.test)
 
 
 # ------------------------------------------------------------------------------ Yotta's hook

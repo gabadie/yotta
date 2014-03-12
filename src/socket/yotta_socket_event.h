@@ -61,7 +61,12 @@ yotta_socket_event_s
  */
 #ifdef YOTTA_DEBUG
 #define yotta_socket_event_init(socket_event) \
-    ((yotta_socket_event_t *) (socket_event))->socket_thread = 0;
+    yotta_dirty_offset( \
+        socket_event, \
+        sizeof(yotta_socket_t), \
+        sizeof(yotta_socket_event_t) - sizeof(yotta_socket_t) \
+    ); \
+    ((yotta_socket_event_t *) (socket_event))->socket_thread = 0 \
 
 #else
 #define yotta_socket_event_init(socket_event)
@@ -87,6 +92,15 @@ yotta_socket_event_s
     ((yotta_socket_event_t *) (socket_event))->release_event = (yotta_socket_entry_t)(function_ptr)
 
 /*
+ * @threadsafe
+ * @infos: unlistens socket events
+ *
+ * @param <socket_event>: the socket event
+ */
+void
+yotta_socket_event_unlisten(yotta_socket_event_t * socket_event);
+
+/*
  * @infos: triggers the release event
  *
  * @param <socket_event>: the socket event
@@ -100,6 +114,6 @@ yotta_socket_event_s
  * @param <socket_event>: the socket event to destroy
  */
 #define yotta_socket_event_destroy(socket_event) \
-    yotta_close_socket(&((yotta_socket_event_t *) socket_event)->socket)
+    yotta_socket_close(&((yotta_socket_event_t *) socket_event)->socket)
 
 #endif

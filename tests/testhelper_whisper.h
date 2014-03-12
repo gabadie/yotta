@@ -2,6 +2,7 @@
 #define _HELPER_WHISPER
 
 #include "testhelper_init.h"
+#include "testhelper_lorem.h"
 #include "../src/socket/yotta_socket_thread.h"
 #include "../src/whisper/yotta_whisper_queue.private.h"
 
@@ -31,8 +32,11 @@ static
 void
 testhelper_whisper_protocol_init(testhelper_whisper_protocol_t * testing_protocol)
 {
-    static uint16_t PORT = 8001;
+    static uint16_t listening_port = 0;
     static int32_t const BACKLOG = 16;
+
+    // put some dirty content before to make sure there is no forgotten initialization
+    testhelper_lorem(testing_protocol, sizeof(testhelper_whisper_protocol_t));
 
     yotta_socket_t listening_socket;
 
@@ -42,19 +46,23 @@ testhelper_whisper_protocol_init(testhelper_whisper_protocol_t * testing_protoco
     yotta_socket_thread_init(&testing_protocol->thread);
 
     // Server socket initialization
-    test_assert(yotta_tcp_socket_server(&listening_socket, PORT) == 0);
+    test_assert(yotta_tcp_socket_server(&listening_socket, 0) == 0);
 
     // Server socket listen
-    test_assert(yotta_listen_socket(&listening_socket, BACKLOG) == 0);
+    test_assert(yotta_socket_listen(&listening_socket, BACKLOG) == 0);
+
+    // Get listening port
+    test_assert(yotta_socket_port(&listening_socket, &listening_port) == 0);
+    test_assert(listening_port != 0);
 
     // Create queue 0's socket
-    test_assert(yotta_tcp_socket_client((yotta_socket_t *) &testing_protocol->queue0, "127.0.0.1", PORT) == 0);
+    test_assert(yotta_tcp_socket_client((yotta_socket_t *) &testing_protocol->queue0, "127.0.0.1", listening_port) == 0);
 
     // Create queue 1's socket
-    test_assert(yotta_accept_socket(&listening_socket, (yotta_socket_t *) &testing_protocol->queue1) == 0);
+    test_assert(yotta_socket_accept(&listening_socket, (yotta_socket_t *) &testing_protocol->queue1) == 0);
 
     // Close server socket
-    test_assert(yotta_close_socket(&listening_socket) == 0);
+    test_assert(yotta_socket_close(&listening_socket) == 0);
 
     // inits queues
     yotta_whisper_queue_init(&testing_protocol->queue0);
@@ -82,10 +90,10 @@ testhelper_whisper_protocol_destroy(testhelper_whisper_protocol_t * testing_prot
      *
      * we close only one because the other will be then closed by an exception
      */
-    yotta_tcp_cmd_queue_close((yotta_tcp_cmd_queue_t *) &testing_protocol->queue0);
+    yotta_tcp_queue_finish((yotta_tcp_queue_t *) &testing_protocol->queue0);
 
     // cleans the sockets' thread
-    yotta_socket_thread_destroy(&testing_protocol->thread);
+    test_assert(yotta_socket_thread_destroy(&testing_protocol->thread) == 0);
 }
 
 

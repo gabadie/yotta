@@ -1,10 +1,9 @@
 #include <string.h>
 #include <stdlib.h>
 
-#include "yotta_return.h"
 #include "yotta_init.h"
-#include "yotta_slave.private.h"
-#include "yotta_return.private.h"
+#include "core/yotta_return.private.h"
+#include "slave/yotta_slave_context.private.h"
 #include "socket/yotta_socket_prefix.h"
 
 char const *
@@ -49,7 +48,7 @@ yotta_init(uint64_t argc, char const * const * argv)
             exit(yotta_process_failed_return);
         }
 
-        if (yotta_slave_main(&parameters) != 0)
+        if (yotta_slave_context_main(&parameters) != 0)
         {
             exit(yotta_process_failed_return);
         }

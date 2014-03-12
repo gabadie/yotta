@@ -1,7 +1,7 @@
 #ifndef _YOTTAPRIVATE_WHISPER_QUEUE
 #define _YOTTAPRIVATE_WHISPER_QUEUE
 
-#include "../socket/yotta_tcp_cmd_queue.private.h"
+#include "../socket/yotta_tcp_queue.private.h"
 
 
 /*
@@ -32,7 +32,7 @@ typedef void (* yotta_whisper_recv_t)(
 struct
 yotta_whisper_queue_s
 {
-    yotta_tcp_cmd_queue_t tcp_queue;
+    yotta_tcp_queue_t tcp_queue;
 
     // callback entry to complete the message
     yotta_whisper_recv_t callback;
@@ -48,6 +48,20 @@ yotta_whisper_queue_s
  */
 void
 yotta_whisper_queue_init(yotta_whisper_queue_t * cmd_queue);
+
+/*
+ * @infos: connects a whisper command queue to a whisper master
+ *
+ * @param <cmd_queue>: the command queue to connect to
+ * @param <ip>: the whisper master' ip
+ * @param <port>: the whisper master' port
+ *
+ * @returns:
+ *  == <0> if succeed
+ *  != <0> if failed
+ */
+yotta_return_t
+yotta_whisper_queue_connect(yotta_whisper_queue_t * cmd_queue, char const * ip, uint16_t port);
 
 /*
  * @infos: destroyes a whisper command queue
@@ -77,14 +91,5 @@ yotta_whisper_queue_destroy(yotta_whisper_queue_t * cmd_queue);
  */
 #define yotta_whisper_queue_finish(cmd_queue) \
     (cmd_queue)->callback = 0;
-
-/*
- * @infos: sets in the <cmd_queue>'s <callback> to process futur incomming data
- *
- * @param <cmd_queue>: the command queue
- * @param <callback_func_ptr>: the callback to call when receiving some data
- */
-#define yotta_whisper_queue_continue(cmd_queue,callback_func_ptr) \
-    (cmd_queue)->callback = (callback_func_ptr);
 
 #endif

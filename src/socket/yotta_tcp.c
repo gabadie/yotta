@@ -1,6 +1,6 @@
 
 #include "yotta_tcp.h"
-#include "../yotta_debug.h"
+#include "../core/yotta_debug.h"
 
 
 uint64_t

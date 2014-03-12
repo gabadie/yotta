@@ -13,7 +13,7 @@
  */
 static
 void
-testhelper_log(yotta_log_msg_type_t msg_type, char const * msg, void * user_data)
+testhelper_log(void * user_data, yotta_logger_param_t const * param)
 {
     static char const * const msg_type_name[] = {
         "ERROR",
@@ -21,11 +21,11 @@ testhelper_log(yotta_log_msg_type_t msg_type, char const * msg, void * user_data
         "DEBUG"
     };
 
-    (void) user_data;
+    test_assert(user_data == 0);
+    test_assert(param != 0);
+    test_assert(param->type < (sizeof(msg_type_name) / sizeof(typeof(msg_type_name))));
 
-    test_assert(msg_type < (sizeof(msg_type) / sizeof(typeof(msg_type))));
-
-    printf("%s: %s\n", msg_type_name[msg_type], msg);
+    printf("%s: %s\n", msg_type_name[param->type], param->msg);
 }
 
 /*

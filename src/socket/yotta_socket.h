@@ -31,8 +31,8 @@ yotta_socket_s
  *  == <0> if succeed
  *  != <0> if failed
  */
-uint64_t
-yotta_init_socket_server(yotta_socket_t * sock, uint16_t port, int family, int type);
+yotta_return_t
+yotta_socket_server_init(yotta_socket_t * sock, uint16_t port, int family, int type);
 
 /*
  * @infos: init a yotta socket client
@@ -49,9 +49,22 @@ yotta_init_socket_server(yotta_socket_t * sock, uint16_t port, int family, int t
  *  == <0> if succeed
  *  != <0> if failed
  */
-uint64_t
-yotta_init_socket_client(yotta_socket_t * sock, char const * address,
+yotta_return_t
+yotta_socket_client_init(yotta_socket_t * sock, char const * address,
     uint16_t port, int family, int type);
+
+/*
+ * @infos: gets the port of a yotta socket
+ *
+ * @param <sock>: yotta socket
+ * @param <port>: output port
+ *
+ * @returns:
+ *  == <0> if succeed
+ *  != <0> if failed
+ */
+yotta_return_t
+yotta_socket_port(yotta_socket_t * sock, uint16_t * port);
 
 /*
  * @infos: listen with a yotta socket
@@ -63,8 +76,8 @@ yotta_init_socket_client(yotta_socket_t * sock, char const * address,
  *  == <0> if succeed
  *  != <0> if failed
  */
-uint64_t
-yotta_listen_socket(yotta_socket_t * sock, int backlog);
+yotta_return_t
+yotta_socket_listen(yotta_socket_t * sock, int backlog);
 
 /*
  * @infos: accept a new connection on a yotta socket
@@ -78,8 +91,8 @@ yotta_listen_socket(yotta_socket_t * sock, int backlog);
  *  == <0> if succeed
  *  != <0> if failed
  */
-uint64_t
-yotta_accept_socket(yotta_socket_t * sock, yotta_socket_t * new_sock);
+yotta_return_t
+yotta_socket_accept(yotta_socket_t * sock, yotta_socket_t * new_sock);
 
 /*
  * @infos: close a yotta socket
@@ -90,8 +103,8 @@ yotta_accept_socket(yotta_socket_t * sock, yotta_socket_t * new_sock);
  *  == <0> if succeed
  *  != <0> if failed
  */
-uint64_t
-yotta_close_socket(yotta_socket_t * sock);
+yotta_return_t
+yotta_socket_close(yotta_socket_t * sock);
 
 /*
  * @infos: switches socket mode to passing mode
@@ -103,7 +116,7 @@ yotta_close_socket(yotta_socket_t * sock);
  *  != <0> if failed
  */
 #define yotta_socket_nonblock(socket) \
-    fcntl((socket)->fd, F_SETFL, O_NONBLOCK)
+    fcntl((socket)->fd, F_SETFL, fcntl((socket)->fd, F_GETFL, 0) | O_NONBLOCK)
 
 /*
  * @infos: switches socket mode to blocking mode
@@ -115,6 +128,6 @@ yotta_close_socket(yotta_socket_t * sock);
  *  != <0> if failed
  */
 #define yotta_socket_block(socket) \
-    fcntl((socket)->fd, F_SETFL, 0)
+    fcntl((socket)->fd, F_SETFL, fcntl((socket)->fd, F_GETFL, 0) & ~O_NONBLOCK)
 
 #endif //_YOTTA_SOCKET

@@ -1,10 +1,10 @@
 #include <stdio.h>
 
 #include "yotta_dictate_binary_send.h"
-#include "../yotta_debug.h"
 #include "../yotta_init.h"
-#include "../yotta_logger.private.h"
-#include "../yotta_return.h"
+#include "../core/yotta_debug.h"
+#include "../core/yotta_return.h"
+#include "../core/yotta_logger.private.h"
 #include "../utils/yotta_str_utils.h"
 #include "../socket/yotta_tcp.h"
 
