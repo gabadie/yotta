@@ -178,7 +178,7 @@ yotta_whisper_shared_counter_request_recv(
         yotta_tcp_cmd_set_release(cmd, yotta_whisper_shared_counter_release);
 
         cmd->header_cursor = 0;
-        cmd->header.label = YOTTA_WHISPER_MEM_FETCH_ANSWER;
+        cmd->header.label = YOTTA_WHISPER_SHARED_COUNTER_ANSWER;
         cmd->header.shared_counter_addr = buffer->header.shared_counter_addr;
 
         yotta_counter_t * counter = (yotta_counter_t *) buffer->header.master_counter_addr;
@@ -275,7 +275,7 @@ yotta_whisper_shared_counter(
     yotta_tcp_cmd_set_release(cmd, yotta_whisper_shared_counter_release);
 
     cmd->header_cursor = 0;
-    cmd->header.label = YOTTA_WHISPER_MEM_FETCH_REQUEST;
+    cmd->header.label = YOTTA_WHISPER_SHARED_COUNTER_REQUEST;
     cmd->header.master_counter_addr = shared_counter->master_counter_addr;
     cmd->header.shared_counter_addr = (yotta_addr_t) shared_counter;
     cmd->header.add = shared_counter->stock_size;
