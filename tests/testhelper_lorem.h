@@ -19,5 +19,7 @@ testhelper_lorem(void * data_dest, uint64_t data_size)
     }
 }
 
+#define testhelper_lorem_s(data_dest) \
+    testhelper_lorem(data_dest, sizeof(*data_dest))
 
 #endif

@@ -20,3 +20,4 @@ testlib_threading.c
 testlib_whisper_command.c
 testlib_whisper_fetch.c
 testlib_whisper_push.c
+testlib_whisper_shared_counter.c
