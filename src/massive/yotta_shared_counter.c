@@ -31,6 +31,8 @@ yotta_shared_counter_init(
         yotta_return_inv_value(yotta_shared_counter_init, stock_size)
     }
 
+    yotta_dirty_s(shared);
+
     shared->master_counter_addr = master_counter_addr;
 
     if (yotta_slave_context == 0)
