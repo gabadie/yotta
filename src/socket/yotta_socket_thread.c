@@ -96,6 +96,8 @@ yotta_socket_thread_main(yotta_socket_thread_t * thread)
 
             if (FD_ISSET(fd, &fd_set_except))
             {
+                yotta_assert(socket_it->except_event != 0);
+
                 socket_it->except_event(socket_it);
                 event_counts -= 1;
 
@@ -124,6 +126,8 @@ yotta_socket_thread_main(yotta_socket_thread_t * thread)
 
             if (FD_ISSET(fd, &fd_set_recv))
             {
+                yotta_assert(socket_it->recv_event != 0);
+
                 socket_it->recv_event(socket_it);
                 event_counts -= 1;
 
@@ -143,6 +147,8 @@ yotta_socket_thread_main(yotta_socket_thread_t * thread)
 
             if (FD_ISSET(fd, &fd_set_send))
             {
+                yotta_assert(socket_it->send_event != 0);
+
                 socket_it->send_event(socket_it);
                 event_counts -= 1;
 
@@ -269,6 +275,8 @@ yotta_socket_thread_kill(yotta_socket_thread_t * thread)
 #ifdef YOTTA_ASSERT
         socket_event->socket_thread = 0;
 #endif //YOTTA_ASSERT
+
+        yotta_assert(socket_event->socket_thread == 0);
 
         yotta_socket_event_release(socket_event);
     }
