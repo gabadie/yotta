@@ -129,6 +129,19 @@ yotta_whisper_queue_except(yotta_whisper_queue_t * cmd_queue)
     yotta_socket_event_release(cmd_queue);
 }
 
+static
+void
+yotta_whisper_queue_connection_lost(yotta_whisper_queue_t * cmd_queue)
+{
+    yotta_assert(cmd_queue != 0);
+
+    yotta_logger_error("yotta_whisper_queue_connection_lost: -> releasing");
+
+    yotta_socket_event_unlisten((yotta_socket_event_t *) cmd_queue);
+
+    yotta_socket_event_release(cmd_queue);
+}
+
 void
 yotta_whisper_queue_init(yotta_whisper_queue_t * cmd_queue)
 {
@@ -145,6 +158,7 @@ yotta_whisper_queue_init(yotta_whisper_queue_t * cmd_queue)
     yotta_tcp_queue_init((yotta_tcp_queue_t *) cmd_queue);
     yotta_socket_event_set_recv(cmd_queue, yotta_whisper_queue_recv);
     yotta_socket_event_set_except(cmd_queue, yotta_whisper_queue_except);
+    yotta_socket_event_set_lost(cmd_queue, yotta_whisper_queue_connection_lost);
 
     cmd_queue->callback = 0;
 

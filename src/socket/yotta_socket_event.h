@@ -45,6 +45,9 @@ yotta_socket_event_s
     // the exception event entry point
     yotta_socket_entry_t except_event;
 
+    // the connection lost event entry point
+    yotta_socket_entry_t lost_event;
+
     // the release event entry point
     yotta_socket_entry_t release_event;
 
@@ -62,20 +65,27 @@ yotta_socket_event_s
  */
 #ifdef YOTTA_ASSERT
 #define yotta_socket_event_init(socket_event) \
-    yotta_dirty_offset( \
-        socket_event, \
-        sizeof(yotta_socket_t), \
-        sizeof(yotta_socket_event_t) - sizeof(yotta_socket_t) \
-    ); \
-    ((yotta_socket_event_t *) (socket_event))->socket_thread = 0 \
+    { \
+        yotta_dirty_offset( \
+            socket_event, \
+            sizeof(yotta_socket_t), \
+            sizeof(yotta_socket_event_t) - sizeof(yotta_socket_t) \
+        ); \
+        ((yotta_socket_event_t *) (socket_event))->recv_event = 0; \
+        ((yotta_socket_event_t *) (socket_event))->send_event = 0; \
+        ((yotta_socket_event_t *) (socket_event))->except_event = 0; \
+        ((yotta_socket_event_t *) (socket_event))->lost_event = 0; \
+        ((yotta_socket_event_t *) (socket_event))->release_event = 0; \
+        ((yotta_socket_event_t *) (socket_event))->socket_thread = 0; \
+    }
 
-#else
+#else //YOTTA_ASSERT
 #define yotta_socket_event_init(socket_event) \
     yotta_dirty_offset( \
         socket_event, \
         sizeof(yotta_socket_t), \
         sizeof(yotta_socket_event_t) - sizeof(yotta_socket_t) \
-    ); \
+    );
 
 #endif //YOTTA_ASSERT
 
@@ -94,6 +104,9 @@ yotta_socket_event_s
 #define yotta_socket_event_set_except(socket_event,function_ptr) \
     ((yotta_socket_event_t *) (socket_event))->except_event = (yotta_socket_entry_t)(function_ptr)
 
+#define yotta_socket_event_set_lost(socket_event,function_ptr) \
+    ((yotta_socket_event_t *) (socket_event))->lost_event = (yotta_socket_entry_t)(function_ptr)
+
 #define yotta_socket_event_set_release(socket_event,function_ptr) \
     ((yotta_socket_event_t *) (socket_event))->release_event = (yotta_socket_entry_t)(function_ptr)
 
@@ -105,6 +118,14 @@ yotta_socket_event_s
  */
 void
 yotta_socket_event_unlisten(yotta_socket_event_t * socket_event);
+
+/*
+ * @infos: triggers the connection lost event
+ *
+ * @param <socket_event>: the socket event
+ */
+#define yotta_socket_event_lost(socket_event) \
+    ((yotta_socket_event_t *) (socket_event))->lost_event((yotta_socket_event_t *) (socket_event))
 
 /*
  * @infos: triggers the release event
