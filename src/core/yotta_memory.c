@@ -7,6 +7,7 @@
 
 #include "yotta_memory.h"
 #include "yotta_return.private.h"
+#include "../utils/yotta_math.h"
 
 
 static
@@ -52,7 +53,7 @@ yotta_alloc(size_t size, size_t alignment)
     yotta_assert(size != 0);
     yotta_assert(yotta_memory_allocator != 0);
     yotta_assert(alignment >= YOTTA_DEFAULT_ALIGNMENT);
-    yotta_assert((alignment & (alignment - 1)) == 0); // alignment must be a power of two
+    yotta_assert(yotta_math_is_pow2(alignment)); // alignment must be a power of two
 
     yotta_memory_prefix_t * memory = yotta_memory_allocator(
         yotta_memory_user_data,
