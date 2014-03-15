@@ -14,6 +14,8 @@ yotta_socket_event_unlisten(yotta_socket_event_t * socket_event)
 
     yotta_mutex_lock(&thread->mutex);
     {
+        yotta_assert(thread->socket_event_count > 0);
+
         yotta_socket_event_t ** parent_ptr = &thread->socket_head;
 
         while (*parent_ptr != socket_event)
@@ -36,6 +38,8 @@ yotta_socket_event_unlisten(yotta_socket_event_t * socket_event)
                 thread->current_socket = socket_event->socket_next;
             }
         }
+
+        thread->socket_event_count--;
     }
     yotta_mutex_unlock(&thread->mutex);
 

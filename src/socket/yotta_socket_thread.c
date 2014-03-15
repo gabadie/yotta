@@ -181,14 +181,15 @@ yotta_socket_thread_init(yotta_socket_thread_t * thread)
 
     yotta_dirty_s(thread);
 
-    thread->socket_head = 0;
-    thread->current_socket = 0;
-    thread->quit_status = YOTTA_SOCKET_THREAD_CONTINUE;
-
     if (yotta_mutex_init(&thread->mutex) != 0)
     {
         return YOTTA_UNEXPECTED_FAIL;
     }
+
+    thread->quit_status = YOTTA_SOCKET_THREAD_CONTINUE;
+    thread->socket_event_count = 0;
+    thread->socket_head = 0;
+    thread->current_socket = 0;
 
     if (yotta_thread_create(&thread->id, yotta_socket_thread_main, thread) != 0)
     {
@@ -212,8 +213,16 @@ yotta_socket_thread_listen(yotta_socket_thread_t * thread, yotta_socket_event_t 
 
     yotta_mutex_lock(&thread->mutex);
     {
+        if (thread->socket_event_count == (uint64_t)FD_SETSIZE)
+        {
+            yotta_mutex_unlock(&thread->mutex);
+
+            return YOTTA_INVALID_OPERATION;
+        }
+
         socket_event->socket_next = thread->socket_head;
         thread->socket_head = socket_event;
+        thread->socket_event_count++;
     }
     yotta_mutex_unlock(&thread->mutex);
 
