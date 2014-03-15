@@ -27,7 +27,7 @@ consumer_func(void * s)
     yotta_sync_t * yotta_sync = (yotta_sync_t *) s;
 
     // To "ensure" that the yotta_sync_post happens after the yotta_sync_wait
-    while(yotta_sync->sem == NULL)
+    while(yotta_sync->sem == YOTTA_SYNC_UNTRIGGERED)
     {
 #ifdef YOTTA_UNIX
         test_assert(usleep(10000) == 0);
