@@ -39,7 +39,7 @@ yotta_socket_event_unlisten(yotta_socket_event_t * socket_event)
     }
     yotta_mutex_unlock(&thread->mutex);
 
-#ifdef YOTTA_DEBUG
+#ifdef YOTTA_ASSERT
     socket_event->socket_thread = 0;
-#endif // YOTTA_DEBUG
+#endif //YOTTA_ASSERT
 }

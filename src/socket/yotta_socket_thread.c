@@ -257,9 +257,9 @@ yotta_socket_thread_kill(yotta_socket_thread_t * thread)
 
         thread->socket_head = socket_event->socket_next;
 
-#ifdef YOTTA_DEBUG
+#ifdef YOTTA_ASSERT
         socket_event->socket_thread = 0;
-#endif
+#endif //YOTTA_ASSERT
 
         yotta_socket_event_release(socket_event);
     }

@@ -7,6 +7,10 @@
 #include <stdio.h>
 #include <string.h>
 
+#ifndef YOTTA_ASSERT
+#define YOTTA_ASSERT
+#endif
+
 #define YOTTA_DEBUG_DIRTY
 
 #endif
@@ -96,33 +100,37 @@
  *
  * @param <condition>: assertion's condition code to pass
  */
-#ifdef YOTTA_DEBUG
+#ifdef YOTTA_ASSERT
 #define yotta_assert(condition) \
     if (!(condition)) \
     { \
         printf("ASSERTION ERROR AT %s@%i in %s: %s\n", __FILE__, __LINE__, __func__, yotta_to_str(condition)); \
         yotta_crash_definitly(); \
     }
-#else
+
+#else //YOTTA_ASSERT
 #define yotta_assert(condition)
-#endif
+
+#endif //YOTTA_ASSERT
 
 /*
  * @infos: assert yotta execution
  *
  * @param <condition>: assertion's returned value
  */
-#ifdef YOTTA_DEBUG
+#ifdef YOTTA_ASSERT
 #define yotta_assert_return(function,returned) \
     if ((function) != (returned)) \
     { \
         printf("ASSERTION ERROR AT %s@%i in %s: %s\n", __FILE__, __LINE__, __func__, yotta_to_str(function) " == " yotta_to_str(returned)); \
         yotta_crash_definitly(); \
     }
-#else
+
+#else //YOTTA_ASSERT
 #define yotta_assert_return(function,returned) \
     function
-#endif
+
+#endif //YOTTA_ASSERT
 
 /*
  * @infos: not implemented feature crash

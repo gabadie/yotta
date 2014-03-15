@@ -1,6 +1,7 @@
 #ifndef _YOTTA_SOCKET_EVENT
 #define _YOTTA_SOCKET_EVENT
 
+#include "../core/yotta_debug.h"
 #include "yotta_socket.h"
 
 
@@ -59,7 +60,7 @@ yotta_socket_event_s
  *
  * @param <socket_event>: the socket event to init
  */
-#ifdef YOTTA_DEBUG
+#ifdef YOTTA_ASSERT
 #define yotta_socket_event_init(socket_event) \
     yotta_dirty_offset( \
         socket_event, \
@@ -69,9 +70,14 @@ yotta_socket_event_s
     ((yotta_socket_event_t *) (socket_event))->socket_thread = 0 \
 
 #else
-#define yotta_socket_event_init(socket_event)
+#define yotta_socket_event_init(socket_event) \
+    yotta_dirty_offset( \
+        socket_event, \
+        sizeof(yotta_socket_t), \
+        sizeof(yotta_socket_event_t) - sizeof(yotta_socket_t) \
+    ); \
 
-#endif // YOTTA_DEBUG
+#endif //YOTTA_ASSERT
 
 /*
  * @infos: sets socket event entries

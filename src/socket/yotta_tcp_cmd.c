@@ -56,7 +56,7 @@ yotta_tcp_cmd_finish(yotta_tcp_cmd_t * cmd)
     }
     while (1);
 
-#ifdef YOTTA_DEBUG
+#ifdef YOTTA_ASSERT
     cmd->queue = 0;
-#endif // YOTTA_DEBUG
+#endif //YOTTA_ASSERT
 }
