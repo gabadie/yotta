@@ -4,7 +4,6 @@
 #include "yotta_context.h"
 #include "../core/yotta_debug.h"
 #include "../core/yotta_return.private.h"
-#include "../dictate/yotta_dictate_binary_send.h"
 
 
 yotta_return_t
