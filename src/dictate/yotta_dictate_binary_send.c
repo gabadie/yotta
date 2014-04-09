@@ -74,7 +74,7 @@ yotta_dictate_binary_send(yotta_dictate_binary_cmd_t * cmd)
     }
 
     {
-        // send push's data
+        // send data
 
         uint64_t op = yotta_tcp_cmd_send(
             (yotta_tcp_cmd_t *) cmd,
