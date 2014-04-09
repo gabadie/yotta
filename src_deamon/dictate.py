@@ -1,21 +1,24 @@
 
+import os
 import struct
+import tempfile
 from twisted.internet.protocol import Protocol
 from twisted.internet.protocol import Factory
 
-# struct.pack("qQ", hello)
+
+# ------------------------------------------------------------------------------ dictate label
 
 LABEL_ERROR = 0x0000
 LABEL_DEAMON_INFO = 0x1000
 
-# ------------------------------------------------------------------------------ generate fram to send
+# ------------------------------------------------------------------------------ dictate's frame generators
 
-def error(msg):
+def frame_error(msg):
     """ Generates LABEL_ERROR's trame with a given message
     """
     assert len(msg) < 256 # the yotta library doesn't support longer
 
-    return struct.pack('H', LABEL_ERROR) + struct.pack('Q', len(msg)) + msg
+    return struct.pack('H', LABEL_ERROR) + struct.pack('Q', len(msg)) + struct.pack('s', msg)
 
 def deamon_info(deamon):
     """ Generates LABEL_DEAMON_INFO's trame with a given Deamon
@@ -32,6 +35,7 @@ class InstAbstact(object):
 
     members:
         frame_size = int
+        frame_cursor = int
         protocol = DeamonProtocol
 
     properties:
@@ -66,19 +70,46 @@ class InstAbstact(object):
 
 class InstExecBinaries(InstAbstact):
     """ binary receiving instruction
+
+    members:
+        binary_file = open()
+        binary_path = str
     """
 
     def __init__(self, protocol, frame_size):
         InstAbstact.__init__(self, protocol, frame_size)
 
+        self.binary_file, self.binary_path = tempfile.mkstemp()
+        self.logger.info('receiving binary file {} from {}'.format(self.binary_path, self.protocol.peer_addr))
+
+    def __del__(self):
+        if self.binary_file == None:
+            return
+
+        self.logger.warning('unexpected InstExecBinaries destructor -> removing binary file {}'.format(self.binary_path))
+        self.binary_file.close()
+        os.remove(self.binary_path)
+
     def receive(self, data):
-        assert False # todo
+        self.binary_file.write(data)
+
+        if self.frame_cursor + len(data) == self.frame_size:
+            self.finish()
+
+    def finish(self):
+        assert self.binary_file != None
+
+        self.binary_file.close()
+        self.binary_file = None
+        self.protocol.binary_path = self.binary_path
+
+        self.logger.info('binary file {} from {} fully received'.format(self.binary_path, self.protocol.peer_addr))
 
 
 # ------------------------------------------------------------------------------ dictate instructions' map
 
-instruction = dict()
-instruction[0x2000] = InstExecBinaries
+instruction_map = dict()
+instruction_map[0x2000] = InstExecBinaries
 
 
 # ------------------------------------------------------------------------------ dictate protocol instance
@@ -89,6 +120,8 @@ class DeamonProtocol(Protocol):
     members:
         factory = DeamonProtocolFactory
         instruction = InstAbstact # the current instruction
+        meta_buffer = str
+        binary_path = str
 
     properties:
         deamon = deamon.Deamon
@@ -101,6 +134,8 @@ class DeamonProtocol(Protocol):
 
         self.factory = factory
         self.instruction = None
+        self.meta_buffer = ''
+        self.binary_path = ''
 
     @property
     def deamon(self):
@@ -133,9 +168,11 @@ class DeamonProtocol(Protocol):
 
         while True:
             if self.instruction != None:
-                frame_size = self.instruction.frame_size
-                frame_cursor = self.instruction.frame_cursor
-                frame_remaining_size = frame_size - frame_cursor
+                # we already have got an instruction before, then we continue to process it
+
+                assert self.instruction.frame_size > self.instruction.frame_cursor
+
+                frame_remaining_size = self.instruction.frame_size - self.instruction.frame_cursor
 
                 instruction_data = data
 
@@ -156,10 +193,31 @@ class DeamonProtocol(Protocol):
                 del self.instruction
                 self.instruction = None
 
+            assert self.instruction == None
+
             if len(data) == 0:
                 break
 
-            # TODO: fetch next instruction and process it
+            meta_buffer_size = 8 + 2
+            meta_buffer_remaining = max(meta_buffer_size - len(self.meta_buffer), 0)
+
+            self.meta_buffer += data[0:meta_buffer_remaining]
+            data = data[meta_buffer_remaining:]
+
+            assert len(self.meta_buffer) <= meta_buffer_size
+
+            if len(self.meta_buffer) != meta_buffer_size:
+                # we didn't receive the entire meta buffer
+                break
+
+            frame_label = struct.unpack('H', self.meta_buffer[0:2])
+            frame_size = struct.unpack('Q', self.meta_buffer[2:])
+
+            if frame_label not in instruction_map:
+                assert False # TODO; skeep data
+                break
+
+            self.instruction = instruction_map[frame_label](self, frame_size)
 
         return
 
