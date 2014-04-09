@@ -2,4 +2,4 @@
 # List of the deamon's tests
 #
 
-test_hello_world.py
+test_dictate.py
