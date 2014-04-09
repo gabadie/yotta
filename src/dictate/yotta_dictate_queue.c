@@ -2,7 +2,6 @@
 #include <errno.h>
 
 #include "yotta_dictate_queue.private.h"
-#include "yotta_dictate_labels.private.h"
 #include "yotta_dictate_daemon_info.private.h"
 #include "../core/yotta_logger.private.h"
 #include "../core/yotta_debug.h"
@@ -65,85 +64,37 @@ yotta_dictate_queue_recv(yotta_dictate_queue_t * cmd_queue)
 #endif //YOTTA_DEBUG
         }
 
-        yotta_dictate_label_t label = 0x0000;
+        uint64_t op = yotta_tcp_queue_recv(
+            (yotta_tcp_queue_t *) cmd_queue,
+            sizeof(cmd_queue->header),
+            &cmd_queue->header_cursor,
+            &cmd_queue->header
+        );
 
-        ssize_t label_size = yotta_tcp_recv(&cmd_queue->tcp_queue.socket_event.socket, &label, sizeof(label));
-
-        if (label_size == sizeof(label))
+        if (op != 0)
         {
-            uint64_t data_size = 0;
-            ssize_t data_size_size = yotta_tcp_recv(
-                &cmd_queue->tcp_queue.socket_event.socket,
-                &data_size, sizeof(uint64_t)
-            );
-
-            if (data_size_size == 0)
-            {
-                // the socket has been closed properly on the other side
-
-                yotta_socket_event_unlisten((yotta_socket_event_t *) cmd_queue);
-                yotta_socket_event_release(cmd_queue);
-
-                return;
-            }
-            else if (data_size_size == -1)
-            {
-                int32_t errno_recv = errno;
-
-                if (errno_recv == EAGAIN)
-                {
-                    // no incomming information available
-                    break;
-                }
-            }
-
-            cmd_queue->data_size = data_size;
-
-            switch (label)
-            {
-                case YOTTA_DICTATE_LABEL_DEAMON_INFO:
-                {
-                    /*cmd_queue->callback = yotta_dictate_daemon_info_recv;*/
-                    break;
-                }
-
-                case YOTTA_DICTATE_LABEL_ERROR:
-                {
-                    /*cmd_queue->callback = yotta_dictate_error_recv;*/
-                    break;
-                }
-
-                default:
-                {
-                    /*cmd_queue->callback = yotta_dictate_unknown_label;*/
-                }
-            }
-
-            yotta_assert(cmd_queue->callback != NULL);
-
-            continue;
-        }
-        else if (label_size == 0)
-        {
-            // the socket has been closed properly on the other side
-
-            yotta_socket_event_unlisten((yotta_socket_event_t *) cmd_queue);
-            yotta_socket_event_release(cmd_queue);
-
             return;
         }
-        else if (label_size == -1)
-        {
-            int32_t errno_recv = errno;
 
-            if (errno_recv == EAGAIN)
+        switch (cmd_queue->header.label)
+        {
+            case YOTTA_DICTATE_LABEL_DEAMON_INFO:
             {
-                // no incomming information available
+                cmd_queue->callback = yotta_dictate_daemon_info_recv;
                 break;
             }
-        }
 
-        yotta_crash_msg("receive error");
+            case YOTTA_DICTATE_LABEL_ERROR:
+            {
+                /*cmd_queue->callback = yotta_dictate_error_recv;*/
+                break;
+            }
+
+            default:
+            {
+                /*cmd_queue->callback = yotta_dictate_unknown_label;*/
+            }
+        }
     }
 }
 
@@ -178,9 +129,11 @@ yotta_dictate_queue_init(yotta_dictate_queue_t * cmd_queue)
 
     cmd_queue->callback = NULL;
 
-    memset(&cmd_queue->recv_buffer, 0, YOTTA_DICTATE_RECV_BUFFER_SIZE);
+    memset(&cmd_queue->header, 0, sizeof(cmd_queue->header));
 
-    cmd_queue->data_size = 0;
+    cmd_queue->header_cursor = 0;
+
+    memset(&cmd_queue->recv_buffer, 0, YOTTA_DICTATE_RECV_BUFFER_SIZE);
 
     cmd_queue->vtable = &yotta_dictate_queue_default_vtable;
 }
