@@ -7,25 +7,30 @@ from twisted.internet import reactor
 import dictate
 
 
+def default_logger():
+    log_format = '[%(asctime)s] %(levelname)s - %(message)s'
+    log_formatter = logging.Formatter(log_format)
+    logging.basicConfig(level=logging.DEBUG, format=log_format)
+    logger = logging.getLogger(sys.argv[0])
+
+    logger.handlers = []
+    logger.setLevel(logging.INFO)
+
+    return logger
+
 class Deamon(object):
     """ Deamon general instance
 
     members:
         computers = int
         threads = int
-        listen_port = int
-        tcp4_endpoint = twisted.internet.endpoints.TCP4ServerEndpoint
-        tcp6_endpoint = twisted.internet.endpoints.TCP6ServerEndpoint
-        dictate_factory = dictate.DeamonProtocolFactory
+        logger = dictate.DeamonProtocolFactory
     """
 
-    def __init__(self, logger=None):
+    def __init__(self, logger=default_logger()):
         self.computers = 1
         self.threads = 1
         self.logger = logger
-
-        if self.logger == None:
-            self.logger = logging.getLogger(__name__)
 
     def listen(self, port, protocol_factory):
         assert port >= 0
@@ -89,21 +94,9 @@ def main(args):
 
     args_assert(port != None)
 
-
-    logger = logging.getLogger(sys.argv[0])
-    logger.setLevel(logging.INFO)
-
-    formatter = logging.Formatter("%(asctime)s - %(levelname)s: %(message)s")
-
-    stream = logging.StreamHandler()
-    stream.setFormatter(formatter)
-    stream.setLevel(logging.INFO)
-    logger.addHandler(stream)
-
-
     dictate_factory = dictate.DeamonProtocolFactory()
 
-    deamon = Deamon()
+    deamon = Deamon(logger=default_logger())
     port = deamon.listen(port, dictate_factory)
 
     deamon.logger.info('listening on port: {}'.format(port.getHost().port))
