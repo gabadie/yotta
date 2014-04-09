@@ -3,6 +3,7 @@
 
 #include "yotta_dictate_queue.private.h"
 #include "yotta_dictate_daemon_info.private.h"
+#include "yotta_dictate_daemon_error.private.h"
 #include "../core/yotta_logger.private.h"
 #include "../core/yotta_debug.h"
 #include "../socket/yotta_tcp.h"
@@ -38,7 +39,8 @@ static
 yotta_dictate_vtable_t const
 yotta_dictate_queue_default_vtable =
 {
-    yotta_dictate_vtable_daemon_info_recv
+    yotta_dictate_vtable_daemon_info_recv,
+    yotta_dictate_vtable_daemon_error_recv
 };
 
 static
@@ -78,15 +80,15 @@ yotta_dictate_queue_recv(yotta_dictate_queue_t * cmd_queue)
 
         switch (cmd_queue->header.label)
         {
-            case YOTTA_DICTATE_LABEL_DEAMON_INFO:
+            case YOTTA_DICTATE_LABEL_DAEMON_INFO:
             {
                 cmd_queue->callback = yotta_dictate_daemon_info_recv;
                 break;
             }
 
-            case YOTTA_DICTATE_LABEL_ERROR:
+            case YOTTA_DICTATE_LABEL_DAEMON_ERROR:
             {
-                /*cmd_queue->callback = yotta_dictate_error_recv;*/
+                cmd_queue->callback = yotta_dictate_daemon_error_recv;
                 break;
             }
 

@@ -32,10 +32,11 @@ typedef void (* yotta_dictate_recv_t)(
 typedef struct
 yotta_dictate_vtable_s
 {
-    /*
-     * YOTTA_DICTATE_LABEL_DEAMON_INFO's entry point
-     */
+    // YOTTA_DICTATE_LABEL_DEAMON_INFO's entry point
     void (* receive_daemon_info)(uint64_t, uint64_t);
+
+    // YOTTA_DICTATE_LABEL_DEAMON_ERROR's entry point
+    void (* receive_daemon_error)(char const *);
 }
 yotta_dictate_vtable_t;
 
