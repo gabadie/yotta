@@ -2,14 +2,12 @@
 
 #include "yotta_dictate_binary_send.private.h"
 #include "yotta_dictate_labels.private.h"
-#include "../yotta_init.h"
 #include "../core/yotta_debug.h"
 #include "../core/yotta_memory.h"
 #include "../core/yotta_return.h"
 #include "../core/yotta_logger.private.h"
-#include "../threading/yotta_sync.private.h"
-#include "../utils/yotta_str_utils.h"
 #include "../socket/yotta_tcp.h"
+#include "../threading/yotta_sync.private.h"
 
 #define BINARY_BUFFER_SIZE 1024
 
