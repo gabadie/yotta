@@ -30,9 +30,6 @@ class DeamonProtocol(Protocol):
         assert factory != None
         assert factory.deamon != None
 
-        Protocol.__init__(self)
-
-        self.state = "WAITING"
         self.factory = factory
 
     @property
@@ -42,24 +39,32 @@ class DeamonProtocol(Protocol):
 
         return self.factory.deamon
 
-    def connectionMade(self):
-        self.transport.write("Connection Made\r\n")
-        self.transport.sendInformation(deamon_info(self.deamon))
+    @property
+    def logger(self):
+        return self.deamon.logger
 
-    def dataReceived(self, data):
-        if self.state == "WAITING":
-            datasent = deamon_infos()
-            self.sendInformation(datasent)
-            self.state = "READY"
-        else :
-            pass
-            # write code to create new whispering socket with parameters.
+    @property
+    def peer_addr(self):
+        addr = self.transport.getPeer()
+
+        return '{}:{}'.format(addr.host, addr.port)
+
+    def connectionMade(self):
+        self.transport.write(deamon_info(self.deamon))
+        pass
 
     def connectionLost(self, reason):
-        self.state =="WAITING"
+        addr = self.transport.getPeer()
+
+        self.logger.info("connection from {} losted: {}".format(self.peer_addr, reason))
+
+    def dataReceived(self, data):
+        # TODO: receive data
+        pass
 
     def sendInformation(self, data):
-        self.transport.write(struct.pack("!L",data.data_label))
+        # TODO; send data
+        pass
 
 
 class DeamonProtocolFactory(Factory):
@@ -74,7 +79,13 @@ class DeamonProtocolFactory(Factory):
 
         self.deamon = None
 
+    @property
+    def logger(self):
+        return self.deamon.logger
+
     def buildProtocol(self, addr):
-        assert seld.deamon != None
+        assert self.deamon != None
+
+        self.logger.info('connection from {}:{}'.format(addr.host, addr.port))
 
         return DeamonProtocol(self)
