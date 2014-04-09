@@ -24,16 +24,12 @@ class Deamon(object):
         self.threads = 1
         self.tcp4_endpoint = None
         self.tcp6_endpoint = None
-        self.dictate_factory = dictate.DeamonProtocolFactory(self)
 
         if ipv4_port != None:
             self.tcp4_endpoint = TCP4ServerEndpoint(reactor, ipv4_port)
 
         if ipv6_port != None:
             self.tcp6_endpoint = TCP6ServerEndpoint(reactor, ipv6_port)
-
-        for endpoint in self.tcp_endpoints:
-            endpoint.listen(self.dictate_factory)
 
     @property
     def tcp_endpoints(self):
@@ -47,6 +43,18 @@ class Deamon(object):
 
         return endpoints
 
+    def listen(self, protocol_factory):
+        assert len(self.tcp_endpoints) > 0
+        assert protocol_factory.deamon == None
+
+        for endpoint in self.tcp_endpoints:
+            endpoint.listen(protocol_factory)
+
+        protocol_factory.deamon = self
+
+        return True
+
+
     def main(self):
         reactor.run()
 
@@ -54,7 +62,10 @@ class Deamon(object):
 
 
 if __name__ == "__main__":
+    dictate_factory = dictate.DeamonProtocolFactory()
+
     deamon = Deamon(ipv4_port=5000)
+    deamon.listen(dictate_factory)
 
     r = deamon.main()
 

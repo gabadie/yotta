@@ -69,12 +69,12 @@ class DeamonProtocolFactory(Factory):
         deamon = deamon.Deamon
     """
 
-    def __init__(self, deamon):
-        assert deamon != None
-
+    def __init__(self):
         #Factory.__init__(self)
 
-        self.deamon = deamon
+        self.deamon = None
 
     def buildProtocol(self, addr):
+        assert seld.deamon != None
+
         return DeamonProtocol(self)
