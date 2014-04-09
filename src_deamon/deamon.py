@@ -1,7 +1,6 @@
 
+import logging
 import sys
-from twisted.internet.endpoints import TCP4ServerEndpoint
-from twisted.internet.endpoints import TCP6ServerEndpoint
 from twisted.internet import reactor
 # TODO: import argparse
 
@@ -20,41 +19,23 @@ class Deamon(object):
         dictate_factory = dictate.DeamonProtocolFactory
     """
 
-    def __init__(self, ipv4_port=None, ipv6_port=None):
+    def __init__(self, logger=None):
         self.computers = 1
         self.threads = 1
-        self.tcp4_endpoint = None
-        self.tcp6_endpoint = None
+        self.logger = logger
 
-        if ipv4_port != None:
-            self.tcp4_endpoint = TCP4ServerEndpoint(reactor, ipv4_port)
+        if self.logger == None:
+            self.logger = logging.getLogger(__name__)
 
-        if ipv6_port != None:
-            self.tcp6_endpoint = TCP6ServerEndpoint(reactor, ipv6_port)
-
-    @property
-    def tcp_endpoints(self):
-        endpoints = []
-
-        if self.tcp4_endpoint:
-            endpoints.append(self.tcp4_endpoint)
-
-        if self.tcp6_endpoint:
-            endpoints.append(self.tcp6_endpoint)
-
-        return endpoints
-
-    def listen(self, protocol_factory):
-        assert len(self.tcp_endpoints) > 0
+    def listen(self, port, protocol_factory):
+        assert port >= 0
+        assert port <= 65535
+        assert protocol_factory != None
         assert protocol_factory.deamon == None
-
-        for endpoint in self.tcp_endpoints:
-            endpoint.listen(protocol_factory)
 
         protocol_factory.deamon = self
 
-        return True
-
+        return reactor.listenTCP(port, protocol_factory)
 
     def main(self):
         reactor.run()
@@ -63,7 +44,7 @@ class Deamon(object):
 
 def man():
     print 'syntax:'
-    print '    {} [-ipv4 <IPV4_PORT>] [-ipv6 <IPV6_PORT>]'.format(sys.argv[0])
+    print '    {} [--port <PORT>]'.format(sys.argv[0])
     print ''
 
 def args_assert(condition=False):
@@ -92,33 +73,40 @@ def args_assert_exist(args, i):
     args_error(args, i, 'missing argument')
 
 def main(args):
-    ipv4_port = None
-    ipv6_port = None
+    port = None
 
     i = 0
 
     while i < len(args):
-        if args[i] == '-ipv4':
+        if args[i] == '--port':
             args_assert_exist(args, i + 1)
 
-            ipv4_port = int(args[i + 1])
-            i += 2
-
-        elif args[i] == '-ipv6':
-            args_assert_exist(args, i + 1)
-
-            ipv6_port = int(args[i + 1])
+            port = int(args[i + 1])
             i += 2
 
         else:
             args_error(args, i, 'unknown parameter {}'.format(args[i]))
 
-    args_assert(ipv4_port != None or ipv6_port != None)
+    args_assert(port != None)
+
+
+    logger = logging.getLogger(sys.argv[0])
+    logger.setLevel(logging.INFO)
+
+    formatter = logging.Formatter("%(asctime)s - %(levelname)s: %(message)s")
+
+    stream = logging.StreamHandler()
+    stream.setFormatter(formatter)
+    stream.setLevel(logging.INFO)
+    logger.addHandler(stream)
+
 
     dictate_factory = dictate.DeamonProtocolFactory()
 
-    deamon = Deamon(ipv4_port=ipv4_port, ipv6_port=ipv6_port)
-    deamon.listen(dictate_factory)
+    deamon = Deamon()
+    port = deamon.listen(port, dictate_factory)
+
+    deamon.logger.info('listening on port: {}'.format(port.getHost().port))
 
     r = deamon.main()
 
@@ -128,6 +116,8 @@ def main(args):
 
 
 if __name__ == "__main__":
+    logging.basicConfig(level=logging.INFO)
+
     r = main(sys.argv[1:])
 
     assert isinstance(r, int)
