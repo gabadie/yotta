@@ -1,6 +1,7 @@
 
 import sys
 from twisted.internet.endpoints import TCP4ServerEndpoint
+from twisted.internet.endpoints import TCP6ServerEndpoint
 from twisted.internet import reactor
 
 import dictate
@@ -18,13 +19,18 @@ class Deamon(object):
         dictate_factory = dictate.DeamonProtocolFactory
     """
 
-    def __init__(self, listen_port=5000):
+    def __init__(self, ipv4_port=None, ipv6_port=None):
         self.computers = 1
         self.threads = 1
-        self.listen_port = listen_port
-        self.tcp4_endpoint = TCP4ServerEndpoint(reactor, self.listen_port)
+        self.tcp4_endpoint = None
         self.tcp6_endpoint = None
-        self.dictate_factory = dictate.DeamonProtocolFactory()
+        self.dictate_factory = dictate.DeamonProtocolFactory(self)
+
+        if ipv4_port != None:
+            self.tcp4_endpoint = TCP4ServerEndpoint(reactor, ipv4_port)
+
+        if ipv6_port != None:
+            self.tcp6_endpoint = TCP6ServerEndpoint(reactor, ipv6_port)
 
         for endpoint in self.tcp_endpoints:
             endpoint.listen(self.dictate_factory)
@@ -48,7 +54,7 @@ class Deamon(object):
 
 
 if __name__ == "__main__":
-    deamon = Deamon()
+    deamon = Deamon(ipv4_port=5000)
 
     r = deamon.main()
 
