@@ -5,7 +5,7 @@
 #include "yotta_dictate_queue.private.h"
 
 /*
- * @infos: processes a command feedback
+ * @infos: Processes a daemon info reception
  *
  * @params: see yotta_dictate_recv_t in yotta_dictate_queue.private.h
  */
