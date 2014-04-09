@@ -1,5 +1,13 @@
+#include <string.h>
+#include <errno.h>
+
 #include "yotta_dictate_queue.private.h"
 #include "yotta_dictate_labels.private.h"
+#include "yotta_dictate_daemon_info.private.h"
+#include "../core/yotta_logger.private.h"
+#include "../core/yotta_debug.h"
+#include "../socket/yotta_tcp.h"
+#include "../socket/yotta_socket_thread.h"
 
 
 #ifdef YOTTA_DEBUG
@@ -57,23 +65,23 @@ yotta_dictate_queue_recv(yotta_dictate_queue_t * cmd_queue)
             {
                 case YOTTA_DICTATE_LABEL_DEAMON_INFO:
                 {
-                    cmd_queue->callback = yotta_dictate_daemon_info_recv;
+                    /*cmd_queue->callback = yotta_dictate_daemon_info_recv;*/
                     break;
                 }
 
                 case YOTTA_DICTATE_LABEL_ERROR:
                 {
-                    cmd_queue->callback = yotta_dictate_error_recv;
+                    /*cmd_queue->callback = yotta_dictate_error_recv;*/
                     break;
                 }
 
                 default:
                 {
-                    cmd_queue->callback = yotta_dictate_unknown_label;
+                    /*cmd_queue->callback = yotta_dictate_unknown_label;*/
                 }
             }
 
-            yotta_assert(cmd_queue->callback != 0);
+            yotta_assert(cmd_queue->callback != NULL);
 
             continue;
         }

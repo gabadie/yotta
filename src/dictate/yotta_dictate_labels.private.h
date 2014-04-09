@@ -12,6 +12,9 @@
  /* Master to Daemon */
 #define YOTTA_DICTATE_LABEL_SLAVE_BINARY 0x2000
 
+/* Errors */
+#define YOTTA_DICTATE_LABEL_ERROR 0x3000
+
 
 /*
  * @infos: Type of the Dictate protocol's labels
