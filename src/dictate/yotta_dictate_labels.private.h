@@ -6,14 +6,15 @@
  * (between Master and Daemon)
  */
 
+/* Daemon errors */
+#define YOTTA_DICTATE_LABEL_DAEMON_ERROR 0x0000
+
  /* Daemon to Master */
-#define YOTTA_DICTATE_LABEL_DEAMON_INFO 0x1000
+#define YOTTA_DICTATE_LABEL_DAEMON_INFO  0x1000
 
  /* Master to Daemon */
 #define YOTTA_DICTATE_LABEL_SLAVE_BINARY 0x2000
 
-/* Errors */
-#define YOTTA_DICTATE_LABEL_ERROR 0x3000
 
 
 /*

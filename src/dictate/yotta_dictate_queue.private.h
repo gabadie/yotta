@@ -2,6 +2,7 @@
 #define _YOTTAPRIVATE_DICTATE_QUEUE
 
 #include "../socket/yotta_tcp_queue.private.h"
+#include "yotta_dictate_labels.private.h"
 
 /*
  * @infos: defines the sizes of the receive buffer in bytes
@@ -31,15 +32,20 @@ typedef void (* yotta_dictate_recv_t)(
 typedef struct
 yotta_dictate_vtable_s
 {
-    /*
-     * YOTTA_DICTATE_LABEL_DEAMON_INFO's entry point
-     */
-    void (* receive_deamon_infos)(uint64_t, uint64_t);
+    // YOTTA_DICTATE_LABEL_DEAMON_INFO's entry point
+    void (* receive_daemon_info)(uint64_t, uint64_t);
+
+    // YOTTA_DICTATE_LABEL_DEAMON_ERROR's entry point
+    void (* receive_daemon_error)(char const *);
 }
 yotta_dictate_vtable_t;
 
 /*
  * @infos: defines a dictate commands queue
+ *
+ * Layout of a frame:
+ * |  2   |     8     | xxxx|
+ * |label | data_size | data|
  */
 struct
 yotta_dictate_queue_s
@@ -47,13 +53,23 @@ yotta_dictate_queue_s
     // Inheritance from TCP queue
     yotta_tcp_queue_t tcp_queue;
 
-    // callback entry to complete the message
+    // Callback entry to complete the message
     yotta_dictate_recv_t callback;
 
-    // temporary buffer
+    // Frame header
+    struct
+    {
+        yotta_dictate_label_t label;
+        uint64_t data_size;
+    } __attribute__((packed))
+    header;
+
+    uint64_t header_cursor; // Header cursor
+
+    // Temporary buffer
     uint8_t recv_buffer[YOTTA_DICTATE_RECV_BUFFER_SIZE];
 
-    // receiving virtual table
+    // Receiving virtual table
     yotta_dictate_vtable_t const * vtable;
 };
 
@@ -106,6 +122,6 @@ yotta_dictate_queue_destroy(yotta_dictate_queue_t * cmd_queue);
  * @param <cmd_queue>: the command queue
  */
 #define yotta_dictate_queue_finish(cmd_queue) \
-    (cmd_queue)->callback = 0;
+    (cmd_queue)->callback = NULL;
 
 #endif

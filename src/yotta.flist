@@ -7,6 +7,8 @@ core/yotta_addr_translation.c
 core/yotta_logger.c
 core/yotta_memory.c
 dictate/yotta_dictate_binary_send.c
+dictate/yotta_dictate_daemon_error.c
+dictate/yotta_dictate_daemon_info.c
 dictate/yotta_dictate_queue.c
 massive/yotta_context.c
 massive/yotta_dispatch.c
