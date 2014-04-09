@@ -56,11 +56,10 @@ yotta_dictate_daemon_info_recv(
     buffer->data.nb_threads = 0;
 
     yotta_dictate_queue_finish(cmd_queue);
-
 }
 
 void
 yotta_dictate_vtable_daemon_info_recv(uint64_t nb_computers, uint64_t nb_threads)
 {
-    fprintf(stderr, "Nb computers: %" PRIu64 " | nb threads: %" PRIu64"", nb_computers, nb_threads);
+    fprintf(stderr, "Nb computers: %" PRIu64 " | nb threads: %" PRIu64 "\n", nb_computers, nb_threads);
 }
