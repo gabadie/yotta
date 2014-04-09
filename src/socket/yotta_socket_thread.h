@@ -15,6 +15,7 @@ yotta_socket_thread_s
     yotta_thread_t id;
     yotta_mutex_t mutex;
     uint64_t quit_status;
+    uint64_t socket_event_count;
     yotta_socket_event_t * socket_head;
     yotta_socket_event_t * current_socket;
 } yotta_socket_thread_t;

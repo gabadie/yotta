@@ -6,24 +6,32 @@
 #include "../core/yotta_memory.h"
 
 
+/*
+ * Moves the entire commands' stack content at the tail of the command list
+ */
 static
 void
 yotta_tcp_queue_pop_stack(yotta_tcp_queue_t * cmd_queue)
 {
     yotta_assert(cmd_queue != 0);
+    yotta_assert(cmd_queue->socket_event.socket_thread != 0);
 
-    yotta_tcp_cmd_t * queue_stack = cmd_queue->queue_stack;
-
-    if (queue_stack == 0)
-    {
-        return;
-    }
+    yotta_tcp_cmd_t * queue_stack;
 
     do // atomic commands stack fetching
     {
         queue_stack = cmd_queue->queue_stack;
+
+
+        if (queue_stack == 0)
+        {
+            return;
+        }
     }
     while (!__sync_bool_compare_and_swap(&cmd_queue->queue_stack, queue_stack, 0));
+
+    yotta_assert(queue_stack != 0);
+
 
     // sets the new commands queue's end as the first of the commands stack
     cmd_queue->queue_last = queue_stack;
@@ -70,6 +78,14 @@ yotta_tcp_queue_send(yotta_tcp_queue_t * cmd_queue)
     yotta_assert(cmd->send_event != 0);
 
     cmd->send_event(cmd);
+
+    /*
+     * We should not be doing something else on cmd because it might have killed
+     * itself that could probably append if it has just finished.
+     *
+     * We do not do something else on cmd_queue either because it might have
+     * been killed too.
+     */
 }
 
 void
@@ -125,6 +141,7 @@ yotta_tcp_queue_recv(yotta_tcp_queue_t * cmd_queue, uint64_t buffer_size, uint64
     yotta_assert(buffer_size != 0);
     yotta_assert(buffer_cursor != 0);
     yotta_assert(buffer != 0);
+    yotta_assert(*buffer_cursor < buffer_size);
 
     ssize_t buffer_receiving = buffer_size - *buffer_cursor;
 

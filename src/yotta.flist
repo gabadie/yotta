@@ -26,6 +26,7 @@ threading/yotta_semaphore_pool.c
 threading/yotta_sync.c
 threading/yotta_threading.c
 utils/yotta_file.c
+utils/yotta_math.c
 utils/yotta_str_utils.c
 whisper/yotta_whisper_command.c
 whisper/yotta_whisper_fetch.c
