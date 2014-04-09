@@ -22,11 +22,14 @@ yotta_memory_default_alloc(void * user_data, size_t size, size_t alignment)
 {
     yotta_memory_prefix_t * memory = 0;
 
-    yotta_assert_return(posix_memalign(
+    if (posix_memalign(
         (void **) &memory,
         alignment,
         size + sizeof(yotta_memory_prefix_t)
-    ), 0);
+    ) != 0)
+    {
+        yotta_crash_msg("posix_memalign failed to allocate");
+    }
 
     yotta_assert(memory != 0);
 
