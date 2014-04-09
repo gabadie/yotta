@@ -13,7 +13,7 @@ def deamon_info(deamon):
     """
     # https://docs.python.org/2/library/struct.html
 
-    return struct.pack('HQQQ', LABEL_DEAMON_INFO, 16, deamon.computers, deamon.threads)
+    return struct.pack('H', LABEL_DEAMON_INFO) + struct.pack('QQQ', 16, deamon.computers, deamon.threads)
 
 
 class DeamonProtocol(Protocol):
