@@ -4,6 +4,7 @@
 #include "../yotta_prefix.h"
 #include "../socket/yotta_socket_thread.h"
 #include "../whisper/yotta_whisper_master.h"
+#include "yotta_massive_fwd.h"
 
 /*
  * @infos: store all context's information
@@ -19,6 +20,9 @@ struct yotta_context_s
 
     // Socket thread
     yotta_socket_thread_t worker_thread;
+
+    // Daemons list
+    yotta_daemon_t * daemons;
 
 } yotta_context_t;
 
