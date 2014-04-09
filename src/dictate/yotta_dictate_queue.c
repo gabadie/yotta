@@ -32,6 +32,16 @@ yotta_dictate_queue_assert_buffer(yotta_dictate_queue_t * cmd_queue)
 #endif //YOTTA_DEBUG
 
 
+/*
+ * Default vtable for yotta_dictate_queue_s
+ */
+static
+yotta_dictate_vtable_t const
+yotta_dictate_queue_default_vtable =
+{
+    yotta_dictate_vtable_daemon_info_recv
+};
+
 static
 void
 yotta_dictate_queue_recv(yotta_dictate_queue_t * cmd_queue)
@@ -61,6 +71,34 @@ yotta_dictate_queue_recv(yotta_dictate_queue_t * cmd_queue)
 
         if (label_size == sizeof(label))
         {
+            uint64_t data_size = 0;
+            ssize_t data_size_size = yotta_tcp_recv(
+                &cmd_queue->tcp_queue.socket_event.socket,
+                &data_size, sizeof(uint64_t)
+            );
+
+            if (data_size_size == 0)
+            {
+                // the socket has been closed properly on the other side
+
+                yotta_socket_event_unlisten((yotta_socket_event_t *) cmd_queue);
+                yotta_socket_event_release(cmd_queue);
+
+                return;
+            }
+            else if (data_size_size == -1)
+            {
+                int32_t errno_recv = errno;
+
+                if (errno_recv == EAGAIN)
+                {
+                    // no incomming information available
+                    break;
+                }
+            }
+
+            cmd_queue->data_size = data_size;
+
             switch (label)
             {
                 case YOTTA_DICTATE_LABEL_DEAMON_INFO:
@@ -141,6 +179,10 @@ yotta_dictate_queue_init(yotta_dictate_queue_t * cmd_queue)
     cmd_queue->callback = NULL;
 
     memset(&cmd_queue->recv_buffer, 0, YOTTA_DICTATE_RECV_BUFFER_SIZE);
+
+    cmd_queue->data_size = 0;
+
+    cmd_queue->vtable = &yotta_dictate_queue_default_vtable;
 }
 
 yotta_return_t

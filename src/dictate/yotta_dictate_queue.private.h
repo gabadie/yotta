@@ -34,7 +34,7 @@ yotta_dictate_vtable_s
     /*
      * YOTTA_DICTATE_LABEL_DEAMON_INFO's entry point
      */
-    void (* receive_deamon_infos)(uint64_t, uint64_t);
+    void (* receive_deamon_info)(uint64_t, uint64_t);
 }
 yotta_dictate_vtable_t;
 
@@ -52,6 +52,9 @@ yotta_dictate_queue_s
 
     // temporary buffer
     uint8_t recv_buffer[YOTTA_DICTATE_RECV_BUFFER_SIZE];
+
+    // data size of received data
+    uint64_t data_size;
 
     // receiving virtual table
     yotta_dictate_vtable_t const * vtable;
