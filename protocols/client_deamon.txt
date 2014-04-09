@@ -19,7 +19,7 @@ struct frame
 struct error_frame
 {
     uint16_t data_label = 0x0000;
-    uint64_t data_size = strlen("my error message");
+    uint64_t data_size = strlen("my error message"); // data_size < 256
 
     // error message content
     char data_content[data_size] = "my error message";
