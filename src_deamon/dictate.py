@@ -10,6 +10,7 @@ from twisted.internet.protocol import Factory
 
 LABEL_ERROR = 0x0000
 LABEL_DEAMON_INFO = 0x1000
+LABEL_MASTER_BINARIES = 0x2000
 
 # ------------------------------------------------------------------------------ dictate's frame generators
 
@@ -68,6 +69,36 @@ class InstAbstact(object):
         assert False # should have been implemented
 
 
+class InstSkeep(InstAbstact):
+    """ skeeping instruction used when an unknow command has been received
+    """
+
+    def __init__(self, protocol, frame_size):
+        InstAbstact.__init__(self, protocol, frame_size)
+
+    def receive(self, data):
+        pass
+
+
+class InstError(InstAbstact):
+    """ error receiving instruction
+
+    members:
+        msg = str
+    """
+
+    def __init__(self, protocol, frame_size):
+        InstAbstact.__init__(self, protocol, frame_size)
+
+        self.msg = ''
+
+    def receive(self, data):
+        self.msg += data
+
+        if len(self.msg) == self.frame_size:
+            self.logger.info('received dictate error frame from {}: {}'.format(self.protocol.peer_addr, struct.unpack('s', self.msg)))
+
+
 class InstExecBinaries(InstAbstact):
     """ binary receiving instruction
 
@@ -109,7 +140,8 @@ class InstExecBinaries(InstAbstact):
 # ------------------------------------------------------------------------------ dictate instructions' map
 
 instruction_map = dict()
-instruction_map[0x2000] = InstExecBinaries
+instruction_map[LABEL_ERROR] = InstError
+instruction_map[LABEL_MASTER_BINARIES] = InstExecBinaries
 
 
 # ------------------------------------------------------------------------------ dictate protocol instance
@@ -164,11 +196,10 @@ class DeamonProtocol(Protocol):
         self.logger.info("connection from {} losted: {}".format(self.peer_addr, reason))
 
     def dataReceived(self, data):
-        #self.transport.write(data)
-
         while True:
             if self.instruction != None:
-                # we already have got an instruction before, then we continue to process it
+                # we already have got an instruction before,
+                # then we continue to process it
 
                 assert self.instruction.frame_size > self.instruction.frame_cursor
 
@@ -186,6 +217,8 @@ class DeamonProtocol(Protocol):
                 self.instruction.receive(instruction_data)
 
                 self.instruction.frame_cursor += len(instruction_data)
+
+                assert self.instruction.frame_cursor <= self.instruction.frame_size
 
                 if self.instruction.frame_cursor < self.instruction.frame_size:
                     break
@@ -210,17 +243,23 @@ class DeamonProtocol(Protocol):
                 # we didn't receive the entire meta buffer
                 break
 
-            frame_label = struct.unpack('H', self.meta_buffer[0:2])
-            frame_size = struct.unpack('Q', self.meta_buffer[2:])
+            frame_label = struct.unpack('H', self.meta_buffer[0:2])[0]
+            frame_size = struct.unpack('Q', self.meta_buffer[2:])[0]
 
             if frame_label not in instruction_map:
-                assert False # TODO; skeep data
-                break
+                frame_label = '0x%04x' % frame_label
+                error_msg = 'unknown frame label {}'.format(frame_label)
+                error_frame = frame_error(error_msg)
+
+                self.transport.write(error_frame)
+                self.logger.error('unknown dictate protocol label {} received from {} -> ignoring frame'.format(frame_label, self.peer_addr))
+                self.instruction = InstSkeep(self, frame_size)
+
+                continue
 
             self.instruction = instruction_map[frame_label](self, frame_size)
 
         return
-
 
 
 # ------------------------------------------------------------------------------ dictate protocol factory
