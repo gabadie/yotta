@@ -2,6 +2,7 @@
 import logging
 import sys
 from twisted.internet import reactor
+from twisted.internet.endpoints import TCP4ServerEndpoint, TCP6ServerEndpoint
 # TODO: import argparse
 
 import dictate
@@ -32,7 +33,10 @@ class Deamon(object):
         self.threads = 1
         self.logger = logger
 
-    def listen(self, port, protocol_factory):
+    def _callback_success(self, port):
+        self._port = port
+
+    def listen(self, port, protocol_factory, ipv6=False):
         assert port >= 0
         assert port <= 65535
         assert protocol_factory != None
@@ -40,7 +44,20 @@ class Deamon(object):
 
         protocol_factory.deamon = self
 
-        return reactor.listenTCP(port, protocol_factory)
+        endpoint = None
+
+        if not ipv6:
+            return reactor.listenTCP(port, protocol_factory)
+
+        else:
+            endpoint = TCP6ServerEndpoint(reactor, port)
+
+        assert False # not finished
+
+        deferred = endpoint.listen(protocol_factory)
+        deferred.addCallbacks(self._callback_success)
+
+        return self._port
 
     def main(self):
         reactor.run()
