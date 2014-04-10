@@ -11,6 +11,7 @@ dictate/yotta_dictate_daemon_error.c
 dictate/yotta_dictate_daemon_info.c
 dictate/yotta_dictate_daemon_start.c
 dictate/yotta_dictate_queue.c
+dictate/yotta_dictate_send_memory_block.c
 dictate/yotta_dictate_unknown.c
 massive/yotta_context.c
 massive/yotta_dispatch.c
