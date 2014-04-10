@@ -26,6 +26,7 @@ endif
 
 
 $(call trash_configs, debug nightly release)
+$(call hook_precommit_configs, debug release)
 
 
 # ------------------------------------------------------------------------------ Yotta library's headers directory
@@ -99,6 +100,21 @@ TEST_DEAMON_FILES := $(call filelist,src_deamon/test_deamon.flist)
 TEST_DEAMON_TARGETS := $(call test_scripts,$(TEST_DEAMON_FILES),py.test)
 
 
-# ------------------------------------------------------------------------------ Yotta's hook
+# ------------------------------------------------------------------------------ Yotta demos
 
-$(call hook_precommit_configs, debug release)
+DEMOS := $(call filelist,demos/demos.flist)
+
+$(foreach DEMO_PATH, $(DEMOS), \
+	$(eval DEMO_PRODUCT := $(call product_create,BINEXEC,$(notdir $(DEMO_PATH)))) \
+	$(eval DEMO_TARGET := $(call product_target,$(DEMO_PRODUCT))) \
+	$(call product_public,$(DEMO_PRODUCT)) \
+	$(eval DEMO_FILES := $(call filelist,$(DEMO_PATH)/$(notdir $(DEMO_PATH)).flist)) \
+	$(eval DEMO_BINARIES := $(call bin_object_files, $(DEMO_FILES))) \
+	$(eval $(DEMO_BINARIES): $(LIB_HEADERS_TARGET)) \
+	$(eval $(DEMO_BINARIES): CFLAGS += $(PROJECT_CFLAGS)) \
+	$(eval $(DEMO_BINARIES): CFLAGS += -I $(LIB_HEADERS_TARGET) -I $(test_apis_dir) $(PROJECT_CFLAGS)) \
+	$(eval $(DEMO_TARGET): $(LIB_BINARIES_TARGET)) \
+	$(eval $(DEMO_TARGET): $(DEMO_BINARIES)) \
+	$(eval $(DEMO_TARGET): LDFLAGS += $(LIB_BINARIES_TARGET)) \
+	$(eval $(DEMO_TARGET): LDFLAGS += $(DEMO_BINARIES)) \
+)
