@@ -58,7 +58,7 @@ yotta_dictate_binary_send(yotta_dictate_binary_cmd_t * cmd)
 
     if (cmd->header_cursor != sizeof(cmd->header))
     {
-        // send push's header
+        // send frame header
 
         uint64_t op = yotta_tcp_cmd_send(
             (yotta_tcp_cmd_t *) cmd,
