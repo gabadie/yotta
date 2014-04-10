@@ -23,7 +23,13 @@ yotta_daemon_s
 
     // Total number of available threads
     uint64_t available_threads;
+
+    // the deamon status
+    uint64_t status;
 };
+
+
+#define YOTTA_DAEMON_STATUS_READY 0x1
 
 
 /*

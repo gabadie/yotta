@@ -50,7 +50,7 @@ yotta_dictate_daemon_error_recv(
     }
 
     // Call the vtable's function linked to the daemon info reception
-    cmd_queue->vtable->receive_daemon_error(buffer->data.msg);
+    cmd_queue->vtable->receive_daemon_error(cmd_queue, buffer->data.msg);
 
     // we clean up the tmp buffer
     buffer->data_cursor = 0;
@@ -61,7 +61,7 @@ yotta_dictate_daemon_error_recv(
 }
 
 void
-yotta_dictate_vtable_daemon_error_recv(char const * msg)
+yotta_dictate_vtable_daemon_error_recv(yotta_dictate_queue_t * queue, char const * msg)
 {
     static
     char const msg_prefix[] = "deamon error";
@@ -73,4 +73,6 @@ yotta_dictate_vtable_daemon_error_recv(char const * msg)
     yotta_logger_error(new_msg);
 
     yotta_free(new_msg);
+
+    (void) queue;
 }

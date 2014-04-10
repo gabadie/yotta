@@ -20,6 +20,6 @@ yotta_dictate_daemon_error_recv(
  * @param msg Error message
  */
 void
-yotta_dictate_vtable_daemon_error_recv(char const * msg);
+yotta_dictate_vtable_daemon_error_recv(yotta_dictate_queue_t * queue, char const * msg);
 
 #endif //_YOTTAPRIVATE_DICTATE_DAEMON_ERROR

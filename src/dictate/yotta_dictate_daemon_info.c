@@ -48,7 +48,7 @@ yotta_dictate_daemon_info_recv(
     }
 
     // Call the vtable's function linked to the daemon info reception
-    cmd_queue->vtable->receive_daemon_info(buffer->data.nb_computers, buffer->data.nb_threads);
+    cmd_queue->vtable->receive_daemon_info(cmd_queue, buffer->data.nb_computers, buffer->data.nb_threads);
 
     // we clean up the tmp buffer
     buffer->data_cursor = 0;
@@ -59,7 +59,8 @@ yotta_dictate_daemon_info_recv(
 }
 
 void
-yotta_dictate_vtable_daemon_info_recv(uint64_t nb_computers, uint64_t nb_threads)
+yotta_dictate_vtable_daemon_info_recv(yotta_dictate_queue_t * queue, uint64_t nb_computers, uint64_t nb_threads)
 {
+    (void) queue;
     fprintf(stderr, "Nb computers: %" PRIu64 " | nb threads: %" PRIu64 "\n", nb_computers, nb_threads);
 }

@@ -18,6 +18,6 @@ yotta_dictate_daemon_info_recv(
  * Default handler of the dictate queue's vtable for daemon info reception
  */
 void
-yotta_dictate_vtable_daemon_info_recv(uint64_t nb_computers, uint64_t nb_threads);
+yotta_dictate_vtable_daemon_info_recv(yotta_dictate_queue_t * queue, uint64_t nb_computers, uint64_t nb_threads);
 
 #endif //_YOTTAPRIVATE_DICTATE_DEAMON_INFO

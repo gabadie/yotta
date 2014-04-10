@@ -54,7 +54,7 @@ yotta_dictate_unknown_recv(
     }
 
     // Call the vtable's function linked to the daemon info reception
-    cmd_queue->vtable->receive_unknown(cmd_queue->header.label, cmd_queue->header.data_size);
+    cmd_queue->vtable->receive_unknown(cmd_queue);
 
     // we clean up the tmp buffer
     buffer->data_cursor = 0;
@@ -64,7 +64,7 @@ yotta_dictate_unknown_recv(
 }
 
 void
-yotta_dictate_vtable_unknown_recv(yotta_dictate_label_t label, uint64_t data_size)
+yotta_dictate_vtable_unknown_recv(yotta_dictate_queue_t * queue)
 {
-    fprintf(stderr, "Unknown frame of label %d and size %" PRIu64 "\n", label, data_size);
+    fprintf(stderr, "Unknown frame of label %d and size %" PRIu64 "\n", queue->header.label, queue->header.data_size);
 }
