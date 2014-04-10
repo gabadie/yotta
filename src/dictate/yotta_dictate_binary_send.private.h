@@ -1,7 +1,6 @@
 #ifndef _YOTTA_DICTATE_BINARY_SEND
 #define _YOTTA_DICTATE_BINARY_SEND
 
-#include "../massive/yotta_context.h"
 #include "yotta_dictate_queue.private.h"
 #include "../threading/yotta_sync.h"
 
