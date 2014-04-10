@@ -85,8 +85,6 @@ yotta_context_destroy(yotta_context_t * context)
         yotta_return_inv_value(yotta_context_destroy, context);
     }
 
-    yotta_return_t r = YOTTA_SUCCESS;
-
     if (context->daemons != NULL)
     {
         for (uint64_t i = 0; i < YOTTA_CONTEXT_MAX_DEAMONS; i++)
@@ -96,7 +94,7 @@ yotta_context_destroy(yotta_context_t * context)
                 continue;
             }
 
-            r |= yotta_daemon_destroy(context->daemons + i);
+            yotta_daemon_destroy(context->daemons + i);
         }
 
         yotta_free(context->daemons);
@@ -108,11 +106,6 @@ yotta_context_destroy(yotta_context_t * context)
     }
 
     if (yotta_socket_thread_destroy(&context->worker_thread) != 0)
-    {
-        yotta_return_unexpect_fail(yotta_context_destroy);
-    }
-
-    if (r != YOTTA_SUCCESS)
     {
         yotta_return_unexpect_fail(yotta_context_destroy);
     }
