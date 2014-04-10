@@ -51,3 +51,16 @@ struct slave_binaries
     // executable binaries
     uint8_t executable_binaries[data_size];
 };
+
+struct slave_start
+{
+    uint16_t data_label = 0x2010;
+    uint64_t data_size = 2;
+    uint16_t listening_port;
+};
+
+struct slave_stop
+{
+    uint16_t data_label = 0x2011;
+    uint64_t data_size = 0;
+};
