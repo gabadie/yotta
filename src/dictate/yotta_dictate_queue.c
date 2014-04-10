@@ -4,6 +4,7 @@
 #include "yotta_dictate_queue.private.h"
 #include "yotta_dictate_daemon_info.private.h"
 #include "yotta_dictate_daemon_error.private.h"
+#include "yotta_dictate_unknown.private.h"
 #include "../core/yotta_logger.private.h"
 #include "../core/yotta_debug.h"
 #include "../socket/yotta_tcp.h"
@@ -40,7 +41,8 @@ yotta_dictate_vtable_t const
 yotta_dictate_queue_default_vtable =
 {
     yotta_dictate_vtable_daemon_info_recv,
-    yotta_dictate_vtable_daemon_error_recv
+    yotta_dictate_vtable_daemon_error_recv,
+    yotta_dictate_vtable_unknown_recv
 };
 
 static
