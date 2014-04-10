@@ -90,7 +90,7 @@ def main(args):
             port = int(args[i + 1])
             i += 2
 
-        if args[i] == '--out-port':
+        elif args[i] == '--out-port':
             print_port_on_first_line = True
             i += 1
 
