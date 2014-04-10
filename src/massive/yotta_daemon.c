@@ -28,7 +28,7 @@ yotta_daemon_destroy(yotta_daemon_t * daemon)
     yotta_assert(daemon != NULL);
     yotta_assert(daemon->context != NULL);
 
-    //yotta_dictate_queue_destroy(&daemon->dictate_queue);
+    yotta_dictate_queue_destroy(&daemon->dictate_queue);
     yotta_whisper_queue_destroy(&daemon->whisper_queue);
 
     daemon->context = NULL;

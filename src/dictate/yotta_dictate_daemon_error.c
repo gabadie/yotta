@@ -9,7 +9,7 @@
 #define YOTTA_DICTATE_ERROR_MSG_MAX_SIZE 256
 
 void
-yotta_dictate_daemon_info_recv(
+yotta_dictate_daemon_error_recv(
     yotta_dictate_queue_t * cmd_queue
 )
 {
@@ -61,7 +61,7 @@ yotta_dictate_daemon_info_recv(
 }
 
 void
-yotta_dictate_vtable_daemon_info_recv(char const * msg)
+yotta_dictate_vtable_daemon_error_recv(char const * msg)
 {
     static
     char const msg_prefix[] = "deamon error";
