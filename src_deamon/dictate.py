@@ -19,7 +19,7 @@ def frame_error(msg):
     """
     assert len(msg) < 256 # the yotta library doesn't support longer
 
-    return struct.pack('H', LABEL_ERROR) + struct.pack('Q', len(msg)) + struct.pack('s', msg)
+    return struct.pack('H', LABEL_ERROR) + struct.pack('Q', len(msg)) + struct.pack('{}s'.format(len(msg)), msg)
 
 def deamon_info(deamon):
     """ Generates LABEL_DEAMON_INFO's trame with a given Deamon
@@ -75,6 +75,9 @@ class InstSkeep(InstAbstact):
 
     def __init__(self, protocol, frame_size):
         InstAbstact.__init__(self, protocol, frame_size)
+
+    def __del__(self):
+        self.logger.info("stop skeeping from {}".format(self.protocol.peer_addr))
 
     def receive(self, data):
         pass
@@ -169,6 +172,16 @@ class DeamonProtocol(Protocol):
         self.meta_buffer = ''
         self.binary_path = ''
 
+    def __del__(self):
+        self.logger.info("deleting connection from {} ...".format(self.peer_addr))
+
+        if self.instruction != None:
+            del self.instruction
+
+        if self.binary_path != '':
+            os.remove(self.binary_path)
+            self.logger.info("binary file {} from {} removed".format(self.binary_path, self.peer_addr))
+
     @property
     def deamon(self):
         assert self.factory != None
@@ -187,6 +200,8 @@ class DeamonProtocol(Protocol):
         return '{}:{}'.format(addr.host, addr.port)
 
     def connectionMade(self):
+        self.logger.info('connection with {} made -> sending deamon informations'.format(self.peer_addr))
+
         self.transport.write(deamon_info(self.deamon))
         pass
 
@@ -194,6 +209,17 @@ class DeamonProtocol(Protocol):
         addr = self.transport.getPeer()
 
         self.logger.info("connection from {} losted: {}".format(self.peer_addr, reason))
+
+        # we remove the protocol from the factory's protocol list to break up the circular dependency
+        self.factory.remove(self)
+
+        if self.instruction != None:
+            # we cleans up self.instruction to break up the circular dependency
+            del self.instruction
+
+            self.instruction = None
+
+        del self
 
     def dataReceived(self, data):
         while True:
@@ -269,12 +295,14 @@ class DeamonProtocolFactory(Factory):
 
     members:
         deamon = deamon.Deamon
+        protocols = list(DeamonProtocol)
     """
 
     def __init__(self):
         #Factory.__init__(self)
 
         self.deamon = None
+        self.protocols = []
 
     @property
     def logger(self):
@@ -283,6 +311,15 @@ class DeamonProtocolFactory(Factory):
     def buildProtocol(self, addr):
         assert self.deamon != None
 
-        self.logger.info('connection from {}:{}'.format(addr.host, addr.port))
+        self.logger.info('new connection from {}:{}'.format(addr.host, addr.port))
 
-        return DeamonProtocol(self)
+        protocol = DeamonProtocol(self)
+
+        self.protocols.append(protocol)
+
+        return protocol
+
+    def remove(self, protocol):
+        assert protocol in self.protocols
+
+        self.protocols.remove(protocol)
