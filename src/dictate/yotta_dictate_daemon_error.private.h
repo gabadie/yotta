@@ -1,5 +1,5 @@
-#ifndef _YOTTAPRIVATE_DICTATE_ERROR
-#define _YOTTAPRIVATE_DICTATE_ERROR
+#ifndef _YOTTAPRIVATE_DICTATE_DAEMON_ERROR
+#define _YOTTAPRIVATE_DICTATE_DAEMON_ERROR
 
 #include "../yotta_prefix.h"
 #include "yotta_dictate_queue.private.h"
@@ -22,4 +22,4 @@ yotta_dictate_daemon_error_recv(
 void
 yotta_dictate_vtable_daemon_error_recv(char const * msg);
 
-#endif //_YOTTAPRIVATE_DICTATE_ERROR
+#endif //_YOTTAPRIVATE_DICTATE_DAEMON_ERROR

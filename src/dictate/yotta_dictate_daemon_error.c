@@ -31,7 +31,7 @@ yotta_dictate_daemon_info_recv(
     yotta_dictate_buffer_t * buffer =
         yotta_dictate_queue_recv_buffer(cmd_queue, yotta_dictate_buffer_t);
 
-    // If we have not received all the daemon info yet..
+    // If we have not received all the daemon error msg yet..
     if (buffer->data_cursor < sizeof(buffer->data))
     {
         // ..we try to get it
