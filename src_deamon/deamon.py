@@ -49,7 +49,7 @@ class Deamon(object):
 
 def man():
     print 'syntax:'
-    print '    {} [--port <PORT>]'.format(sys.argv[0])
+    print '    {} (--port <PORT>, --out-port)*'.format(sys.argv[0])
     print ''
 
 def args_assert(condition=False):
@@ -79,6 +79,7 @@ def args_assert_exist(args, i):
 
 def main(args):
     port = None
+    print_port_on_first_line = False
 
     i = 0
 
@@ -89,6 +90,10 @@ def main(args):
             port = int(args[i + 1])
             i += 2
 
+        if args[i] == '--out-port':
+            print_port_on_first_line = True
+            i += 1
+
         else:
             args_error(args, i, 'unknown parameter {}'.format(args[i]))
 
@@ -98,6 +103,9 @@ def main(args):
 
     deamon = Deamon(logger=default_logger())
     port = deamon.listen(port, dictate_factory)
+
+    if print_port_on_first_line:
+        print str(port.getHost().port)
 
     deamon.logger.info('listening on port: {}'.format(port.getHost().port))
 
