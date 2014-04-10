@@ -22,4 +22,32 @@ yotta_daemon_s
     uint64_t available_threads;
 };
 
+
+/*
+ * @infos: init the given deamon
+ *
+ * @param <deamon>: the yotta deamon to initialize
+ * @param <ip>: the yotta deamon's ip address
+ * @param <port>: the yotta deamon's listening port
+ *
+ * @returns:
+ *  == <0> if succeed
+ *  != <0> if failed
+ */
+yotta_return_t
+yotta_daemon_init(yotta_daemon_t * daemon, char const * ip, uint16_t port);
+
+/*
+ * @infos: destroy the given deamon
+ *
+ * @param <deamon>: the yotta deamon to destroy
+ *
+ * @returns:
+ *  == <0> if succeed
+ *  != <0> if failed
+ */
+yotta_return_t
+yotta_daemon_destroy(yotta_daemon_t * daemon);
+
+
 #endif //_YOTTA_DAEMON
