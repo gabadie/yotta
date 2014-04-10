@@ -12,7 +12,8 @@
  * @param <data>: the data (binary) to send
  * @param <sync>: the sync object when finished
  */
-void yotta_dictate_daemon_start(
+void
+yotta_dictate_daemon_start(
     yotta_dictate_queue_t * cmd_queue,
     uint64_t data_size,
     void const * data,

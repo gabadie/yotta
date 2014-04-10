@@ -1,6 +1,7 @@
 
 import os
 import struct
+import subprocess
 import tempfile
 from twisted.internet.protocol import Protocol
 from twisted.internet.protocol import Factory
@@ -11,6 +12,7 @@ from twisted.internet.protocol import Factory
 LABEL_ERROR = 0x0000
 LABEL_DEAMON_INFO = 0x1000
 LABEL_MASTER_BINARIES = 0x2000
+LABEL_MASTER_START = 0x2010
 
 # ------------------------------------------------------------------------------ dictate's frame generators
 
@@ -67,6 +69,9 @@ class InstAbstact(object):
         """
 
         assert False # should have been implemented
+
+    def frame_error(self, msg):
+        self.protocol.transport.write(frame_error(msg))
 
 
 class InstSkeep(InstAbstact):
@@ -139,12 +144,56 @@ class InstExecBinaries(InstAbstact):
 
         self.logger.info('binary file {} from {} fully received'.format(self.binary_path, self.protocol.peer_addr))
 
+class InstStartSlave(InstAbstact):
+    """ start slave execution
+    """
+
+    def __init__(self, protocol, frame_size):
+        InstAbstact.__init__(self, protocol, frame_size)
+        self.data = ''
+
+    def receive(self, data):
+        self.data += data
+
+        if self.frame_cursor + len(data) == self.frame_size:
+            self.finish()
+
+    def finish(self, data):
+        assert len(data) == 2
+
+        whisper_ip = self.protocol.transport.getPeer().host
+        whisper_port = struct.unpack('H', data)[0]
+
+        error_prefix = 'can\'t start {} \'s process: '.format(self.protocol.peer_addr)
+
+        if self.protocol.binary_path == '':
+            self.logger.info(error_prefix + 'binary file doesn\'t exists')
+            self.frame_error('can\'t start executable: binary file doesn\'t exists')
+
+        if self.protocol.process != None:
+            self.logger.info(error_prefix + 'already started')
+            self.frame_error('can\'t start executable: already started')
+
+        if whisper_port == 0:
+            self.logger.info(error_prefix + 'invalid whisper port 0')
+            self.frame_error('can\'t start executable: invalid whisper port 0')
+
+        cmd = [self.protocol.binary_path]
+        cmd.append('--yotta')
+        cmd.extend(['--yotta-client-ip', str(whisper_ip)])
+        cmd.extend(['--yotta-client-port', str(whisper_port)])
+
+        self.logger.info('starting {}\'s binary: {}'.format(self.protocol.peer_addr, ' '.join(cmd)))
+
+        self.protocol.process = subprocess.Popen(cmd)
+
 
 # ------------------------------------------------------------------------------ dictate instructions' map
 
 instruction_map = dict()
 instruction_map[LABEL_ERROR] = InstError
 instruction_map[LABEL_MASTER_BINARIES] = InstExecBinaries
+instruction_map[LABEL_MASTER_START] = InstStartSlave
 
 
 # ------------------------------------------------------------------------------ dictate protocol instance
@@ -171,6 +220,7 @@ class DeamonProtocol(Protocol):
         self.instruction = None
         self.meta_buffer = ''
         self.binary_path = ''
+        self.process = None
 
     def __del__(self):
         self.logger.info("deleting connection from {} ...".format(self.peer_addr))
