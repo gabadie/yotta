@@ -15,7 +15,6 @@
  /* Master to Daemon */
 #define YOTTA_DICTATE_LABEL_SLAVE_BINARY 0x2000
 #define YOTTA_DICTATE_LABEL_DAEMON_START 0x2010
-#define YOTTA_DICTATE_LABEL_DAEMON_STOP  0x2011
 
 /*
  * @infos: Type of the Dictate protocol's labels
