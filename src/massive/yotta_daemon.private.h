@@ -44,12 +44,8 @@ yotta_daemon_init(yotta_daemon_t * daemon, yotta_context_t * context, char const
  * @infos: destroy the given deamon
  *
  * @param <deamon>: the yotta deamon to destroy
- *
- * @returns:
- *  == <0> if succeed
- *  != <0> if failed
  */
-yotta_return_t
+void
 yotta_daemon_destroy(yotta_daemon_t * daemon);
 
 

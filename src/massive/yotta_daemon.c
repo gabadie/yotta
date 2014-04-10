@@ -22,14 +22,14 @@ yotta_daemon_init(yotta_daemon_t * daemon, yotta_context_t * context, char const
     return YOTTA_UNEXPECTED_FAIL;
 }
 
-yotta_return_t
+void
 yotta_daemon_destroy(yotta_daemon_t * daemon)
 {
     yotta_assert(daemon != NULL);
+    yotta_assert(daemon->context != NULL);
 
-    (void) daemon;
+    //yotta_dictate_queue_destroy(&daemon->dictate_queue);
+    yotta_whisper_queue_destroy(&daemon->whisper_queue);
 
-    yotta_todo("implement here");
-
-    return YOTTA_UNEXPECTED_FAIL;
+    daemon->context = NULL;
 }
