@@ -9,8 +9,8 @@
 /*
  * @infos: store all context's information
  */
-typedef
-struct yotta_context_s
+struct
+yotta_context_s
 {
     // Port used for incoming connections
     uint16_t incoming_port;
@@ -24,7 +24,7 @@ struct yotta_context_s
     // Daemons list
     yotta_daemon_t * daemons;
 
-} yotta_context_t;
+};
 
 
 /*

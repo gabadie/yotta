@@ -15,6 +15,9 @@ yotta_daemon_s
     yotta_dictate_queue_t dictate_queue;
     yotta_whisper_queue_t whisper_queue;
 
+    // the deamon's context
+    yotta_context_t * context;
+
     // Number of available computers known by the daemon
     uint64_t available_computers;
 
@@ -35,7 +38,7 @@ yotta_daemon_s
  *  != <0> if failed
  */
 yotta_return_t
-yotta_daemon_init(yotta_daemon_t * daemon, char const * ip, uint16_t port);
+yotta_daemon_init(yotta_daemon_t * daemon, yotta_context_t * context, char const * ip, uint16_t port);
 
 /*
  * @infos: destroy the given deamon
