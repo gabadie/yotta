@@ -19,7 +19,7 @@ def frame_error(msg):
     """
     assert len(msg) < 256 # the yotta library doesn't support longer
 
-    return struct.pack('H', LABEL_ERROR) + struct.pack('Q', len(msg)) + struct.pack('s', msg)
+    return struct.pack('H', LABEL_ERROR) + struct.pack('Q', len(msg)) + struct.pack('{}s'.format(len(msg)), msg)
 
 def deamon_info(deamon):
     """ Generates LABEL_DEAMON_INFO's trame with a given Deamon
