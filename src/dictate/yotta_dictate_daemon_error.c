@@ -53,7 +53,7 @@ yotta_dictate_daemon_info_recv(
 
     // we clean up the tmp buffer
     buffer->data_cursor = 0;
-    memset(buffer->data.msg, 0, sizeof(buffer->data.msg));
+    memset(buffer->data, 0, sizeof(buffer->data));
 
     yotta_dictate_queue_finish(cmd_queue);
 
