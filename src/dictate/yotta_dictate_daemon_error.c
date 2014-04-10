@@ -1,8 +1,9 @@
-#include <stdio.h>
+
 #include <string.h>
 
 #include "yotta_dictate_daemon_error.private.h"
 #include "../core/yotta_debug.h"
+#include "../core/yotta_memory.h"
 #include "../core/yotta_logger.private.h"
 
 #define YOTTA_DICTATE_ERROR_MSG_MAX_SIZE 256
@@ -62,5 +63,14 @@ yotta_dictate_daemon_info_recv(
 void
 yotta_dictate_vtable_daemon_info_recv(char const * msg)
 {
-    fprintf(stderr, "Daemon error: %s\n", msg);
+    static
+    char const msg_prefix[] = "deamon error";
+    char * new_msg = yotta_alloc_d(strlen(msg_prefix) + strlen(msg) + 1);
+
+    strcpy(new_msg, msg_prefix);
+    strcat(new_msg, msg);
+
+    yotta_logger_error(new_msg);
+
+    yotta_free(new_msg);
 }
