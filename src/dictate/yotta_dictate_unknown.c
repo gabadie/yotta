@@ -1,5 +1,6 @@
 #include <stdio.h>
 #include <string.h>
+#include <inttypes.h>
 
 #include "yotta_dictate_unknown.private.h"
 #include "../core/yotta_debug.h"
@@ -57,7 +58,7 @@ yotta_dictate_unknown_recv(
 
     // we clean up the tmp buffer
     buffer->data_cursor = 0;
-    memset(buffer->data, 0, sizeof(buffer->data));
+    memset(&buffer->data, 0, sizeof(buffer->data));
 
     yotta_dictate_queue_finish(cmd_queue);
 }
@@ -65,5 +66,5 @@ yotta_dictate_unknown_recv(
 void
 yotta_dictate_vtable_unknown_recv(yotta_dictate_label_t label, uint64_t data_size)
 {
-    fprintf(stderr, "Unknown frame of label %llu and size %" PRIu64 "%\n", label, data_size);
+    fprintf(stderr, "Unknown frame of label %d and size %" PRIu64 "\n", label, data_size);
 }

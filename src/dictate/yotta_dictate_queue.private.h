@@ -33,10 +33,13 @@ typedef struct
 yotta_dictate_vtable_s
 {
     // YOTTA_DICTATE_LABEL_DEAMON_INFO's entry point
-    void (* receive_daemon_info)(uint64_t, uint64_t);
+    void (* receive_daemon_info)(uint64_t nb_computers, uint64_t nb_threads);
 
     // YOTTA_DICTATE_LABEL_DEAMON_ERROR's entry point
-    void (* receive_daemon_error)(char const *);
+    void (* receive_daemon_error)(char const * error_msg);
+
+    // Unknown or depracated frame entry point
+    void (* receive_unknown)(yotta_dictate_label_t label, uint64_t data_size);
 }
 yotta_dictate_vtable_t;
 

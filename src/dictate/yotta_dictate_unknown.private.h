@@ -17,9 +17,10 @@ yotta_dictate_unknown_recv(
 /*
  * Default handler of the dictate queue's vtable for unknown (or depracated) frame reception
  *
- * @param msg Error message
+ * @param label Label of the unknown or depracted frame
+ * @param data_size Data size of the unknown frame
  */
 void
-yotta_dictate_vtable_unknown_recv(char const * msg);
+yotta_dictate_vtable_unknown_recv(yotta_dictate_label_t label, uint64_t data_size);
 
 #endif //_YOTTAPRIVATE_DICTATE_UNKNOWN
