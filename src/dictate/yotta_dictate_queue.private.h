@@ -38,7 +38,7 @@ yotta_dictate_vtable_s
     // YOTTA_DICTATE_LABEL_DEAMON_ERROR's entry point
     void (* receive_daemon_error)(char const * error_msg);
 
-    // Unknown or depracated frame entry point
+    // Unknown or deprecated frame entry point
     void (* receive_unknown)(yotta_dictate_label_t label, uint64_t data_size);
 }
 yotta_dictate_vtable_t;
