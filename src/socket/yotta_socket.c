@@ -194,7 +194,10 @@ yotta_socket_parse(struct sockaddr_storage const * sin, yotta_ipaddr_t ip_addres
             *port = ntohs(s->sin_port);
         }
 
-        inet_ntop(AF_INET, &s->sin_addr, ip_address, YOTTA_IPADDR_STRLEN);
+        if (ip_address != NULL)
+        {
+            inet_ntop(AF_INET, &s->sin_addr, ip_address, YOTTA_IPADDR_STRLEN);
+        }
     }
     else
     {
@@ -205,7 +208,10 @@ yotta_socket_parse(struct sockaddr_storage const * sin, yotta_ipaddr_t ip_addres
             *port = ntohs(s->sin6_port);
         }
 
-        inet_ntop(AF_INET6, &s->sin6_addr, ip_address, YOTTA_IPADDR_STRLEN);
+        if (ip_address != NULL)
+        {
+            inet_ntop(AF_INET6, &s->sin6_addr, ip_address, YOTTA_IPADDR_STRLEN);
+        }
     }
 }
 
