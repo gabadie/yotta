@@ -87,19 +87,6 @@ yotta_return_t
 yotta_socket_host(yotta_socket_t * sock, yotta_ipaddr_t ip_address, uint16_t * port);
 
 /*
- * @infos: gets the port of a yotta socket
- *
- * @param <sock>: yotta socket
- * @param <port>: output port
- *
- * @returns:
- *  == <0> if succeed
- *  != <0> if failed
- */
-#define yotta_socket_port(sock, port) \
-    yotta_socket_host(sock, NULL, port)
-
-/*
  * @infos: listen with a yotta socket
  *
  * @param <sock>: the listening yotta socket
