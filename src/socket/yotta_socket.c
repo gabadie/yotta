@@ -159,6 +159,25 @@ yotta_socket_client_init(yotta_socket_t * sock, char const * address,
     return 0;
 }
 
+yotta_return_t
+yotta_socket_pair(yotta_socket_t * sock0, yotta_socket_t * sock1, int family, int type)
+{
+    yotta_assert(sock0 != NULL);
+    yotta_assert(sock1 != NULL);
+
+    int fds[2];
+
+    if (socketpair(family, type, 0, fds))
+    {
+        return -1;
+    }
+
+    sock0->fd = fds[0];
+    sock1->fd = fds[1];
+
+    return 0;
+}
+
 static
 void
 yotta_socket_parse(struct sockaddr_storage const * sin, yotta_ipaddr_t ip_address, uint16_t * port)

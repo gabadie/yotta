@@ -50,6 +50,20 @@
 
 
 /*
+ * @infos: paired to yotta TCP socket client
+ *
+ * @param <sock0>: the yotta TCP socket to initialize
+ * @param <sock1>: the other yotta TCP socket to initialize
+ *
+ * @returns:
+ *  == <0> if succeed
+ *  != <0> if failed
+ */
+#define yotta_tcp_pair(sock0, sock1) \
+    yotta_socket_pair((sock0), (sock1), AF_UNSPEC, SOCK_STREAM)
+
+
+/*
  * @infos: send data via a yotta TCP socket
  *
  * @param <sock>: the yotta socket used to send

@@ -59,6 +59,23 @@ yotta_socket_client_init(yotta_socket_t * sock, char const * address,
     uint16_t port, int family, int type);
 
 /*
+ * @infos: creates paired sockets
+ *
+ * @param <sock0>: the first socket
+ * @param <sock1>: the second socket
+ * @param <family>: the family of the yotta socket
+ *                  (AF_INET (IPv4), AF_INET6 (IPv6) or AF_UNSPEC (Unspecified)
+ * @param <type>: the type of the yotta socket
+ *                SOCK_STREAM (TCP) or SOCK_DGRAM (UDP)
+ *
+ * @returns:
+ *  == <0> if succeed
+ *  != <0> if failed
+ */
+yotta_return_t
+yotta_socket_pair(yotta_socket_t * sock0, yotta_socket_t * sock1, int family, int type);
+
+/*
  * @infos: gets the peer's information of a yotta socket
  *
  * @param <sock>: yotta socket
