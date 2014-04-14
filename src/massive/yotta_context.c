@@ -1,4 +1,6 @@
 
+#include <string.h>
+
 #include "yotta_context.h"
 #include "yotta_daemon.private.h"
 #include "../core/yotta_debug.h"
@@ -10,6 +12,17 @@
 
 static
 void
+yotta_context_release_whisper_queue(yotta_whisper_queue_t * queue)
+{
+    yotta_assert(queue != NULL);
+
+    yotta_daemon_t * d = yotta_struct_container(yotta_daemon_t, whisper_queue, queue);
+
+    yotta_daemon_destroy(d);
+}
+
+static
+void
 yotta_context_create_whisper_queue(yotta_whisper_master_t * master)
 {
     yotta_assert(master != NULL);
@@ -18,27 +31,64 @@ yotta_context_create_whisper_queue(yotta_whisper_master_t * master)
 
     yotta_assert(&context->whisper_master == master);
 
+    yotta_socket_t socket;
+
+    if (yotta_socket_accept(&master->socket_event.socket, &socket) != 0)
+    {
+        yotta_logger_warning("yotta_context_create_whisper_queue: connection has failed");
+        return;
+    }
+
+    yotta_ipaddr_t incomming_ip_address;
+
+    if (yotta_socket_peer(&socket, incomming_ip_address, NULL))
+    {
+        yotta_logger_warning("yotta_context_create_whisper_queue: unknown IP address");
+        yotta_socket_close(&socket);
+        return;
+    }
+
     yotta_whisper_queue_t * cmd_queue = NULL;
 
     for (size_t i = 0; i < YOTTA_CONTEXT_MAX_DEAMONS; i++)
     {
         yotta_daemon_t * d = context->daemons + i;
 
-        yotta_not_implemented_yet();
+        if (d->context == NULL)
+        {
+            continue;
+        }
 
-        (void)d;
+        yotta_ipaddr_t ip_address;
+
+        if (yotta_socket_peer(&d->dictate_queue.tcp_queue.socket_event.socket, ip_address, NULL))
+        {
+            yotta_logger_warning("yotta_context_create_whisper_queue: unknown dictate IP address");
+            continue;
+        }
+
+        if (strcmp(ip_address, incomming_ip_address) == 0)
+        {
+            cmd_queue = &d->whisper_queue;
+            break;
+        }
     }
 
-    yotta_dirty_s(cmd_queue);
-
-    if (yotta_socket_accept(&master->socket_event.socket, &cmd_queue->tcp_queue.socket_event.socket) != 0)
+    if (cmd_queue == NULL)
     {
-        yotta_logger_debug("yotta_whisper_master_recv: connection has failed");
+        yotta_logger_warning("yotta_context_create_whisper_queue: unknown deamon");
+        yotta_socket_close(&socket);
         return;
     }
 
+    // TODO: daemon already connected?
+
+    yotta_dirty_s(cmd_queue);
+
+    cmd_queue->tcp_queue.socket_event.socket.fd = socket.fd;
+
     yotta_whisper_queue_init(cmd_queue);
-    //yotta_socket_event_set_release(&cmd_queue->tcp_queue.socket_event, yotta_whisper_queue_release);
+    yotta_socket_event_set_release((yotta_socket_event_t *) cmd_queue, yotta_context_release_whisper_queue);
 
     if (yotta_socket_thread_listen(master->socket_event.socket_thread, (yotta_socket_event_t *) cmd_queue) != 0)
     {
