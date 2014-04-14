@@ -159,20 +159,72 @@ yotta_socket_client_init(yotta_socket_t * sock, char const * address,
     return 0;
 }
 
+static
+void
+yotta_socket_parse(struct sockaddr_storage const * sin, yotta_ipaddr_t ip_address, uint16_t * port)
+{
+    yotta_assert(sin != NULL);
+    yotta_assert(ip_address != NULL || port != NULL);
+
+    if (sin->ss_family == AF_INET)
+    {
+        struct sockaddr_in *s = (struct sockaddr_in *) sin;
+
+        if (port != NULL)
+        {
+            *port = ntohs(s->sin_port);
+        }
+
+        inet_ntop(AF_INET, &s->sin_addr, ip_address, YOTTA_IPADDR_STRLEN);
+    }
+    else
+    {
+        struct sockaddr_in6 *s = (struct sockaddr_in6 *) sin;
+
+        if (port != NULL)
+        {
+            *port = ntohs(s->sin6_port);
+        }
+
+        inet_ntop(AF_INET6, &s->sin6_addr, ip_address, YOTTA_IPADDR_STRLEN);
+    }
+}
+
 yotta_return_t
-yotta_socket_port(yotta_socket_t * sock, uint16_t * port)
+yotta_socket_peer(yotta_socket_t * sock, yotta_ipaddr_t ip_address, uint16_t * port)
 {
     yotta_assert(sock != NULL);
-    yotta_assert(port != NULL);
+    yotta_assert(ip_address != NULL || port != NULL);
 
-    struct sockaddr_in sin;
-    socklen_t len = sizeof(sin);
-    if (getsockname(sock->fd, (struct sockaddr *) &sin, &len) == -1)
+    struct sockaddr_storage sin;
+    socklen_t sin_len = sizeof(sin);
+
+    if (getpeername(sock->fd, (struct sockaddr *) &sin, &sin_len) == -1)
     {
-        yotta_return_unexpect_fail(yotta_socket_port);
+        return YOTTA_UNEXPECTED_FAIL;
     }
 
-    *port = ntohs(sin.sin_port);
+    yotta_socket_parse(&sin, ip_address, port);
+
+    return YOTTA_SUCCESS;
+}
+
+yotta_return_t
+yotta_socket_host(yotta_socket_t * sock, yotta_ipaddr_t ip_address, uint16_t * port)
+{
+    yotta_assert(sock != NULL);
+    yotta_assert(ip_address != NULL || port != NULL);
+
+    struct sockaddr_storage sin;
+    socklen_t sin_len = sizeof(sin);
+
+    if (getsockname(sock->fd, (struct sockaddr *) &sin, &sin_len) == -1)
+    {
+        return YOTTA_UNEXPECTED_FAIL;
+    }
+
+    yotta_socket_parse(&sin, ip_address, port);
+
     return YOTTA_SUCCESS;
 }
 

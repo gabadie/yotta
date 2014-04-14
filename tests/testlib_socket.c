@@ -40,17 +40,23 @@ test_socket_nonblocking()
 }
 
 void
-test_socket_port()
+test_socket_peer_host_listening()
 {
     uint16_t const PORT = 8006;
 
     yotta_socket_t sock;
     yotta_tcp_socket_server(&sock, PORT);
 
-    uint16_t port = 0;
-    test_assert(yotta_socket_port(&sock, &port) == YOTTA_SUCCESS);
+    yotta_ipaddr_t host_ip;
+    uint16_t host_port = 0;
 
-    test_assert(port == PORT);
+    test_assert(yotta_socket_peer(&sock, host_ip, &host_port) != YOTTA_SUCCESS);
+    test_assert(yotta_socket_host(&sock, host_ip, &host_port) == YOTTA_SUCCESS);
+
+    //test_assert(strcmp(host_ip, "127.0.0.1") == 0 || strcmp(host_ip, "::") == 0);
+    //TODO: tests host_ip bove for IPv4 or IPv6
+
+    test_assert(host_port == PORT);
 
     yotta_socket_close(&sock);
 }
@@ -62,7 +68,7 @@ main()
 
     test_socket();
     test_socket_nonblocking();
-    test_socket_port();
+    test_socket_peer_host_listening();
 
     return 0;
 }
