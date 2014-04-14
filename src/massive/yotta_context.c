@@ -8,15 +8,62 @@
 #define YOTTA_CONTEXT_MAX_DEAMONS 32
 
 
+static
+void
+yotta_context_create_whisper_queue(yotta_whisper_master_t * master)
+{
+    yotta_assert(master != NULL);
+
+    yotta_context_t * context = yotta_struct_container(yotta_context_t, whisper_master, master);
+
+    yotta_assert(&context->whisper_master == master);
+
+    yotta_whisper_queue_t * cmd_queue = NULL;
+
+    for (size_t i = 0; i < YOTTA_CONTEXT_MAX_DEAMONS; i++)
+    {
+        yotta_daemon_t * d = context->daemons + i;
+
+        yotta_not_implemented_yet();
+
+        (void)d;
+    }
+
+    yotta_dirty_s(cmd_queue);
+
+    if (yotta_socket_accept(&master->socket_event.socket, &cmd_queue->tcp_queue.socket_event.socket) != 0)
+    {
+        yotta_logger_debug("yotta_whisper_master_recv: connection has failed");
+        return;
+    }
+
+    yotta_whisper_queue_init(cmd_queue);
+    //yotta_socket_event_set_release(&cmd_queue->tcp_queue.socket_event, yotta_whisper_queue_release);
+
+    if (yotta_socket_thread_listen(master->socket_event.socket_thread, (yotta_socket_event_t *) cmd_queue) != 0)
+    {
+        yotta_socket_event_release(cmd_queue);
+    }
+
+    return;
+}
+
+static
+yotta_whisper_master_vtable_t const
+yotta_context_whisper_vtable = {
+    yotta_context_create_whisper_queue
+};
+
+
 yotta_return_t
 yotta_context_init(yotta_context_t * context, uint16_t incoming_port)
 {
-    if (context == 0)
+    if (context == NULL)
     {
         yotta_return_inv_value(yotta_context_init, context);
     }
 
-    if (yotta_whisper_master_init(&context->whisper_master, incoming_port) != 0)
+    if (yotta_whisper_master_init(&context->whisper_master, &yotta_context_whisper_vtable, incoming_port) != 0)
     {
         context->daemons = NULL;
 
@@ -27,7 +74,7 @@ yotta_context_init(yotta_context_t * context, uint16_t incoming_port)
 
     context->daemons = yotta_alloc_sa(yotta_daemon_t, YOTTA_CONTEXT_MAX_DEAMONS);
 
-    for (uint64_t i = 0; i < YOTTA_CONTEXT_MAX_DEAMONS; i++)
+    for (size_t i = 0; i < YOTTA_CONTEXT_MAX_DEAMONS; i++)
     {
         context->daemons[i].context = NULL;
     }
@@ -38,11 +85,11 @@ yotta_context_init(yotta_context_t * context, uint16_t incoming_port)
 yotta_return_t
 yotta_context_connect(yotta_context_t * context, char const * ip, uint16_t port)
 {
-    if (context == 0)
+    if (context == NULL)
     {
         yotta_return_inv_value(yotta_context_connect, context);
     }
-    else if (ip == 0)
+    else if (ip == NULL)
     {
         yotta_return_inv_value(yotta_context_connect, ip);
     }
@@ -53,7 +100,7 @@ yotta_context_connect(yotta_context_t * context, char const * ip, uint16_t port)
 
     yotta_daemon_t * uninit_deamon = NULL;
 
-    for (uint64_t i = 0; i < YOTTA_CONTEXT_MAX_DEAMONS; i++)
+    for (size_t i = 0; i < YOTTA_CONTEXT_MAX_DEAMONS; i++)
     {
         if (context->daemons[i].context == NULL)
         {
@@ -81,14 +128,14 @@ yotta_context_connect(yotta_context_t * context, char const * ip, uint16_t port)
 yotta_return_t
 yotta_context_destroy(yotta_context_t * context)
 {
-    if (context == 0)
+    if (context == NULL)
     {
         yotta_return_inv_value(yotta_context_destroy, context);
     }
 
     if (context->daemons != NULL)
     {
-        for (uint64_t i = 0; i < YOTTA_CONTEXT_MAX_DEAMONS; i++)
+        for (size_t i = 0; i < YOTTA_CONTEXT_MAX_DEAMONS; i++)
         {
             if (context->daemons[i].context == NULL)
             {
