@@ -1,4 +1,3 @@
-
 # ------------------------------------------------------------------------------ Yotta library's headers directory
 
 # ------------------------------------------------------------ default configuration
@@ -115,6 +114,7 @@ $(foreach DEMO_PATH, $(DEMOS), \
 	$(eval $(DEMO_BINARIES): CFLAGS += -I $(LIB_HEADERS_TARGET) -I $(test_apis_dir) $(PROJECT_CFLAGS)) \
 	$(eval $(DEMO_TARGET): $(LIB_BINARIES_TARGET)) \
 	$(eval $(DEMO_TARGET): $(DEMO_BINARIES)) \
-	$(eval $(DEMO_TARGET): LDFLAGS += $(LIB_BINARIES_TARGET)) \
 	$(eval $(DEMO_TARGET): LDFLAGS += $(DEMO_BINARIES)) \
+	$(eval $(DEMO_TARGET): LDFLAGS += $(LIB_BINARIES_TARGET)) \
+	$(eval $(DEMO_TARGET): LDFLAGS += $(PROJECT_LDFLAGS)) \
 )
