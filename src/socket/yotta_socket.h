@@ -12,9 +12,6 @@ yotta_socket_s
     // File descriptor
     SOCKET fd;
 
-    // Socket info
-    struct addrinfo info;
-
 } yotta_socket_t;
 
 /*

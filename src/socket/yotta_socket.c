@@ -87,8 +87,6 @@ yotta_socket_server_init(yotta_socket_t * sock, uint16_t port, int family, int t
 
     // Set the out socket
     sock->fd = sockfd;
-    memcpy(&sock->info, a, sizeof(struct addrinfo));
-    sock->info.ai_next = NULL;
 
     freeaddrinfo(results); // Free resources
 
@@ -155,8 +153,6 @@ yotta_socket_client_init(yotta_socket_t * sock, char const * address,
 
     // Set the out socket
     sock->fd = sockfd;
-    memcpy(&sock->info, a, sizeof(struct addrinfo));
-    sock->info.ai_next = NULL;
 
     freeaddrinfo(results); // Free resources
 
@@ -213,18 +209,6 @@ yotta_socket_accept(yotta_socket_t * sock, yotta_socket_t * new_sock)
     }
 
     new_sock->fd = new_fd;
-
-    new_sock->info.ai_family = sock->info.ai_family;     // IPv4 (AF_INET), IPv6 (AF_INET6) or Unspecified (AF_UNSPEC)
-    new_sock->info.ai_socktype = sock->info.ai_socktype; // TCP (SOCK_STREAM) or UDP (SOCK_DGRAM)
-    new_sock->info.ai_flags = 0;
-    new_sock->info.ai_protocol = 0;
-    new_sock->info.ai_canonname = NULL;
-    new_sock->info.ai_addr = NULL;
-    new_sock->info.ai_next = NULL;
-    //FIXME
-    /*printf("Size of sockaddr : %d == %d\n", connector_addr_len, sizeof(connector_addr));*/
-    new_sock->info.ai_addr = (struct sockaddr *) malloc(sizeof(struct sockaddr));
-    memcpy(new_sock->info.ai_addr, (struct sockaddr *) &connector_addr, sizeof(struct sockaddr));
 
 #if 0
     char address[INET6_ADDRSTRLEN];
