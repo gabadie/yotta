@@ -1,6 +1,7 @@
 #ifndef _YOTTA_DEBUG
 #define _YOTTA_DEBUG
 
+#include "yotta_struct.h"
 #include "../yotta_prefix.h"
 
 #ifdef YOTTA_DEBUG
@@ -136,10 +137,10 @@
  * @infos: not implemented feature crash
  */
 #ifdef YOTTA_DEBUG
-#define yotta_not_implemented_yet \
+#define yotta_not_implemented_yet() \
     yotta_crash_msg("Not implemented yet");
 #else
-#define yotta_not_implemented_yet
+#define yotta_not_implemented_yet()
 #endif
 
 /*
