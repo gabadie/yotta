@@ -80,6 +80,8 @@ yotta_dictate_queue_recv(yotta_dictate_queue_t * cmd_queue)
             return;
         }
 
+        cmd_queue->header_cursor = 0;
+
         switch (cmd_queue->header.label)
         {
             case YOTTA_DICTATE_LABEL_DAEMON_INFO:

@@ -1,4 +1,5 @@
 
+#include "yotta_context.h"
 #include "yotta_daemon.private.h"
 #include "../core/yotta_debug.h"
 #include "../core/yotta_return.private.h"
@@ -16,12 +17,12 @@ yotta_daemon_daemon_info_process(yotta_dictate_queue_t * queue, uint64_t nb_comp
 
     yotta_daemon_t * daemon = (yotta_daemon_t *) queue;
 
-    yotta_assert((daemon->status & YOTTA_DAEMON_STATUS_READY) == 0x0);
+    yotta_assert((daemon->status & YOTTA_DAEMON_DICTATE_READY) == 0x0);
 
     daemon->available_computers = nb_computers;
     daemon->available_threads = nb_threads;
 
-    yotta_atomic_fetch_or(&daemon->status, YOTTA_DAEMON_STATUS_READY);
+    yotta_atomic_fetch_or(&daemon->status, YOTTA_DAEMON_DICTATE_READY);
 }
 
 static
@@ -32,6 +33,23 @@ yotta_daemon_dictate_vtable =
     yotta_dictate_vtable_daemon_error_recv,
     yotta_dictate_vtable_unknown_recv
 };
+
+static
+void
+yotta_daemon_dictate_release(yotta_tcp_queue_t * dictate_queue)
+{
+    yotta_daemon_t * daemon = (yotta_daemon_t *) dictate_queue;
+
+    if (daemon->status & YOTTA_DAEMON_DICTATE_READY)
+    {
+        yotta_dictate_queue_destroy(&daemon->dictate_queue);
+    }
+
+    if (daemon->status & YOTTA_DAEMON_WHISPER_READY)
+    {
+        yotta_whisper_queue_destroy(&daemon->whisper_queue);
+    }
+}
 
 yotta_return_t
 yotta_daemon_init(yotta_daemon_t * daemon, yotta_context_t * context, char const * ip, uint16_t port)
@@ -47,6 +65,10 @@ yotta_daemon_init(yotta_daemon_t * daemon, yotta_context_t * context, char const
         return YOTTA_UNEXPECTED_FAIL;
     }
 
+    yotta_socket_event_set_release(&daemon->dictate_queue, yotta_daemon_dictate_release);
+
+    yotta_socket_thread_listen(&context->worker_thread, (yotta_socket_event_t *) &daemon->dictate_queue);
+
     daemon->dictate_queue.vtable = &yotta_daemon_dictate_vtable;
     daemon->context = context;
     daemon->status = 0x0;
@@ -60,8 +82,12 @@ yotta_daemon_destroy(yotta_daemon_t * daemon)
     yotta_assert(daemon != NULL);
     yotta_assert(daemon->context != NULL);
 
-    yotta_dictate_queue_destroy(&daemon->dictate_queue);
-    yotta_whisper_queue_destroy(&daemon->whisper_queue);
+    yotta_tcp_queue_finish((yotta_tcp_queue_t *) &daemon->dictate_queue);
+
+    if (daemon->status & YOTTA_DAEMON_WHISPER_READY)
+    {
+        yotta_tcp_queue_finish((yotta_tcp_queue_t *)&daemon->whisper_queue);
+    }
 
     daemon->context = NULL;
 }

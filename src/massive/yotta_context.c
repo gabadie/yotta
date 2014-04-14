@@ -58,6 +58,7 @@ yotta_context_connect(yotta_context_t * context, char const * ip, uint16_t port)
         if (context->daemons[i].context == NULL)
         {
             uninit_deamon = context->daemons + i;
+            uninit_deamon->context = context;
             break;
         }
     }
