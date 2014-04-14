@@ -8,6 +8,7 @@
 #include "yotta_whisper_fetch.private.h"
 #include "yotta_whisper_push.private.h"
 #include "yotta_whisper_shared_counter.private.h"
+#include "yotta_whisper_stop.private.h"
 #include "../core/yotta_logger.private.h"
 #include "../core/yotta_debug.h"
 #include "../socket/yotta_tcp.h"
@@ -30,7 +31,7 @@ yotta_whisper_label_entries[YOTTA_WHISPER_LABELS_COUNT] =
     (yotta_whisper_recv_t) yotta_whisper_push_master_recv,
     (yotta_whisper_recv_t) yotta_whisper_shared_counter_answer_recv,
     (yotta_whisper_recv_t) yotta_whisper_shared_counter_request_recv,
-    0
+    (yotta_whisper_recv_t) yotta_whisper_stop_recv
 };
 
 #ifdef YOTTA_DEBUG
