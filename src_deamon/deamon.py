@@ -1,5 +1,6 @@
 
 import logging
+import multiprocessing
 import sys
 from twisted.internet import reactor
 # TODO: import argparse
@@ -29,7 +30,7 @@ class Deamon(object):
 
     def __init__(self, logger=default_logger()):
         self.computers = 1
-        self.threads = 1
+        self.threads = multiprocessing.cpu_count()
         self.logger = logger
 
     def listen(self, port, protocol_factory):
