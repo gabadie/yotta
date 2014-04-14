@@ -19,7 +19,7 @@
         cmd_queue, \
         YOTTA_DICTATE_LABEL_DAEMON_START, \
         2, \
-        &p, \
+        (void const *) &p, \
         sync_finished \
     ); \
 }
