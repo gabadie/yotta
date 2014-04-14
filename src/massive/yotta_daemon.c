@@ -1,11 +1,15 @@
 
 #include "yotta_context.h"
 #include "yotta_daemon.private.h"
+#include "../yotta_init.h"
 #include "../core/yotta_debug.h"
 #include "../core/yotta_return.private.h"
+#include "../dictate/yotta_dictate_binary_send.private.h"
 #include "../dictate/yotta_dictate_daemon_error.private.h"
+#include "../dictate/yotta_dictate_daemon_start.private.h"
 #include "../dictate/yotta_dictate_unknown.private.h"
 #include "../threading/yotta_atomic.h"
+#include "../threading/yotta_sync.h"
 
 
 void
@@ -72,6 +76,12 @@ yotta_daemon_init(yotta_daemon_t * daemon, yotta_context_t * context, char const
     daemon->dictate_queue.vtable = &yotta_daemon_dictate_vtable;
     daemon->context = context;
     daemon->status = 0x0;
+
+    yotta_sync_t binary_sync;
+    yotta_dictate_binary(&daemon->dictate_queue, yotta_executable_path, &binary_sync);
+
+    yotta_sync_t daemon_sync;
+    yotta_dictate_daemon_start(&daemon->dictate_queue, port, &daemon_sync);
 
     return YOTTA_SUCCESS;
 }
