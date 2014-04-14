@@ -29,7 +29,8 @@ yotta_whisper_label_entries[YOTTA_WHISPER_LABELS_COUNT] =
     (yotta_whisper_recv_t) yotta_whisper_fetch_request_recv,
     (yotta_whisper_recv_t) yotta_whisper_push_master_recv,
     (yotta_whisper_recv_t) yotta_whisper_shared_counter_answer_recv,
-    (yotta_whisper_recv_t) yotta_whisper_shared_counter_request_recv
+    (yotta_whisper_recv_t) yotta_whisper_shared_counter_request_recv,
+    0
 };
 
 #ifdef YOTTA_DEBUG
