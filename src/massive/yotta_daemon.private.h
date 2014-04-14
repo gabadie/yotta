@@ -29,7 +29,8 @@ yotta_daemon_s
 };
 
 
-#define YOTTA_DAEMON_STATUS_READY 0x1
+#define YOTTA_DAEMON_DICTATE_READY 0x1
+#define YOTTA_DAEMON_WHISPER_READY 0x2
 
 
 /*
