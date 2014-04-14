@@ -52,7 +52,7 @@ testhelper_whisper_protocol_init(testhelper_whisper_protocol_t * testing_protoco
     test_assert(yotta_socket_listen(&listening_socket, BACKLOG) == 0);
 
     // Get listening port
-    test_assert(yotta_socket_port(&listening_socket, &listening_port) == 0);
+    test_assert(yotta_socket_host(&listening_socket, NULL, &listening_port) == 0);
     test_assert(listening_port != 0);
 
     // Create queue 0's socket

@@ -87,8 +87,6 @@ yotta_socket_server_init(yotta_socket_t * sock, uint16_t port, int family, int t
 
     // Set the out socket
     sock->fd = sockfd;
-    memcpy(&sock->info, a, sizeof(struct addrinfo));
-    sock->info.ai_next = NULL;
 
     freeaddrinfo(results); // Free resources
 
@@ -155,8 +153,6 @@ yotta_socket_client_init(yotta_socket_t * sock, char const * address,
 
     // Set the out socket
     sock->fd = sockfd;
-    memcpy(&sock->info, a, sizeof(struct addrinfo));
-    sock->info.ai_next = NULL;
 
     freeaddrinfo(results); // Free resources
 
@@ -164,19 +160,90 @@ yotta_socket_client_init(yotta_socket_t * sock, char const * address,
 }
 
 yotta_return_t
-yotta_socket_port(yotta_socket_t * sock, uint16_t * port)
+yotta_socket_pair(yotta_socket_t * sock0, yotta_socket_t * sock1, int family, int type)
 {
-    yotta_assert(sock != NULL);
-    yotta_assert(port != NULL);
+    yotta_assert(sock0 != NULL);
+    yotta_assert(sock1 != NULL);
 
-    struct sockaddr_in sin;
-    socklen_t len = sizeof(sin);
-    if (getsockname(sock->fd, (struct sockaddr *) &sin, &len) == -1)
+    int fds[2];
+
+    if (socketpair(family, type, 0, fds))
     {
-        yotta_return_unexpect_fail(yotta_socket_port);
+        return -1;
     }
 
-    *port = ntohs(sin.sin_port);
+    sock0->fd = fds[0];
+    sock1->fd = fds[1];
+
+    return 0;
+}
+
+static
+void
+yotta_socket_parse(struct sockaddr_storage const * sin, yotta_ipaddr_t ip_address, uint16_t * port)
+{
+    yotta_assert(sin != NULL);
+    yotta_assert(ip_address != NULL || port != NULL);
+
+    if (sin->ss_family == AF_INET)
+    {
+        struct sockaddr_in *s = (struct sockaddr_in *) sin;
+
+        if (port != NULL)
+        {
+            *port = ntohs(s->sin_port);
+        }
+
+        inet_ntop(AF_INET, &s->sin_addr, ip_address, YOTTA_IPADDR_STRLEN);
+    }
+    else
+    {
+        struct sockaddr_in6 *s = (struct sockaddr_in6 *) sin;
+
+        if (port != NULL)
+        {
+            *port = ntohs(s->sin6_port);
+        }
+
+        inet_ntop(AF_INET6, &s->sin6_addr, ip_address, YOTTA_IPADDR_STRLEN);
+    }
+}
+
+yotta_return_t
+yotta_socket_peer(yotta_socket_t * sock, yotta_ipaddr_t ip_address, uint16_t * port)
+{
+    yotta_assert(sock != NULL);
+    yotta_assert(ip_address != NULL || port != NULL);
+
+    struct sockaddr_storage sin;
+    socklen_t sin_len = sizeof(sin);
+
+    if (getpeername(sock->fd, (struct sockaddr *) &sin, &sin_len) == -1)
+    {
+        return YOTTA_UNEXPECTED_FAIL;
+    }
+
+    yotta_socket_parse(&sin, ip_address, port);
+
+    return YOTTA_SUCCESS;
+}
+
+yotta_return_t
+yotta_socket_host(yotta_socket_t * sock, yotta_ipaddr_t ip_address, uint16_t * port)
+{
+    yotta_assert(sock != NULL);
+    yotta_assert(ip_address != NULL || port != NULL);
+
+    struct sockaddr_storage sin;
+    socklen_t sin_len = sizeof(sin);
+
+    if (getsockname(sock->fd, (struct sockaddr *) &sin, &sin_len) == -1)
+    {
+        return YOTTA_UNEXPECTED_FAIL;
+    }
+
+    yotta_socket_parse(&sin, ip_address, port);
+
     return YOTTA_SUCCESS;
 }
 
@@ -213,18 +280,6 @@ yotta_socket_accept(yotta_socket_t * sock, yotta_socket_t * new_sock)
     }
 
     new_sock->fd = new_fd;
-
-    new_sock->info.ai_family = sock->info.ai_family;     // IPv4 (AF_INET), IPv6 (AF_INET6) or Unspecified (AF_UNSPEC)
-    new_sock->info.ai_socktype = sock->info.ai_socktype; // TCP (SOCK_STREAM) or UDP (SOCK_DGRAM)
-    new_sock->info.ai_flags = 0;
-    new_sock->info.ai_protocol = 0;
-    new_sock->info.ai_canonname = NULL;
-    new_sock->info.ai_addr = NULL;
-    new_sock->info.ai_next = NULL;
-    //FIXME
-    /*printf("Size of sockaddr : %d == %d\n", connector_addr_len, sizeof(connector_addr));*/
-    new_sock->info.ai_addr = (struct sockaddr *) malloc(sizeof(struct sockaddr));
-    memcpy(new_sock->info.ai_addr, (struct sockaddr *) &connector_addr, sizeof(struct sockaddr));
 
 #if 0
     char address[INET6_ADDRSTRLEN];

@@ -12,9 +12,6 @@
 struct
 yotta_context_s
 {
-    // Port used for incoming connections
-    uint16_t incoming_port;
-
     // Whisper master
     yotta_whisper_master_t whisper_master;
 
@@ -23,7 +20,6 @@ yotta_context_s
 
     // Daemons list
     yotta_daemon_t * daemons;
-
 };
 
 
