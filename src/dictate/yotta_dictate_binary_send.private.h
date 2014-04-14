@@ -8,15 +8,13 @@
  * @infos: Sends the binary (<data>) to a slave
  *
  * @param <cmd_queue>: the command queue to send the binary
- * @param <data_size>: the data size
- * @param <data>: the data (binary) to send
+ * @param <executable_path>: the path of the binary to send
  * @param <sync>: the sync object when finished
  */
-void
+uint64_t
 yotta_dictate_binary(
     yotta_dictate_queue_t * cmd_queue,
-    uint64_t data_size,
-    void const * data,
+    char const * executable_path,
     yotta_sync_t * sync_finished
 );
 
