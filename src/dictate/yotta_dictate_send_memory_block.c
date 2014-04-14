@@ -1,3 +1,5 @@
+#include <string.h>
+
 #include "yotta_dictate_send_memory_block.private.h"
 #include "../core/yotta_memory.h"
 #include "../core/yotta_return.h"
@@ -113,12 +115,20 @@ void yotta_dictate_send_memory_block(
     }
 
     /*
-     * Create the yotta binary send command
+     * Create the yotta binary send command +
+     * allocate a buffer for the data
      */
-    yotta_dictate_send_memory_block_cmd_t * cmd = yotta_alloc_s(yotta_dictate_send_memory_block_cmd_t);
+    yotta_dictate_send_memory_block_cmd_t * cmd =
+        yotta_alloc_d(
+            sizeof(yotta_dictate_send_memory_block_cmd_t) + data_size
+        );
 
     yotta_dirty_s(cmd);
 
+    // Copy the data to the allocated buffer
+    memcpy(cmd + sizeof(yotta_dictate_send_memory_block_cmd_t), data, data_size);
+
+    // Initialize the command
     yotta_tcp_cmd_init(cmd);
     yotta_tcp_cmd_set_send(cmd, yotta_dictate_send_memory_block_send);
     yotta_tcp_cmd_set_release(cmd, yotta_dictate_send_memory_block_release);
@@ -126,7 +136,7 @@ void yotta_dictate_send_memory_block(
     cmd->header_cursor = 0;
     cmd->header.label = label;
     cmd->header.data_size = data_size;
-    cmd->data = data;
+    cmd->data = cmd + sizeof(yotta_dictate_send_memory_block_cmd_t);
     cmd->sync_finished = sync_finished;
 
     yotta_tcp_queue_append((yotta_tcp_queue_t *) cmd_queue, (yotta_tcp_cmd_t *) cmd);
