@@ -126,11 +126,11 @@ class InstExecBinaries(InstAbstact):
             return
 
         self.logger.warning('unexpected InstExecBinaries destructor -> removing binary file {}'.format(self.binary_path))
-        self.binary_file.close()
+        os.close(self.binary_file)
         os.remove(self.binary_path)
 
     def receive(self, data):
-        self.binary_file.write(data)
+        os.write(self.binary_file, data)
 
         if self.frame_cursor + len(data) == self.frame_size:
             self.finish()
@@ -138,7 +138,7 @@ class InstExecBinaries(InstAbstact):
     def finish(self):
         assert self.binary_file != None
 
-        self.binary_file.close()
+        os.close(self.binary_file)
         self.binary_file = None
         self.protocol.binary_path = self.binary_path
 
