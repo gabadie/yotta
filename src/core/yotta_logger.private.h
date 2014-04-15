@@ -11,6 +11,15 @@ void
 yotta_logger_error(char const * msg);
 
 /*
+ * @infos: append an external error message to the log
+ *
+ * @param <msg>: error message to log
+ * @param <errno>: the errno message to log
+ */
+void
+yotta_logger_error_external(char const * msg, int errno);
+
+/*
  * @infos: append a warning message to the log
  *
  * @param <msg>: warning message to log

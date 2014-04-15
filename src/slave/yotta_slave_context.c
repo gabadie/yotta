@@ -43,8 +43,7 @@ yotta_slave_context_main(yotta_slave_parameters_t const * out_parameters)
         return YOTTA_UNEXPECTED_FAIL;
     }
 
-    yotta_logger_debug("yotta_slave_context_main ...");
-
+    yotta_logger_debug("yotta_init: launching sockets' thread");
 
     /*
      * Sets the slave queue's release event as the destroy event because
@@ -62,7 +61,7 @@ yotta_slave_context_main(yotta_slave_parameters_t const * out_parameters)
      */
     yotta_socket_thread_destroy(&yotta_slave_context_plain.thread);
 
-    yotta_logger_debug("yotta_slave_context_main ...");
+    yotta_logger_debug("yotta_init: sockets' thread finished");
 
     return YOTTA_SUCCESS;
 }

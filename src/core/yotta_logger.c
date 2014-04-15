@@ -1,6 +1,10 @@
 
+#include <string.h>
+
 #include "yotta_logger.h"
 #include "yotta_logger.private.h"
+#include "../core/yotta_debug.h"
+#include "../core/yotta_memory.h"
 #include "../massive/yotta_dispatch.h"
 #include "../threading/yotta_threading.h"
 
@@ -20,9 +24,12 @@ void * yotta_logger_user_data;
  *
  * @returns: void
  */
+static
 void
 yotta_logger(yotta_log_msg_type_t msg_type, char const * msg)
 {
+    yotta_assert(msg != NULL);
+
     if (yotta_logger_callback == 0)
     {
         return;
@@ -55,12 +62,37 @@ yotta_set_logger_entry(yotta_logger_entry_t callback, void * user_data)
 void
 yotta_logger_error(char const * msg)
 {
+    yotta_assert(msg != NULL);
+
     yotta_logger(YOTTA_LOG_ERROR, msg);
+}
+
+void
+yotta_logger_error_external(char const * msg, int errno)
+{
+    yotta_assert(msg != NULL);
+    yotta_assert(errno != 0);
+
+    char const * errno_str = strerror(errno);
+
+    yotta_assert(errno_str != NULL);
+
+    size_t new_message_len = strlen(msg) + strlen(errno_str) + 1;
+    char * new_message = yotta_alloc_sa(char, new_message_len);
+
+    strcpy(new_message, msg);
+    strcat(new_message, errno_str);
+
+    yotta_logger(YOTTA_LOG_EXTERNAL_ERROR, new_message);
+
+    yotta_free(new_message);
 }
 
 void
 yotta_logger_warning(char const * msg)
 {
+    yotta_assert(msg != NULL);
+
     yotta_logger(YOTTA_LOG_WARNING, msg);
 }
 
@@ -68,6 +100,8 @@ yotta_logger_warning(char const * msg)
 void
 yotta_logger_debug(char const * msg)
 {
+    yotta_assert(msg != NULL);
+
     yotta_logger(YOTTA_LOG_DEBUG, msg);
 }
 
