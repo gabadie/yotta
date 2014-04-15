@@ -43,7 +43,7 @@ thread_prime_t;
 
 static
 void
-thread_is_prime(thread_prime_t * thread_prime)
+is_prime_range_thread(thread_prime_t * thread_prime)
 {
     uint64_t tid = 0;
     uint64_t nb_threads = 0;
@@ -70,12 +70,10 @@ is_prime_range_dispatch(prime_t * prime)
     uint8_t * results = yotta_alloc_sa(uint8_t, prime->range);
     memset(results, 0, prime->range);
 
-    thread_prime_t params;
-    params.prime = prime;
-    params.results = results;
+    thread_prime_t params = { prime, results };
 
     // Dispatch the computation to all available cores
-    yotta_dispatch((yotta_dispatch_func_t) thread_is_prime, &params, 0);
+    yotta_dispatch((yotta_dispatch_func_t) is_prime_range_thread, &params, 0);
 
     fprintf(stderr, "Dispatch DONE\n");
 
