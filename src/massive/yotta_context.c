@@ -288,8 +288,8 @@ yotta_context_massive(
             group_count,
             global_offset,
             global_count,
-            &syncs[2*i],
-            &syncs[2*i+1]
+            &syncs[2*group_id],
+            &syncs[2*group_id+1]
         );
 
         group_id++;
@@ -297,6 +297,7 @@ yotta_context_massive(
     }
 
     // Synchronizations
+    group_id = 0;
     for (size_t i = 0; i < YOTTA_CONTEXT_MAX_DEAMONS; i++)
     {
         if (context->daemons[i].context == NULL)
@@ -304,8 +305,9 @@ yotta_context_massive(
             continue;
         }
 
-        yotta_sync_wait(&syncs[2*i]);
-        yotta_sync_wait(&syncs[2*i+1]);
+        yotta_sync_wait(&syncs[2*group_id]);
+        yotta_sync_wait(&syncs[2*group_id+1]);
+        group_id++;
     }
 
     return YOTTA_SUCCESS;
