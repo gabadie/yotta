@@ -33,42 +33,6 @@ is_prime(uint64_t nb)
     return 1;
 }
 
-static
-void
-is_prime_range(prime_t * prime)
-{
-    uint8_t * results = yotta_alloc_sa(uint8_t, prime->range);
-    memset(results, 0, prime->range);
-
-    for(uint64_t i = 0; i < prime->range; i++)
-    {
-        for (uint64_t j = 0; j < 8; j++)
-        {
-            uint64_t nb = prime->nb + i * 8 + j;
-
-            if(is_prime(nb))
-            {
-                results[i] |= (1u << j);
-                fprintf(stderr, "%" PRIu64 " is prime\n", nb);
-            }
-            else
-            {
-                fprintf(stderr, "%" PRIu64 " is not prime\n", nb);
-            }
-        }
-        fprintf(stderr, "%d\n", results[i]);
-    }
-
-    // Send the results to the master
-    yotta_sync_t sync;
-    yotta_push_package(prime->master_addr, prime->range, results, &sync);
-    yotta_sync_wait(&sync);
-
-    fprintf(stderr, "Push DONE\n");
-
-    yotta_free(results);
-}
-
 typedef
 struct thread_prime_s
 {
@@ -87,13 +51,13 @@ thread_is_prime(thread_prime_t * thread_prime)
 
     yotta_get_local_id(&tid, &nb_threads);
 
-    /*fprintf(stderr, "In thread %" PRIu64 " (%" PRIu64 " threads)\n", tid, nb_threads);*/
+    fprintf(stderr, "In thread %" PRIu64 " (%" PRIu64 " threads)\n", tid, nb_threads);
 
     for (uint64_t j = tid; j < prime->range * 8; j += nb_threads)
     {
         if(is_prime(prime->nb + j))
         {
-            /*fprintf(stderr, "%" PRIu64 " is prime (tid: %" PRIu64 ")\n", prime->nb + j, tid);*/
+            fprintf(stderr, "%" PRIu64 " is prime (tid: %" PRIu64 ")\n", prime->nb + j, tid);
             yotta_atomic_fetch_or(thread_prime->results + j / 8, (1u << (j % 8)));
         }
     }
@@ -113,14 +77,14 @@ is_prime_range_dispatch(prime_t * prime)
     // Dispatch the computation to all available cores
     yotta_dispatch((yotta_dispatch_func_t) thread_is_prime, &params, 0);
 
-    /*fprintf(stderr, "Dispatch DONE\n");*/
+    fprintf(stderr, "Dispatch DONE\n");
 
     // Send the results to the master
     yotta_sync_t sync;
     yotta_push_package(prime->master_addr, prime->range, results, &sync);
     yotta_sync_wait(&sync);
 
-    /*fprintf(stderr, "Push DONE\n");*/
+    fprintf(stderr, "Push DONE\n");
 
     yotta_free(results);
 }
@@ -143,31 +107,73 @@ main(int argc, char const * const * argv)
         return 1;
     }
 
+#if 0
+    if (yotta_context_connect(&context, "127.0.0.1", 5001))
+    {
+        return 1;
+    }
+#endif
+
     fprintf(stderr, "Connected\n");
 
-    uint8_t results[RANGE_SIZE];
-    memset(results, 1, RANGE_SIZE);
+    uint64_t const NB_DAEMONS = 2;
 
-    prime_t prime;
+    uint8_t results[NB_DAEMONS * RANGE_SIZE];
+    memset(results, 1, NB_DAEMONS * RANGE_SIZE);
 
-    prime.nb = 2;
-    prime.range = RANGE_SIZE;
-    prime.master_addr = yotta_addr(&results);
+    prime_t primes[NB_DAEMONS];
 
-    /*is_prime_range_dispatch(&prime);*/
+    primes[0].nb = 2;
+    primes[0].range = RANGE_SIZE;
+    primes[0].master_addr = yotta_addr(results);
 
-    if (yotta_context_massive(&context, (yotta_massive_command_entry_t) is_prime_range, sizeof(prime), &prime, 0))
+    primes[1].nb = 2 + 8 * RANGE_SIZE;
+    primes[1].range = RANGE_SIZE;
+    primes[1].master_addr = yotta_addr(results + RANGE_SIZE);
+
+    /*is_prime_range_dispatch(&primes[0]);*/
+    /*is_prime_range_dispatch(&primes[1]);*/
+
+    if (
+        yotta_context_massive(
+            &context,
+            (yotta_massive_command_entry_t) is_prime_range_dispatch,
+            sizeof(prime_t),
+            &primes[0],
+            0
+            /*sizeof(prime_t)*/
+        )
+    )
+    {
+        return 1;
+    }
+
+    if (
+        yotta_context_massive(
+            &context,
+            (yotta_massive_command_entry_t) is_prime_range_dispatch,
+            sizeof(prime_t),
+            &primes[1],
+            0
+            /*sizeof(prime_t)*/
+        )
+    )
     {
         return 1;
     }
 
     fprintf(stderr, "Massived\n");
 
-    for (size_t i = 0; i < prime.range; i++)
+    for( size_t p = 0; p < NB_DAEMONS; p++)
     {
-        for (size_t j = 0; j < 8; j++)
+        size_t offset = p * primes[p].range;
+        for (size_t i = 0; i < primes[p].range; i++)
         {
-            fprintf(stderr, "%" PRIu64 " is prime: %d\n", prime.nb + i * 8 + j, (results[i] & (1u << j)) >> j);
+            for (size_t j = 0; j < 8; j++)
+            {
+                fprintf(stderr, "%" PRIu64 " is prime: %d\n",
+                    primes[p].nb + i * 8 + j, (results[offset + i] & (1u << j)) >> j);
+            }
         }
     }
 
