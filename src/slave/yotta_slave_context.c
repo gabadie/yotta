@@ -1,6 +1,7 @@
 
 #include "yotta_slave_context.private.h"
 #include "../core/yotta_debug.h"
+#include "../core/yotta_logger.private.h"
 
 
 /*
@@ -23,7 +24,7 @@ yotta_slave_context_main(yotta_slave_parameters_t const * out_parameters)
     yotta_assert(out_parameters->client_port != 0);
     yotta_assert(yotta_slave_context == 0);
 
-    yotta_dirty_s(yotta_slave_context);
+    yotta_dirty_s(&yotta_slave_context_plain);
 
     if (yotta_socket_thread_init(&yotta_slave_context_plain.thread) != 0)
     {
@@ -42,6 +43,9 @@ yotta_slave_context_main(yotta_slave_parameters_t const * out_parameters)
         return YOTTA_UNEXPECTED_FAIL;
     }
 
+    yotta_logger_debug("yotta_slave_context_main ...");
+
+
     /*
      * Sets the slave queue's release event as the destroy event because
      * <yotta_slave_context_plain> it is statically allocated
@@ -57,6 +61,8 @@ yotta_slave_context_main(yotta_slave_parameters_t const * out_parameters)
      * Run the slave sockets' thread until the queue is released
      */
     yotta_socket_thread_destroy(&yotta_slave_context_plain.thread);
+
+    yotta_logger_debug("yotta_slave_context_main ...");
 
     return YOTTA_SUCCESS;
 }

@@ -6,6 +6,7 @@
 #include "../core/yotta_debug.h"
 #include "../core/yotta_memory.h"
 #include "../core/yotta_return.private.h"
+#include "../threading/yotta_sync.private.h"
 
 #define YOTTA_CONTEXT_MAX_DEAMONS 32
 
@@ -48,7 +49,7 @@ yotta_context_create_whisper_queue(yotta_whisper_master_t * master)
         return;
     }
 
-    yotta_whisper_queue_t * cmd_queue = NULL;
+    yotta_daemon_t * current_daemon = NULL;
 
     for (size_t i = 0; i < YOTTA_CONTEXT_MAX_DEAMONS; i++)
     {
@@ -69,31 +70,38 @@ yotta_context_create_whisper_queue(yotta_whisper_master_t * master)
 
         if (strcmp(ip_address, incomming_ip_address) == 0)
         {
-            cmd_queue = &d->whisper_queue;
+            current_daemon = d;
             break;
         }
     }
 
-    if (cmd_queue == NULL)
+    if (current_daemon == NULL)
     {
         yotta_logger_warning("yotta_context_create_whisper_queue: unknown deamon");
         yotta_socket_close(&socket);
         return;
     }
 
+    yotta_whisper_queue_t * whisper_queue = &current_daemon->whisper_queue;
+
     // TODO: daemon already connected?
 
-    yotta_dirty_s(cmd_queue);
+    yotta_dirty_s(whisper_queue);
 
-    cmd_queue->tcp_queue.socket_event.socket.fd = socket.fd;
+    whisper_queue->tcp_queue.socket_event.socket.fd = socket.fd;
 
-    yotta_whisper_queue_init(cmd_queue);
-    yotta_socket_event_set_release((yotta_socket_event_t *) cmd_queue, yotta_context_release_whisper_queue);
+    yotta_whisper_queue_init(whisper_queue);
+    yotta_socket_event_set_release((yotta_socket_event_t *) whisper_queue, yotta_context_release_whisper_queue);
 
-    if (yotta_socket_thread_listen(master->socket_event.socket_thread, (yotta_socket_event_t *) cmd_queue) != 0)
+    if (yotta_socket_thread_listen(master->socket_event.socket_thread, (yotta_socket_event_t *) whisper_queue) != 0)
     {
-        yotta_socket_event_release(cmd_queue);
+        yotta_logger_warning("yotta_context_create_whisper_queue: failed to listen daemon");
+        yotta_socket_event_release(whisper_queue);
+        return;
     }
+
+    yotta_logger_debug("yotta_context_create_whisper_queue: daemon's whisper ready");
+    yotta_sync_post(&current_daemon->sync_whisper_ready);
 
     return;
 }
@@ -164,6 +172,8 @@ yotta_context_connect(yotta_context_t * context, char const * ip, uint16_t port)
     {
         yotta_return_inv_op(yotta_context_connect);
     }
+
+    yotta_logger_debug("yotta_context_connect: connecting ...");
 
     yotta_return_t r = yotta_daemon_init(uninit_deamon, context, ip, port);
 

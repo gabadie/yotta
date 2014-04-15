@@ -9,7 +9,7 @@
 #include "../dictate/yotta_dictate_daemon_start.private.h"
 #include "../dictate/yotta_dictate_unknown.private.h"
 #include "../threading/yotta_atomic.h"
-#include "../threading/yotta_sync.h"
+#include "../threading/yotta_sync.private.h"
 
 
 void
@@ -27,6 +27,8 @@ yotta_daemon_daemon_info_process(yotta_dictate_queue_t * queue, uint64_t nb_comp
     daemon->available_threads = nb_threads;
 
     yotta_atomic_fetch_or(&daemon->status, YOTTA_DAEMON_DICTATE_READY);
+
+    yotta_sync_post(&daemon->sync_dictate_ready);
 }
 
 static
@@ -71,18 +73,24 @@ yotta_daemon_init(yotta_daemon_t * daemon, yotta_context_t * context, char const
 
     yotta_socket_event_set_release(&daemon->dictate_queue, yotta_daemon_dictate_release);
 
+    yotta_sync_init(&daemon->sync_dictate_ready);
+    yotta_sync_init(&daemon->sync_whisper_ready);
+
     yotta_socket_thread_listen(&context->worker_thread, (yotta_socket_event_t *) &daemon->dictate_queue);
 
     daemon->dictate_queue.vtable = &yotta_daemon_dictate_vtable;
     daemon->context = context;
     daemon->status = 0x0;
 
+    uint16_t whisper_port = 0;
+
+    yotta_socket_host(&daemon->context->whisper_master.socket_event.socket, NULL, &whisper_port);
+
     yotta_dictate_binary(&daemon->dictate_queue, yotta_executable_path, NULL);
+    yotta_dictate_daemon_start(&daemon->dictate_queue, whisper_port, NULL);
 
-    yotta_sync_t daemon_sync;
-    yotta_dictate_daemon_start(&daemon->dictate_queue, port, &daemon_sync);
-
-    yotta_sync_wait(&daemon_sync);
+    yotta_sync_wait(&daemon->sync_dictate_ready);
+    yotta_sync_wait(&daemon->sync_whisper_ready);
 
     return YOTTA_SUCCESS;
 }

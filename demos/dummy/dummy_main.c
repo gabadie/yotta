@@ -27,7 +27,7 @@ main(int argc, char const * const * argv)
     yotta_set_logger_entry(logger, 0);
     yotta_init(argc, argv);
 
-    if (yotta_context_init(&context, 0))
+    if (yotta_context_init(&context, 8000))
     {
         return 1;
     }

@@ -4,6 +4,7 @@
 #include "../yotta_prefix.h"
 #include "yotta_massive_fwd.h"
 #include "../dictate/yotta_dictate_queue.private.h"
+#include "../threading/yotta_sync.h"
 #include "../whisper/yotta_whisper_queue.private.h"
 
 /*
@@ -26,6 +27,12 @@ yotta_daemon_s
 
     // the deamon status
     uint64_t status;
+
+    // dictate sync
+    yotta_sync_t sync_dictate_ready;
+
+    // whisper sync
+    yotta_sync_t sync_whisper_ready;
 };
 
 

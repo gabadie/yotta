@@ -95,8 +95,8 @@ yotta_dictate_send_memory_block_send(yotta_dictate_send_memory_block_cmd_t * cmd
     yotta_tcp_cmd_release(cmd);
 }
 
-
-void yotta_dictate_send_memory_block(
+void
+yotta_dictate_send_memory_block(
     yotta_dictate_queue_t * cmd_queue,
     yotta_dictate_label_t label,
     uint64_t data_size,
@@ -125,9 +125,6 @@ void yotta_dictate_send_memory_block(
 
     yotta_dirty_s(cmd);
 
-    // Copy the data to the allocated buffer
-    memcpy(cmd + sizeof(yotta_dictate_send_memory_block_cmd_t), data, data_size);
-
     // Initialize the command
     yotta_tcp_cmd_init(cmd);
     yotta_tcp_cmd_set_send(cmd, yotta_dictate_send_memory_block_send);
@@ -136,8 +133,12 @@ void yotta_dictate_send_memory_block(
     cmd->header_cursor = 0;
     cmd->header.label = label;
     cmd->header.data_size = data_size;
-    cmd->data = cmd + sizeof(yotta_dictate_send_memory_block_cmd_t);
+    cmd->data_cursor = 0;
+    cmd->data = (cmd + 1);
     cmd->sync_finished = sync_finished;
+
+    // Copy the data to the allocated buffer
+    memcpy((cmd + 1), data, data_size);
 
     yotta_tcp_queue_append((yotta_tcp_queue_t *) cmd_queue, (yotta_tcp_cmd_t *) cmd);
 }
