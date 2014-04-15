@@ -79,7 +79,7 @@ main(int argc, char const * const * argv)
 
     /*is_prime(&prime);*/
 
-    if (yotta_context_massive(&context, (yotta_massive_command_entry_t) is_prime, 8, &prime, 0))
+    if (yotta_context_massive(&context, (yotta_massive_command_entry_t) is_prime, sizeof(prime), &prime, 0))
     {
         return 1;
     }
