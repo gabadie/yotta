@@ -51,6 +51,8 @@ yotta_slave_context_main(yotta_slave_parameters_t const * out_parameters)
      */
     yotta_socket_event_set_release(&yotta_slave_context_plain.queue, yotta_whisper_queue_destroy);
 
+    yotta_socket_thread_listen(&yotta_slave_context_plain.thread, (yotta_socket_event_t *) &yotta_slave_context_plain.queue);
+
     /*
      * Publishes the slave context to the entire application
      */
