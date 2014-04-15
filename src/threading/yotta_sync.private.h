@@ -18,18 +18,46 @@
  * @param <sync>: sync object to initialize
  */
 #ifdef YOTTA_DEBUG
-static inline void
+static
+inline
+void
 yotta_sync_init(yotta_sync_t * yotta_sync)
 {
     yotta_assert((yotta_sync) != NULL);
     (yotta_sync)->sem = YOTTA_SYNC_UNTRIGGERED;
 }
+
 #else
 #define yotta_sync_init(yotta_sync) \
     { \
         yotta_assert((yotta_sync) != NULL); \
         (yotta_sync)->sem = YOTTA_SYNC_UNTRIGGERED; \
     }
+
+#endif
+
+/*
+ * @infos: Initialize and post a yotta sync object
+ *
+ * @param <sync>: sync object to initialize
+ */
+#ifdef YOTTA_DEBUG
+static
+inline
+void
+yotta_sync_init_post(yotta_sync_t * yotta_sync)
+{
+    yotta_assert((yotta_sync) != NULL);
+    (yotta_sync)->sem = YOTTA_SYNC_TRIGGERED;
+}
+
+#else
+#define yotta_sync_init_post(yotta_sync) \
+    { \
+        yotta_assert((yotta_sync) != NULL); \
+        (yotta_sync)->sem = YOTTA_SYNC_TRIGGERED; \
+    }
+
 #endif
 
 /*
