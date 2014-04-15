@@ -90,7 +90,9 @@ yotta_dictate_binary_send(yotta_dictate_binary_cmd_t * cmd)
 
         while (!feof(cmd->binary_file))
         {
-            cmd->data_read = fread(cmd->data, BINARY_BUFFER_SIZE, 1, cmd->binary_file);
+            cmd->data_read = fread(cmd->data, 1, BINARY_BUFFER_SIZE, cmd->binary_file);
+
+            yotta_assert(cmd->data_read > 0);
 
             uint64_t op = yotta_tcp_cmd_send(
                 (yotta_tcp_cmd_t *) cmd,
