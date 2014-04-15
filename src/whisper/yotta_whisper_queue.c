@@ -79,42 +79,23 @@ yotta_whisper_queue_recv(yotta_whisper_queue_t * cmd_queue)
 #endif //YOTTA_DEBUG
         }
 
+        uint64_t label_cursor = 0;
         yotta_whisper_label_t label = 0;
 
-        ssize_t label_size = yotta_tcp_recv(&cmd_queue->tcp_queue.socket_event.socket, &label, sizeof(label));
+        uint64_t op = yotta_tcp_queue_recv(&cmd_queue->tcp_queue, sizeof(label), &label_cursor, &label);
 
-        if (label_size == sizeof(label))
+        if (op != 0)
         {
-            yotta_assert(label < YOTTA_WHISPER_LABELS_COUNT);
-            yotta_assert(yotta_whisper_label_entries[label] != 0);
-
-            cmd_queue->callback = yotta_whisper_label_entries[label];
-
-            yotta_assert(cmd_queue->callback != 0);
-
-            continue;
-        }
-        else if (label_size == 0)
-        {
-            // the socket has been closed properly on the other side
-
-            yotta_socket_event_unlisten((yotta_socket_event_t *) cmd_queue);
-            yotta_socket_event_release(cmd_queue);
-
+            // no incomming information available
             return;
         }
-        else if (label_size == -1)
-        {
-            int32_t errno_recv = errno;
 
-            if (errno_recv == EAGAIN)
-            {
-                // no incomming information available
-                break;
-            }
-        }
+        yotta_assert(label < YOTTA_WHISPER_LABELS_COUNT);
+        yotta_assert(yotta_whisper_label_entries[label] != 0);
 
-        yotta_crash_msg("receive error");
+        cmd_queue->callback = yotta_whisper_label_entries[label];
+
+        yotta_assert(cmd_queue->callback != 0);
     }
 }
 

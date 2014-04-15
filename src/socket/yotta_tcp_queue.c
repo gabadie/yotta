@@ -1,4 +1,6 @@
 
+#include <errno.h>
+
 #include "yotta_tcp.h"
 #include "yotta_tcp_queue.private.h"
 #include "yotta_socket_thread.h"
@@ -153,6 +155,31 @@ yotta_tcp_queue_recv(yotta_tcp_queue_t * cmd_queue, uint64_t buffer_size, uint64
 
     if (buffer_received == -1)
     {
+        if (errno == EAGAIN)
+        {
+            // no incomming information available
+            return 1;
+        }
+        else if (errno == ECONNRESET)
+        {
+            // The connection is closed by the peer during a receive attempt on a socket.
+            yotta_socket_event_lost(cmd_queue);
+
+            return 1;
+        }
+
+        // unhandled error
+        yotta_crash_msg("yotta_tcp_queue_recv unhandled error");
+
+        return 1;
+    }
+    else if (buffer_received == 0)
+    {
+        // The connection is closed by the peer during a receive attempt on a socket.
+
+        yotta_socket_event_unlisten((yotta_socket_event_t *) cmd_queue);
+        yotta_socket_event_release(cmd_queue);
+
         return 1;
     }
 
