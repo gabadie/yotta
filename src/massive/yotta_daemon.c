@@ -10,7 +10,7 @@
 #include "../dictate/yotta_dictate_unknown.private.h"
 #include "../threading/yotta_atomic.h"
 #include "../threading/yotta_sync.private.h"
-
+#include "../whisper/yotta_whisper_stop.private.h"
 
 void
 yotta_daemon_daemon_info_process(yotta_dictate_queue_t * queue, uint64_t nb_computers, uint64_t nb_threads)
@@ -42,19 +42,17 @@ yotta_daemon_dictate_vtable =
 
 static
 void
-yotta_daemon_dictate_release(yotta_tcp_queue_t * dictate_queue)
+yotta_daemon_dictate_release(yotta_dictate_queue_t * dictate_queue)
 {
-    yotta_daemon_t * daemon = (yotta_daemon_t *) dictate_queue;
+    yotta_assert(dictate_queue != NULL);
 
-    if (daemon->status & YOTTA_DAEMON_DICTATE_READY)
-    {
-        yotta_dictate_queue_destroy(&daemon->dictate_queue);
-    }
+    yotta_daemon_t * d = yotta_struct_container(yotta_daemon_t, dictate_queue, dictate_queue);
 
-    if (daemon->status & YOTTA_DAEMON_WHISPER_READY)
-    {
-        yotta_whisper_queue_destroy(&daemon->whisper_queue);
-    }
+    yotta_assert(d->status & YOTTA_DAEMON_DICTATE_READY);
+
+    d->status &= ~YOTTA_DAEMON_WHISPER_READY;
+
+    yotta_dictate_queue_destroy(dictate_queue);
 }
 
 yotta_return_t
@@ -100,13 +98,11 @@ yotta_daemon_destroy(yotta_daemon_t * daemon)
 {
     yotta_assert(daemon != NULL);
     yotta_assert(daemon->context != NULL);
+    yotta_assert(daemon->status & YOTTA_DAEMON_DICTATE_READY);
+    yotta_assert(daemon->status & YOTTA_DAEMON_WHISPER_READY);
 
     yotta_tcp_queue_finish((yotta_tcp_queue_t *) &daemon->dictate_queue);
-
-    if (daemon->status & YOTTA_DAEMON_WHISPER_READY)
-    {
-        yotta_tcp_queue_finish((yotta_tcp_queue_t *)&daemon->whisper_queue);
-    }
+    yotta_whisper_stop(&daemon->whisper_queue);
 
     daemon->context = NULL;
 }

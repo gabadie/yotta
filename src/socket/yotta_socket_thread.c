@@ -80,6 +80,8 @@ yotta_socket_thread_main(yotta_socket_thread_t * thread)
         {
             yotta_logger_error("yotta_socket_thread_main: select error");
 
+            yotta_assert(0);
+
             return 0;
         }
 

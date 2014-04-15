@@ -13,13 +13,28 @@
 
 static
 void
+yotta_context_release_whisper_master(yotta_whisper_master_t * master)
+{
+    yotta_assert(master != NULL);
+
+    yotta_logger_warning("yotta_context_release_whisper_master");
+
+    yotta_not_implemented_yet();
+
+    yotta_whisper_master_destroy(master);
+}
+
+static
+void
 yotta_context_release_whisper_queue(yotta_whisper_queue_t * queue)
 {
     yotta_assert(queue != NULL);
 
     yotta_daemon_t * d = yotta_struct_container(yotta_daemon_t, whisper_queue, queue);
 
-    yotta_daemon_destroy(d);
+    d->status &= ~YOTTA_DAEMON_WHISPER_READY;
+
+    yotta_whisper_queue_destroy(queue);
 }
 
 static
@@ -82,6 +97,8 @@ yotta_context_create_whisper_queue(yotta_whisper_master_t * master)
         return;
     }
 
+    yotta_assert((current_daemon->status & YOTTA_DAEMON_WHISPER_READY) == 0x0);
+
     yotta_whisper_queue_t * whisper_queue = &current_daemon->whisper_queue;
 
     // TODO: daemon already connected?
@@ -99,6 +116,8 @@ yotta_context_create_whisper_queue(yotta_whisper_master_t * master)
         yotta_socket_event_release(whisper_queue);
         return;
     }
+
+    current_daemon->status |= YOTTA_DAEMON_WHISPER_READY;
 
     yotta_logger_debug("yotta_context_create_whisper_queue: daemon's whisper ready");
     yotta_sync_post(&current_daemon->sync_whisper_ready);
@@ -128,7 +147,12 @@ yotta_context_init(yotta_context_t * context, uint16_t incoming_port)
         yotta_return_unexpect_fail(yotta_context_destroy)
     }
 
+    yotta_socket_listen(&context->whisper_master.socket_event.socket, 16);
+
+    yotta_socket_event_set_release(&context->whisper_master, yotta_context_release_whisper_master);
+
     yotta_socket_thread_init(&context->worker_thread);
+    yotta_socket_thread_listen(&context->worker_thread, (yotta_socket_event_t *) &context->whisper_master);
 
     context->daemons = yotta_alloc_sa(yotta_daemon_t, YOTTA_CONTEXT_MAX_DEAMONS);
 
@@ -207,6 +231,11 @@ yotta_context_destroy(yotta_context_t * context)
 
         yotta_free(context->daemons);
     }
+
+    yotta_socket_event_unlisten(&context->whisper_master.socket_event);
+
+    // select error work arrount the sockets' thread
+    sleep(1);
 
     if (yotta_whisper_master_destroy(&context->whisper_master) != 0)
     {
