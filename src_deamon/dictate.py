@@ -132,7 +132,17 @@ class InstExecBinaries(InstAbstract):
     def receive(self, data):
         os.write(self.binary_file, data)
 
-        self.logger.info('receiving binary file {} from {} : {}'.format(self.binary_path, self.protocol.peer_addr, float(self.frame_cursor)/float(self.frame_size)))
+        frame_received = self.frame_cursor + len(data)
+
+        percent = 100.0 * float(frame_received) / float(self.frame_size)
+
+        self.logger.info('receiving binary file {} from {} : {} bytes / {} bytes ({}%)'.format(
+            self.binary_path,
+            self.protocol.peer_addr,
+            frame_received,
+            self.frame_size,
+            percent
+        ))
 
         if self.frame_cursor + len(data) == self.frame_size:
             self.finish()
