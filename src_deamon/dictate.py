@@ -23,17 +23,17 @@ def frame_error(msg):
 
     return struct.pack('H', LABEL_ERROR) + struct.pack('Q', len(msg)) + struct.pack('{}s'.format(len(msg)), msg)
 
-def deamon_info(deamon):
-    """ Generates LABEL_DEAMON_INFO's trame with a given Deamon
+def deamon_info(daemon):
+    """ Generates LABEL_DEAMON_INFO's trame with a given daemon
     """
     # https://docs.python.org/2/library/struct.html
 
-    return struct.pack('H', LABEL_DEAMON_INFO) + struct.pack('QQQ', 16, deamon.computers, deamon.threads)
+    return struct.pack('H', LABEL_DEAMON_INFO) + struct.pack('QQQ', 16, daemon.computers, daemon.threads)
 
 
 # ------------------------------------------------------------------------------ dictate instruction
 
-class InstAbstact(object):
+class InstAbstract(object):
     """ abstract dictate instruction
 
     members:
@@ -42,7 +42,7 @@ class InstAbstact(object):
         protocol = DeamonProtocol
 
     properties:
-        deamon = deamon.Deamon
+        daemon = daemon.daemon
         logger = logging.Logger
     """
 
@@ -55,14 +55,14 @@ class InstAbstact(object):
         self.frame_cursor = 0
 
     @property
-    def deamon(self):
+    def daemon(self):
         assert self.protocol != None
 
-        return self.protocol.deamon
+        return self.protocol.daemon
 
     @property
     def logger(self):
-        return self.deamon.logger
+        return self.daemon.logger
 
     def receive(self, data):
         """ receive data from the protocol.
@@ -74,12 +74,12 @@ class InstAbstact(object):
         self.protocol.transport.write(frame_error(msg))
 
 
-class InstSkeep(InstAbstact):
+class InstSkip(InstAbstract):
     """ skeeping instruction used when an unknow command has been received
     """
 
     def __init__(self, protocol, frame_size):
-        InstAbstact.__init__(self, protocol, frame_size)
+        InstAbstract.__init__(self, protocol, frame_size)
 
     def __del__(self):
         self.logger.info("stop skeeping from {}".format(self.protocol.peer_addr))
@@ -88,7 +88,7 @@ class InstSkeep(InstAbstact):
         pass
 
 
-class InstError(InstAbstact):
+class InstError(InstAbstract):
     """ error receiving instruction
 
     members:
@@ -96,7 +96,7 @@ class InstError(InstAbstact):
     """
 
     def __init__(self, protocol, frame_size):
-        InstAbstact.__init__(self, protocol, frame_size)
+        InstAbstract.__init__(self, protocol, frame_size)
 
         self.msg = ''
 
@@ -107,7 +107,7 @@ class InstError(InstAbstact):
             self.logger.info('received dictate error frame from {}: {}'.format(self.protocol.peer_addr, struct.unpack('s', self.msg)))
 
 
-class InstExecBinaries(InstAbstact):
+class InstExecBinaries(InstAbstract):
     """ binary receiving instruction
 
     members:
@@ -116,7 +116,7 @@ class InstExecBinaries(InstAbstact):
     """
 
     def __init__(self, protocol, frame_size):
-        InstAbstact.__init__(self, protocol, frame_size)
+        InstAbstract.__init__(self, protocol, frame_size)
 
         self.binary_file, self.binary_path = tempfile.mkstemp()
         self.logger.info('receiving binary file {} from {}'.format(self.binary_path, self.protocol.peer_addr))
@@ -144,12 +144,12 @@ class InstExecBinaries(InstAbstact):
 
         self.logger.info('binary file {} from {} fully received'.format(self.binary_path, self.protocol.peer_addr))
 
-class InstStartSlave(InstAbstact):
+class InstStartSlave(InstAbstract):
     """ start slave execution
     """
 
     def __init__(self, protocol, frame_size):
-        InstAbstact.__init__(self, protocol, frame_size)
+        InstAbstract.__init__(self, protocol, frame_size)
         self.data = ''
 
     def receive(self, data):
@@ -203,18 +203,18 @@ class DeamonProtocol(Protocol):
 
     members:
         factory = DeamonProtocolFactory
-        instruction = InstAbstact # the current instruction
+        instruction = InstAbstract # the current instruction
         meta_buffer = str
         binary_path = str
 
     properties:
-        deamon = deamon.Deamon
+        daemon = daemon.daemon
         logger = logging.Logger
     """
 
     def __init__(self, factory):
         assert factory != None
-        assert factory.deamon != None
+        assert factory.daemon != None
 
         self.factory = factory
         self.instruction = None
@@ -233,15 +233,15 @@ class DeamonProtocol(Protocol):
             self.logger.info("binary file {} from {} removed".format(self.binary_path, self.peer_addr))
 
     @property
-    def deamon(self):
+    def daemon(self):
         assert self.factory != None
-        assert self.factory.deamon != None
+        assert self.factory.daemon != None
 
-        return self.factory.deamon
+        return self.factory.daemon
 
     @property
     def logger(self):
-        return self.deamon.logger
+        return self.daemon.logger
 
     @property
     def peer_addr(self):
@@ -250,9 +250,9 @@ class DeamonProtocol(Protocol):
         return '{}:{}'.format(addr.host, addr.port)
 
     def connectionMade(self):
-        self.logger.info('connection with {} made -> sending deamon informations'.format(self.peer_addr))
+        self.logger.info('connection with {} made -> sending daemon informations'.format(self.peer_addr))
 
-        self.transport.write(deamon_info(self.deamon))
+        self.transport.write(deamon_info(self.daemon))
         pass
 
     def connectionLost(self, reason):
@@ -329,7 +329,7 @@ class DeamonProtocol(Protocol):
 
                 self.transport.write(error_frame)
                 self.logger.error('unknown dictate protocol label {} received from {} -> ignoring frame'.format(frame_label, self.peer_addr))
-                self.instruction = InstSkeep(self, frame_size)
+                self.instruction = InstSkip(self, frame_size)
 
                 continue
 
@@ -344,22 +344,22 @@ class DeamonProtocolFactory(Factory):
     """ Twisted's dictate protocol factory
 
     members:
-        deamon = deamon.Deamon
+        daemon = daemon.daemon
         protocols = list(DeamonProtocol)
     """
 
     def __init__(self):
         #Factory.__init__(self)
 
-        self.deamon = None
+        self.daemon = None
         self.protocols = []
 
     @property
     def logger(self):
-        return self.deamon.logger
+        return self.daemon.logger
 
     def buildProtocol(self, addr):
-        assert self.deamon != None
+        assert self.daemon != None
 
         self.logger.info('new connection from {}:{}'.format(addr.host, addr.port))
 
