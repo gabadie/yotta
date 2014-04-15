@@ -3,8 +3,9 @@
 #include "../utils/yotta_str_utils.h"
 #include "../core/yotta_return.private.h"
 
+#include <errno.h>
 #include <string.h>
-#include <stdlib.h>
+
 
 #ifdef YOTTA_DEBUG
 // Get sockaddr, IPv4 or IPv6:
@@ -55,13 +56,11 @@ yotta_socket_server_init(yotta_socket_t * sock, uint16_t port, int family, int t
     {
         if((sockfd = socket(a->ai_family, a->ai_socktype, a->ai_protocol)) == -1)
         {
-            yotta_perror("server: socket");
             continue;
         }
 
         if(setsockopt(sockfd, SOL_SOCKET, SO_REUSEADDR, &yes, sizeof(int)) == -1)
         {
-            yotta_perror("setsockopt");
             continue;
         }
 
@@ -70,7 +69,6 @@ yotta_socket_server_init(yotta_socket_t * sock, uint16_t port, int family, int t
             if(bind(sockfd, a->ai_addr, a->ai_addrlen) == -1)
             {
                 close(sockfd);
-                yotta_perror("server: bind");
                 continue;
             }
         }
@@ -81,7 +79,7 @@ yotta_socket_server_init(yotta_socket_t * sock, uint16_t port, int family, int t
     if(a == NULL)
     {
         freeaddrinfo(results); // Free resources
-        yotta_log("Failed to create yotta socket server");
+        yotta_logger_debug("Failed to create yotta socket server");
         return -1;
     }
 
@@ -121,14 +119,12 @@ yotta_socket_client_init(yotta_socket_t * sock, char const * address,
     {
         if((sockfd = socket(a->ai_family, a->ai_socktype, a->ai_protocol)) == -1)
         {
-            yotta_perror("client: socket");
             continue;
         }
 
         if(connect(sockfd, a->ai_addr, a->ai_addrlen) == -1)
         {
             closesocket(sockfd);
-            yotta_perror("client: connect");
             continue;
         }
 
@@ -138,7 +134,7 @@ yotta_socket_client_init(yotta_socket_t * sock, char const * address,
     if(a == NULL)
     {
         freeaddrinfo(results); // Free resources
-        yotta_log("Failed to create yotta socket client");
+        yotta_logger_debug("Failed to create yotta socket server");
         return -1;
     }
 

@@ -11,9 +11,10 @@
  */
 typedef enum
 {
-    YOTTA_LOG_ERROR     = 0x0,
-    YOTTA_LOG_WARNING   = 0x1,
-    YOTTA_LOG_DEBUG     = 0x2
+    YOTTA_LOG_ERROR             = 0x0,
+    YOTTA_LOG_EXTERNAL_ERROR    = 0x1,
+    YOTTA_LOG_WARNING           = 0x2,
+    YOTTA_LOG_DEBUG             = 0x3
 }
 yotta_log_msg_type_t;
 
