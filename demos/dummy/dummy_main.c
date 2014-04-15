@@ -1,6 +1,8 @@
 
+#include <inttypes.h>
+#include <math.h>
 #include <stdio.h>
-#include "../../src/yotta.h"
+#include <yotta.h>
 
 
 static
@@ -14,9 +16,21 @@ logger(void * user_data, yotta_logger_param_t const * param)
 
 static
 void
-launch(yotta_context_t * context)
+is_prime(void * nb)
 {
-    (void) context;
+    fprintf(stderr, "In is_prime\n");
+    uint64_t sqrt_nb = sqrt((uint64_t)nb) + 1;
+
+    for (uint64_t i = 0; i < sqrt_nb; i++)
+    {
+        if(((uint64_t)nb) % i == 0)
+        {
+            fprintf(stderr, "%" PRIu64 " is not prime\n", (uint64_t) nb);
+            return;
+        }
+    }
+
+    fprintf(stderr, "%" PRIu64 " is prime\n", (uint64_t) nb);
 }
 
 int
@@ -32,12 +46,23 @@ main(int argc, char const * const * argv)
         return 1;
     }
 
+    fprintf(stderr, "Initialized\n");
+
     if (yotta_context_connect(&context, "127.0.0.1", 5000))
     {
         return 1;
     }
 
-    launch(&context);
+    fprintf(stderr, "Connected\n");
+
+    uint64_t nb = 43;
+
+    if (yotta_context_massive(&context, is_prime, 8, &nb, 0))
+    {
+        return 1;
+    }
+
+    fprintf(stderr, "Massived\n");
 
     if (yotta_context_destroy(&context))
     {
