@@ -234,9 +234,6 @@ yotta_context_destroy(yotta_context_t * context)
 
     yotta_socket_event_unlisten(&context->whisper_master.socket_event);
 
-    // select error work arrount the sockets' thread
-    sleep(1);
-
     if (yotta_whisper_master_destroy(&context->whisper_master) != 0)
     {
         yotta_return_unexpect_fail(yotta_context_destroy)

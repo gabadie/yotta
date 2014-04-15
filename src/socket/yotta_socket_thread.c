@@ -2,6 +2,7 @@
 #include <sys/time.h>
 #include <sys/types.h>
 #include <unistd.h>
+#include <errno.h>
 
 #include "yotta_socket_thread.h"
 #include "../core/yotta_debug.h"
@@ -78,6 +79,12 @@ yotta_socket_thread_main(yotta_socket_thread_t * thread)
 
         if (event_counts == -1)
         {
+            if (errno == EBADF)
+            {
+                // bad file descriptor, a socket might have been destroyed -> we repoll
+                continue;
+            }
+
             yotta_logger_error("yotta_socket_thread_main: select error");
 
             yotta_assert(0);
