@@ -2,16 +2,16 @@
 #define _YOTTAPRIVATE_WHISPER_COMMAND
 
 #include "yotta_whisper_queue.private.h"
+#include "../massive/yotta_context.h"
 #include "../threading/yotta_sync.private.h"
 
 
 /*
  * @infos: defines yotta whisper command entry function pointer type
  *
- * The tcp command entry received 2 parameters:
  *  - void * param: the user param
  */
-typedef void (* yotta_whisper_command_entry_t)(void *);
+typedef yotta_massive_command_entry_t yotta_whisper_command_entry_t;
 
 /*
  * @infos: launches a command by a sending a command order to the other side
