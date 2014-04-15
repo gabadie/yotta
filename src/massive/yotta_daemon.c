@@ -77,11 +77,12 @@ yotta_daemon_init(yotta_daemon_t * daemon, yotta_context_t * context, char const
     daemon->context = context;
     daemon->status = 0x0;
 
-    yotta_sync_t binary_sync;
-    yotta_dictate_binary(&daemon->dictate_queue, yotta_executable_path, &binary_sync);
+    yotta_dictate_binary(&daemon->dictate_queue, yotta_executable_path, NULL);
 
     yotta_sync_t daemon_sync;
     yotta_dictate_daemon_start(&daemon->dictate_queue, port, &daemon_sync);
+
+    yotta_sync_wait(&daemon_sync);
 
     return YOTTA_SUCCESS;
 }

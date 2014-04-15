@@ -9,6 +9,7 @@
 #include "../core/yotta_logger.private.h"
 #include "../socket/yotta_tcp.h"
 #include "../threading/yotta_sync.private.h"
+#include "../utils/yotta_file.h"
 
 #define BINARY_BUFFER_SIZE 4096
 
@@ -162,16 +163,10 @@ yotta_dictate_binary(
 
     cmd->header_cursor = 0;
     cmd->header.label = YOTTA_DICTATE_LABEL_SLAVE_BINARY;
-
-    fseek(cmd->binary_file, 0, SEEK_END);
-    cmd->header.data_size = ftell(cmd->binary_file);
-    rewind(cmd->binary_file);
-
+    cmd->header.data_size = yotta_file_size(cmd->binary_file);
     cmd->data_cursor = 0;
     cmd->data_read = 0;
-    memset(cmd->data, 0, sizeof(cmd->data));
     cmd->sync_finished = sync_finished;
-
 
 
     // Queue the command
