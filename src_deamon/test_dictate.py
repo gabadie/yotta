@@ -1,7 +1,7 @@
 
 import struct
 
-from deamon import Deamon
+from deamon import Daemon
 import dictate
 
 
@@ -19,11 +19,11 @@ def test_frame_error():
     assert frame == theoric_frame
 
 def test_deamon_info():
-    deamon = Deamon()
-    deamon.computers = 3
-    deamon.threads = 7
+    daemon = Daemon()
+    daemon.computers = 3
+    daemon.threads = 7
 
-    frame = dictate.deamon_info(deamon)
+    frame = dictate.deamon_info(daemon)
 
     theoric_frame = ''
     theoric_frame += '\x00\x10'

@@ -19,7 +19,7 @@ def default_logger():
 
     return logger
 
-class Deamon(object):
+class Daemon(object):
     """ Deamon general instance
 
     members:
@@ -37,9 +37,9 @@ class Deamon(object):
         assert port >= 0
         assert port <= 65535
         assert protocol_factory != None
-        assert protocol_factory.deamon == None
+        assert protocol_factory.daemon == None
 
-        protocol_factory.deamon = self
+        protocol_factory.daemon = self
 
         return reactor.listenTCP(port, protocol_factory)
 
@@ -102,15 +102,15 @@ def main(args):
 
     dictate_factory = dictate.DeamonProtocolFactory()
 
-    deamon = Deamon(logger=default_logger())
-    port = deamon.listen(port, dictate_factory)
+    daemon = Daemon(logger=default_logger())
+    port = daemon.listen(port, dictate_factory)
 
     if print_port_on_first_line:
         print str(port.getHost().port)
 
-    deamon.logger.info('listening on port: {}'.format(port.getHost().port))
+    daemon.logger.info('listening on port: {}'.format(port.getHost().port))
 
-    r = deamon.main()
+    r = daemon.main()
 
     print ''
 

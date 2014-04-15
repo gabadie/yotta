@@ -132,6 +132,8 @@ class InstExecBinaries(InstAbstract):
     def receive(self, data):
         os.write(self.binary_file, data)
 
+        self.logger.info('receiving binary file {} from {} : {}'.format(self.binary_path, self.protocol.peer_addr, float(self.frame_cursor)/float(self.frame_size)))
+
         if self.frame_cursor + len(data) == self.frame_size:
             self.finish()
 
@@ -139,6 +141,7 @@ class InstExecBinaries(InstAbstract):
         assert self.binary_file != None
 
         os.close(self.binary_file)
+        os.chmod(self.binary_path, 0744)
         self.binary_file = None
         self.protocol.binary_path = self.binary_path
 
@@ -155,8 +158,8 @@ class InstStartSlave(InstAbstract):
     def receive(self, data):
         self.data += data
 
-        if self.frame_cursor + len(data) == self.frame_size:
-            self.finish()
+        if len(self.data) == self.frame_size:
+            self.finish(self.data)
 
     def finish(self, data):
         assert len(data) == 2
@@ -301,6 +304,9 @@ class DeamonProtocol(Protocol):
 
                 del self.instruction
                 self.instruction = None
+
+                self.meta_buffer = ''
+
 
             assert self.instruction == None
 
