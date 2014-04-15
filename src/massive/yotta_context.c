@@ -7,6 +7,7 @@
 #include "../core/yotta_memory.h"
 #include "../core/yotta_return.private.h"
 #include "../threading/yotta_sync.private.h"
+#include "../whisper/yotta_whisper_command.private.h"
 
 #define YOTTA_CONTEXT_MAX_DEAMONS 32
 
@@ -204,6 +205,80 @@ yotta_context_connect(yotta_context_t * context, char const * ip, uint16_t port)
     if (r == YOTTA_UNEXPECTED_FAIL)
     {
         yotta_return_unexpect_fail(yotta_context_connect);
+    }
+
+    return YOTTA_SUCCESS;
+}
+
+yotta_return_t
+yotta_context_massive(
+    yotta_context_t * context,
+    yotta_massive_command_entry_t function_addr,
+    uint64_t param_size,
+    void const * param,
+    uint64_t stride
+)
+{
+    if (context == NULL)
+    {
+        yotta_return_inv_value(yotta_context_massive, context);
+    }
+
+    uint64_t group_count = 0;
+    uint64_t global_count = 0;
+
+    for (size_t i = 0; i < YOTTA_CONTEXT_MAX_DEAMONS; i++)
+    {
+        if (context->daemons[i].context != NULL)
+        {
+            yotta_assert(
+                context->daemons[i].available_computers == 1
+            );
+
+            group_count++;
+            global_count += context->daemons[i].available_threads;
+        }
+    }
+
+    uint64_t group_id = 0;
+    uint64_t global_offset = 0;
+
+    yotta_sync_t * syncs = yotta_alloc_sa(yotta_sync_t, 2 * group_count);
+
+    for (size_t i = 0; i < YOTTA_CONTEXT_MAX_DEAMONS; i++)
+    {
+        if (context->daemons[i].context == NULL)
+        {
+            continue;
+        }
+
+        yotta_whisper_command(
+            &context->daemons[i].whisper_queue,
+            function_addr,
+            param_size,
+            ((uint8_t *) param) + i * stride,
+            group_id,
+            group_count,
+            global_offset,
+            global_count,
+            &syncs[2*i],
+            &syncs[2*i+1]
+        );
+
+        group_id++;
+        global_offset += context->daemons[i].available_threads;
+    }
+
+    // Synchronizations
+    for (size_t i = 0; i < YOTTA_CONTEXT_MAX_DEAMONS; i++)
+    {
+        if (context->daemons[i].context == NULL)
+        {
+            continue;
+        }
+
+        yotta_sync_wait(&syncs[2*i]);
+        yotta_sync_wait(&syncs[2*i+1]);
     }
 
     return YOTTA_SUCCESS;
