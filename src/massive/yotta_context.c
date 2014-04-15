@@ -165,6 +165,33 @@ yotta_context_init(yotta_context_t * context, uint16_t incoming_port)
 }
 
 yotta_return_t
+yotta_context_deamons_count(yotta_context_t * context, uint64_t * out_count)
+{
+    if (context == NULL)
+    {
+        yotta_return_inv_value(yotta_context_init, context);
+    }
+    else if (out_count == NULL)
+    {
+        yotta_return_inv_value(yotta_context_init, out_count);
+    }
+
+    uint64_t deamons_count = 0;
+
+    for (size_t i = 0; i < YOTTA_CONTEXT_MAX_DEAMONS; i++)
+    {
+        if (context->daemons[i].context)
+        {
+            deamons_count++;
+        }
+    }
+
+    *out_count = deamons_count;
+
+    return YOTTA_SUCCESS;
+}
+
+yotta_return_t
 yotta_context_connect(yotta_context_t * context, char const * ip, uint16_t port)
 {
     if (context == NULL)

@@ -36,6 +36,19 @@ yotta_return_t
 yotta_context_init(yotta_context_t * context, uint16_t incoming_port);
 
 /*
+ * @infos: count deamons in a given context
+ *
+ * @param <context>: the yotta context to count in
+ * @param <out_count>: the number of deamons output
+ *
+ * @returns:
+ *  == <0> if succeed
+ *  != <0> if failed
+ */
+yotta_return_t
+yotta_context_deamons_count(yotta_context_t * context, uint64_t * out_count);
+
+/*
  * @infos: connection to a yotta deamon
  *
  * @param <context>: the yotta context to initialize
