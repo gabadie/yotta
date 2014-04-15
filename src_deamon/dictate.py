@@ -118,7 +118,7 @@ class InstExecBinaries(InstAbstract):
     def __init__(self, protocol, frame_size):
         InstAbstract.__init__(self, protocol, frame_size)
 
-        self.binary_file, self.binary_path = tempfile.mkstemp()
+        self.binary_file, self.binary_path = tempfile.mkstemp(prefix='yotta_slave_', suffix='_exec')
         self.logger.info('receiving binary file {} from {}'.format(self.binary_path, self.protocol.peer_addr))
 
     def __del__(self):
@@ -196,9 +196,9 @@ class InstStartSlave(InstAbstract):
         cmd.extend(['--yotta-client-ip', str(whisper_ip)])
         cmd.extend(['--yotta-client-port', str(whisper_port)])
 
-        self.logger.info('starting {}\'s binary: {}'.format(self.protocol.peer_addr, ' '.join(cmd)))
-
         self.protocol.process = subprocess.Popen(cmd)
+
+        self.logger.info('starting {}\'s binary: {} (PID: {})'.format(self.protocol.peer_addr, ' '.join(cmd), self.protocol.process.pid))
 
 
 # ------------------------------------------------------------------------------ dictate instructions' map
@@ -242,6 +242,10 @@ class DeamonProtocol(Protocol):
             del self.instruction
 
         if self.binary_path != '':
+            if self.process != None:
+                self.logger.info('waiting {}\'s process (PID: {})'.format(self.peer_addr, self.process.pid))
+                self.process.wait()
+
             os.remove(self.binary_path)
             self.logger.info("binary file {} from {} removed".format(self.binary_path, self.peer_addr))
 
