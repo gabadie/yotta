@@ -186,7 +186,7 @@ main(int argc, char const * const * argv)
     // One computer no dispatch
     if(!dispatch)
     {
-        print("\n1 COMPUTER - NO DISPATCH\n");
+        print("\n### 1 COMPUTER - NO DISPATCH ###\n");
         if(output) print("\nPrime numbers from %" PRIu64 " to %" PRIu64 ": \n", from, to);
         for(uint64_t i = from; i < to; i++)
         {
@@ -208,6 +208,7 @@ main(int argc, char const * const * argv)
         yotta_context_connect(&context, "192.168.0.3", 5000);
         /*yotta_context_connect(&context, "192.168.0.4", 5000);*/
         yotta_context_connect(&context, "192.168.0.5", 5000);
+        yotta_context_connect(&context, "192.168.0.6", 5000);
     }
 
     // Results storage
@@ -223,24 +224,17 @@ main(int argc, char const * const * argv)
 
     // Global information
     uint64_t nb_computers = 0;
-    uint64_t nb_threads = 0;
-    yotta_get_group_id(NULL, &nb_computers);
-    yotta_get_global_id(NULL, &nb_threads);
+    yotta_context_deamons_count(&context, &nb_computers);
 
     if(!network && !massive) // One computer with dispatching and no network
     {
-        print("\n### %" PRIu64 " COMPUTER - %" PRIu64 " THREAD(S) - NO NETWORK ### \n\n", nb_computers, nb_threads);
+        print("\n### 1 COMPUTER - NO NETWORK ### \n\n");
 
         is_prime_range_dispatch(&primes);
     }
     else // Massive dispatching via network
     {
-        uint64_t nb_computers = 0;
-        uint64_t nb_threads = 0;
-        yotta_get_group_id(NULL, &nb_computers);
-        yotta_get_global_id(NULL, &nb_threads);
-
-        print("\n### %" PRIu64 " COMPUTER(S) - %" PRIu64 " THREAD(S) - MASSIVE DISPATCH ### \n", nb_computers, nb_threads);
+        print("\n### %" PRIu64 " COMPUTER(S) - MASSIVE DISPATCH ### \n", nb_computers);
 
         // Dispatches the computation
         yotta_return_t r = yotta_context_massive(
