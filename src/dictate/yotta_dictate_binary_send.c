@@ -91,7 +91,10 @@ yotta_dictate_binary_send(yotta_dictate_binary_cmd_t * cmd)
 
         while (!feof(cmd->binary_file))
         {
-            cmd->data_read = fread(cmd->data, 1, BINARY_BUFFER_SIZE, cmd->binary_file);
+            if(cmd->data_read == 0)
+            {
+                cmd->data_read = fread(cmd->data, 1, BINARY_BUFFER_SIZE, cmd->binary_file);
+            }
 
             yotta_assert(cmd->data_read > 0);
 
@@ -108,6 +111,7 @@ yotta_dictate_binary_send(yotta_dictate_binary_cmd_t * cmd)
             }
 
             cmd->data_cursor = 0;
+            cmd->data_read = 0;
         }
     }
 
