@@ -95,8 +95,8 @@ $(TEST_SCRIPT_TARGETS): TESTFLAGS = $(BUILD_DIR)
 
 # ------------------------------------------------------------------------------ Yotta deamon's tests
 
-TEST_DEAMON_FILES := $(call filelist,src_deamon/test_deamon.flist)
-TEST_DEAMON_TARGETS := $(call test_scripts,$(TEST_DEAMON_FILES),py.test)
+TEST_DAEMON_FILES := $(call filelist,src_daemon/test_daemon.flist)
+TEST_DAEMON_TARGETS := $(call test_scripts,$(TEST_DAEMON_FILES),py.test)
 
 
 # ------------------------------------------------------------------------------ Yotta demos

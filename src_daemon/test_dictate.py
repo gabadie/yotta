@@ -1,7 +1,7 @@
 
 import struct
 
-from deamon import Daemon
+from daemon import Daemon
 import dictate
 
 
