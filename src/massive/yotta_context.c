@@ -231,6 +231,7 @@ yotta_context_connect(yotta_context_t * context, char const * ip, uint16_t port)
 
     if (r == YOTTA_UNEXPECTED_FAIL)
     {
+        uninit_deamon->context = NULL;
         yotta_return_unexpect_fail(yotta_context_connect);
     }
 
