@@ -64,7 +64,7 @@ is_prime_range_thread(thread_prime_t * thread_prime)
     uint64_t nb_threads = 0;
     prime_t * prime = thread_prime->prime;
 
-    yotta_get_local_id(&tid, &nb_threads);
+    yotta_get_global_id(&tid, &nb_threads);
 
     if(output) print("In thread %" PRIu64 " (Total: %" PRIu64 " threads)\n", tid, nb_threads);
 
@@ -201,30 +201,14 @@ main(int argc, char const * const * argv)
     }
 
 
-    if (yotta_context_connect(&context, "127.0.0.1", 5000))
-    {
-        return 1;
-    }
+    /*yotta_context_connect(&context, "127.0.0.1", 5000);*/
 
-#if 0
     if(massive)
     {
-        if (yotta_context_connect(&context, "127.0.0.1", 5100))
-        {
-            return 1;
-        }
-
-        if (yotta_context_connect(&context, "127.0.0.1", 5200))
-        {
-            return 1;
-        }
-
-        if (yotta_context_connect(&context, "127.0.0.1", 5300))
-        {
-            return 1;
-        }
+        yotta_context_connect(&context, "192.168.0.3", 5000);
+        /*yotta_context_connect(&context, "192.168.0.4", 5000);*/
+        yotta_context_connect(&context, "192.168.0.5", 5000);
     }
-#endif
 
     // Results storage
     uint64_t results_size = (to - from) / 8 + 1;
