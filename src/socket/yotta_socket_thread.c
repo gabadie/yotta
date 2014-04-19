@@ -2,6 +2,7 @@
 #include <sys/time.h>
 #include <sys/types.h>
 #include <unistd.h>
+#include <errno.h>
 
 #include "yotta_socket_thread.h"
 #include "../core/yotta_debug.h"
@@ -78,7 +79,15 @@ yotta_socket_thread_main(yotta_socket_thread_t * thread)
 
         if (event_counts == -1)
         {
+            if (errno == EBADF)
+            {
+                // bad file descriptor, a socket might have been destroyed -> we repoll
+                continue;
+            }
+
             yotta_logger_error("yotta_socket_thread_main: select error");
+
+            yotta_assert(0);
 
             return 0;
         }
@@ -96,6 +105,8 @@ yotta_socket_thread_main(yotta_socket_thread_t * thread)
 
             if (FD_ISSET(fd, &fd_set_except))
             {
+                yotta_assert(socket_it->except_event != 0);
+
                 socket_it->except_event(socket_it);
                 event_counts -= 1;
 
@@ -124,6 +135,8 @@ yotta_socket_thread_main(yotta_socket_thread_t * thread)
 
             if (FD_ISSET(fd, &fd_set_recv))
             {
+                yotta_assert(socket_it->recv_event != 0);
+
                 socket_it->recv_event(socket_it);
                 event_counts -= 1;
 
@@ -143,6 +156,8 @@ yotta_socket_thread_main(yotta_socket_thread_t * thread)
 
             if (FD_ISSET(fd, &fd_set_send))
             {
+                yotta_assert(socket_it->send_event != 0);
+
                 socket_it->send_event(socket_it);
                 event_counts -= 1;
 
@@ -181,14 +196,15 @@ yotta_socket_thread_init(yotta_socket_thread_t * thread)
 
     yotta_dirty_s(thread);
 
-    thread->socket_head = 0;
-    thread->current_socket = 0;
-    thread->quit_status = YOTTA_SOCKET_THREAD_CONTINUE;
-
     if (yotta_mutex_init(&thread->mutex) != 0)
     {
         return YOTTA_UNEXPECTED_FAIL;
     }
+
+    thread->quit_status = YOTTA_SOCKET_THREAD_CONTINUE;
+    thread->socket_event_count = 0;
+    thread->socket_head = 0;
+    thread->current_socket = 0;
 
     if (yotta_thread_create(&thread->id, yotta_socket_thread_main, thread) != 0)
     {
@@ -212,8 +228,16 @@ yotta_socket_thread_listen(yotta_socket_thread_t * thread, yotta_socket_event_t 
 
     yotta_mutex_lock(&thread->mutex);
     {
+        if (thread->socket_event_count == (uint64_t)FD_SETSIZE)
+        {
+            yotta_mutex_unlock(&thread->mutex);
+
+            return YOTTA_INVALID_OPERATION;
+        }
+
         socket_event->socket_next = thread->socket_head;
         thread->socket_head = socket_event;
+        thread->socket_event_count++;
     }
     yotta_mutex_unlock(&thread->mutex);
 
@@ -257,9 +281,11 @@ yotta_socket_thread_kill(yotta_socket_thread_t * thread)
 
         thread->socket_head = socket_event->socket_next;
 
-#ifdef YOTTA_DEBUG
+#ifdef YOTTA_ASSERT
         socket_event->socket_thread = 0;
-#endif
+#endif //YOTTA_ASSERT
+
+        yotta_assert(socket_event->socket_thread == 0);
 
         yotta_socket_event_release(socket_event);
     }

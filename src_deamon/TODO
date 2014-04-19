@@ -1,2 +1,0 @@
--> Etablir des tests unitaires (demander déroulement à Guillaume)
--> Réaliser serveur TCP qui reçoit demande client -> reçoit le code source -> reçoit la demande de réalisation -> lance le processus.

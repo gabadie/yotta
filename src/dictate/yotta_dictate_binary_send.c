@@ -1,48 +1,180 @@
 #include <stdio.h>
+#include <string.h>
 
-#include "yotta_dictate_binary_send.h"
-#include "../yotta_init.h"
+#include "yotta_dictate_binary_send.private.h"
+#include "yotta_dictate_labels.private.h"
 #include "../core/yotta_debug.h"
+#include "../core/yotta_memory.h"
 #include "../core/yotta_return.h"
 #include "../core/yotta_logger.private.h"
-#include "../utils/yotta_str_utils.h"
 #include "../socket/yotta_tcp.h"
+#include "../threading/yotta_sync.private.h"
+#include "../utils/yotta_file.h"
 
-#define BINARY_BUFFER_SIZE 1024
+#define BINARY_BUFFER_SIZE 4096
 
-uint64_t
-yotta_dictate_binary_send(yotta_context_t * context, char const * ip, uint16_t port)
+
+typedef struct
+yotta_dictate_binary_send_cmd_s
 {
-    yotta_assert(context != NULL);
+    // TCP command inheritance
+    yotta_tcp_cmd_t abstract_cmd;
 
-    uint64_t return_code = yotta_tcp_socket_client(&context->slave, ip, port);
-
-    if(return_code != YOTTA_SUCCESS)
+    // The header
+    uint64_t header_cursor;
+    struct
     {
-        yotta_logger_error("Failed to create tcp socket");
-        return return_code;
+        yotta_dictate_label_t label;
+        uint64_t data_size;
+    } __attribute__((packed))
+    header;
+
+    // File handler of the binary
+    FILE * binary_file;
+
+    // Cursor on the binary's data
+    uint64_t data_cursor;
+
+    // Last size of data read
+    size_t data_read;
+
+    // Temporary buffer for binary send
+    uint8_t data[BINARY_BUFFER_SIZE];
+
+    // The finish sync object
+    yotta_sync_t * sync_finished;
+}
+yotta_dictate_binary_cmd_t;
+
+/*
+ * @infos: yotta_dictate binary release event
+ */
+static
+void
+yotta_dictate_binary_release(yotta_tcp_cmd_t * cmd)
+{
+    yotta_assert(cmd != NULL);
+
+    yotta_free(cmd);
+}
+
+/*
+ * @infos: yotta_dictate binary send event
+ */
+static
+void
+yotta_dictate_binary_send(yotta_dictate_binary_cmd_t * cmd)
+{
+    yotta_assert(cmd != NULL);
+    yotta_assert(cmd->abstract_cmd.queue != NULL);
+    yotta_assert(cmd->binary_file != NULL);
+
+    if (cmd->header_cursor != sizeof(cmd->header))
+    {
+        // Send frame header
+
+        uint64_t op = yotta_tcp_cmd_send(
+            (yotta_tcp_cmd_t *) cmd,
+            sizeof(cmd->header),
+            &cmd->header_cursor,
+            &cmd->header
+        );
+
+        if (op != 0)
+        {
+            return;
+        }
     }
 
-    FILE * binary;
-    uint8_t buffer[BINARY_BUFFER_SIZE];
+    {
+        // Send data
 
-    binary = fopen(yotta_executable_path, "rb");
-    if(binary == NULL)
+        while (!feof(cmd->binary_file))
+        {
+            if(cmd->data_read == 0)
+            {
+                cmd->data_read = fread(cmd->data, 1, BINARY_BUFFER_SIZE, cmd->binary_file);
+            }
+
+            yotta_assert(cmd->data_read > 0);
+
+            uint64_t op = yotta_tcp_cmd_send(
+                (yotta_tcp_cmd_t *) cmd,
+                cmd->data_read,
+                &cmd->data_cursor,
+                cmd->data
+            );
+
+            if (op != 0)
+            {
+                return;
+            }
+
+            cmd->data_cursor = 0;
+            cmd->data_read = 0;
+        }
+    }
+
+    /*
+     * We push the sync event and destroy this command
+     */
+    if (cmd->sync_finished)
+    {
+        yotta_sync_post(cmd->sync_finished);
+    }
+
+    yotta_tcp_cmd_finish((yotta_tcp_cmd_t *) cmd);
+
+    fclose(cmd->binary_file);
+    yotta_tcp_cmd_release(cmd);
+}
+
+
+uint64_t
+yotta_dictate_binary(
+    yotta_dictate_queue_t * cmd_queue,
+    char const * executable_path,
+    yotta_sync_t * sync_finished
+)
+{
+    yotta_assert(cmd_queue != NULL);
+
+    // Initialize the finish sync object
+    if (sync_finished != NULL)
+    {
+        yotta_sync_init(sync_finished);
+    }
+
+    /*
+     * Create the yotta binary send command
+     */
+    yotta_dictate_binary_cmd_t * cmd = yotta_alloc_s(yotta_dictate_binary_cmd_t);
+
+    yotta_dirty_s(cmd);
+
+    // Initialize the command
+    yotta_tcp_cmd_init(cmd);
+    yotta_tcp_cmd_set_send(cmd, yotta_dictate_binary_send);
+    yotta_tcp_cmd_set_release(cmd, yotta_dictate_binary_release);
+
+    cmd->binary_file = fopen(executable_path, "rb");
+
+    if(cmd->binary_file == NULL)
     {
         yotta_logger_error("Failed to open binary");
         return YOTTA_INVALID_VALUE;
     }
 
-    //TODO
-    /*yotta_tcp_send(&context->slave,*/
+    cmd->header_cursor = 0;
+    cmd->header.label = YOTTA_DICTATE_LABEL_SLAVE_BINARY;
+    cmd->header.data_size = yotta_file_size(cmd->binary_file);
+    cmd->data_cursor = 0;
+    cmd->data_read = 0;
+    cmd->sync_finished = sync_finished;
 
-    size_t read_size = 0;
-    while(!feof(binary))
-    {
-        read_size = fread(buffer, BINARY_BUFFER_SIZE, 1, binary);
-        yotta_tcp_send(&context->slave, buffer, read_size);
-    }
 
-    fclose(binary);
+    // Queue the command
+    yotta_tcp_queue_append((yotta_tcp_queue_t *) cmd_queue, (yotta_tcp_cmd_t *) cmd);
+
     return YOTTA_SUCCESS;
 }

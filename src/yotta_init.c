@@ -50,6 +50,8 @@ yotta_init(uint64_t argc, char const * const * argv)
 
         if (yotta_slave_context_main(&parameters) != 0)
         {
+            yotta_logger_error("yotta_slave_context_main failed");
+
             exit(yotta_process_failed_return);
         }
 

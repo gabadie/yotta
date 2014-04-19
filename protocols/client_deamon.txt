@@ -19,14 +19,14 @@ struct frame
 struct error_frame
 {
     uint16_t data_label = 0x0000;
-    uint64_t data_size = strlen("my error message");
+    uint64_t data_size = strlen("my error message"); // data_size < 256
 
     // error message content
     char data_content[data_size] = "my error message";
 };
 
 
-// ----------------------------------------------------------------------------- FROM DEAMON TO CLIENT
+// ----------------------------------------------------------------------------- FROM DEAMON TO MASTER
 
 struct deamon_infos
 {
@@ -41,7 +41,7 @@ struct deamon_infos
 };
 
 
-// ----------------------------------------------------------------------------- FROM CLIENT TO DEAMON
+// ----------------------------------------------------------------------------- FROM MASTER TO DEAMON
 
 struct slave_binaries
 {
@@ -50,4 +50,17 @@ struct slave_binaries
 
     // executable binaries
     uint8_t executable_binaries[data_size];
+};
+
+struct slave_start
+{
+    uint16_t data_label = 0x2010;
+    uint64_t data_size = 2;
+    uint16_t listening_port;
+};
+
+struct slave_stop
+{
+    uint16_t data_label = 0x2011;
+    uint64_t data_size = 0;
 };

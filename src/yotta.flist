@@ -6,8 +6,15 @@ yotta_init.c
 core/yotta_addr_translation.c
 core/yotta_logger.c
 core/yotta_memory.c
-#dictate/yotta_dictate_binary_send.c TODO: implement dictate protocol
+dictate/yotta_dictate_binary_send.c
+dictate/yotta_dictate_daemon_error.c
+dictate/yotta_dictate_daemon_info.c
+dictate/yotta_dictate_daemon_start.c
+dictate/yotta_dictate_queue.c
+dictate/yotta_dictate_send_memory_block.c
+dictate/yotta_dictate_unknown.c
 massive/yotta_context.c
+massive/yotta_daemon.c
 massive/yotta_dispatch.c
 massive/yotta_fetch.c
 massive/yotta_push.c
@@ -26,6 +33,7 @@ threading/yotta_semaphore_pool.c
 threading/yotta_sync.c
 threading/yotta_threading.c
 utils/yotta_file.c
+utils/yotta_math.c
 utils/yotta_str_utils.c
 whisper/yotta_whisper_command.c
 whisper/yotta_whisper_fetch.c
@@ -33,3 +41,4 @@ whisper/yotta_whisper_master.c
 whisper/yotta_whisper_push.c
 whisper/yotta_whisper_queue.c
 whisper/yotta_whisper_shared_counter.c
+whisper/yotta_whisper_stop.c

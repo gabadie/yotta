@@ -70,9 +70,8 @@ yotta_whisper_shared_counter_request_send(yotta_whisper_shared_counter_request_c
     yotta_assert(cmd != 0);
     yotta_assert(cmd->abstract_cmd.queue != 0);
 
-    if (cmd->header_cursor != sizeof(cmd->header))
     {
-        // send fetch request's header
+        // send shared counter request's header
 
         uint64_t op = yotta_tcp_cmd_send(
             (yotta_tcp_cmd_t *) cmd,
@@ -101,9 +100,8 @@ yotta_whisper_shared_counter_answer_send(yotta_whisper_shared_counter_answer_cmd
     yotta_assert(cmd != 0);
     yotta_assert(cmd->abstract_cmd.queue != 0);
 
-    if (cmd->header_cursor != sizeof(cmd->header))
     {
-        // send fetch answer's header
+        // send shared counter answer's header
 
         uint64_t op = yotta_tcp_cmd_send(
             (yotta_tcp_cmd_t *) cmd,
@@ -150,7 +148,7 @@ yotta_whisper_shared_counter_request_recv(
         yotta_whisper_queue_recv_buffer(cmd_queue, yotta_whisper_buffer_t);
 
     {
-        // we are receiving the fetch request's header
+        // we are receiving the shared counter request's header
 
         uint64_t op = yotta_tcp_queue_recv(
             (yotta_tcp_queue_t *) cmd_queue,
@@ -166,7 +164,7 @@ yotta_whisper_shared_counter_request_recv(
     }
 
     {
-        // generates fetch answer command
+        // generates shared counter answer command
 
         yotta_whisper_shared_counter_answer_cmd_t * cmd =
             yotta_alloc_s(yotta_whisper_shared_counter_answer_cmd_t);
@@ -178,7 +176,7 @@ yotta_whisper_shared_counter_request_recv(
         yotta_tcp_cmd_set_release(cmd, yotta_whisper_shared_counter_release);
 
         cmd->header_cursor = 0;
-        cmd->header.label = YOTTA_WHISPER_MEM_FETCH_ANSWER;
+        cmd->header.label = YOTTA_WHISPER_SHARED_COUNTER_ANSWER;
         cmd->header.shared_counter_addr = buffer->header.shared_counter_addr;
 
         yotta_counter_t * counter = (yotta_counter_t *) buffer->header.master_counter_addr;
@@ -226,7 +224,7 @@ yotta_whisper_shared_counter_answer_recv(
         yotta_whisper_queue_recv_buffer(cmd_queue, yotta_whisper_buffer_t);
 
     {
-        // we are receiving the fetch awnser's header
+        // we are receiving the shared counter awnser's header
 
         uint64_t op = yotta_tcp_queue_recv(
             (yotta_tcp_queue_t *) cmd_queue,
@@ -241,7 +239,26 @@ yotta_whisper_shared_counter_answer_recv(
         }
     }
 
-    yotta_todo("Finishes processing the shared counter answer");
+    {
+        yotta_shared_counter_t * shared =
+            (yotta_shared_counter_t *) buffer->header.shared_counter_addr;
+
+        yotta_assert(shared->range_status != 0x3);
+
+        /*
+         * First, we assume this is only the second range
+         */
+        shared->range_start[1] = buffer->header.range;
+
+        if (!yotta_atomic_compare_swap_b(&shared->range_status, 0x1, 0x3))
+        {
+            /*
+             * Its has failed, so this is the first one
+             */
+            shared->range_start[0] = buffer->header.range;
+            shared->range_status = 0x1;
+        }
+    }
 
     buffer->header_cursor = 0;
     buffer->header.shared_counter_addr = 0;
@@ -275,7 +292,7 @@ yotta_whisper_shared_counter(
     yotta_tcp_cmd_set_release(cmd, yotta_whisper_shared_counter_release);
 
     cmd->header_cursor = 0;
-    cmd->header.label = YOTTA_WHISPER_MEM_FETCH_REQUEST;
+    cmd->header.label = YOTTA_WHISPER_SHARED_COUNTER_REQUEST;
     cmd->header.master_counter_addr = shared_counter->master_counter_addr;
     cmd->header.shared_counter_addr = (yotta_addr_t) shared_counter;
     cmd->header.add = shared_counter->stock_size;

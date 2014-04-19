@@ -9,6 +9,7 @@ testlib_logger.c
 testlib_massive_barrier.c
 testlib_massive_context.c
 testlib_massive_dispatch.c
+testlib_math.c
 testlib_memory.c
 testlib_semaphore_pool.c
 testlib_slave.c
@@ -20,3 +21,4 @@ testlib_threading.c
 testlib_whisper_command.c
 testlib_whisper_fetch.c
 testlib_whisper_push.c
+testlib_whisper_shared_counter.c

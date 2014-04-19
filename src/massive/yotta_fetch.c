@@ -30,8 +30,7 @@ yotta_fetch_package(yotta_addr_t master_addr, uint64_t buffer_size, void * dest_
     {
         memcpy(dest_buffer, (void *) master_addr, buffer_size);
 
-        yotta_sync_init(sync_finished);
-        yotta_sync_post(sync_finished);
+        yotta_sync_init_post(sync_finished);
 
         return YOTTA_SUCCESS;
     }

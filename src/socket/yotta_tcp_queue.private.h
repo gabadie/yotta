@@ -18,7 +18,15 @@ yotta_tcp_queue_s
     yotta_tcp_cmd_t * queue_first;
     yotta_tcp_cmd_t * queue_last;
 
-    // the command queue stack entry
+    /*
+     * the command queue's stack
+     *
+     * to avoid a mutex here, yotta_tcp_queue_append() do not append at the
+     * queue's tail directly. Instead, it is atomically pushed to the queue's
+     * stack. Then the socket thread will pop the queue's stack and append at
+     * the queue's tail. Despite that stage, the first in, first out is still
+     * guaranted.
+     */
     yotta_tcp_cmd_t * queue_stack;
 }
 yotta_tcp_queue_t;

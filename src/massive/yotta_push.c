@@ -29,8 +29,7 @@ yotta_push_package(yotta_addr_t master_addr, uint64_t buffer_size, void const * 
 
         if (sync_finished != 0)
         {
-            yotta_sync_init(sync_finished);
-            yotta_sync_post(sync_finished);
+            yotta_sync_init_post(sync_finished);
         }
 
         return YOTTA_SUCCESS;

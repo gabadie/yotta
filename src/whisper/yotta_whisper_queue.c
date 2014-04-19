@@ -8,6 +8,7 @@
 #include "yotta_whisper_fetch.private.h"
 #include "yotta_whisper_push.private.h"
 #include "yotta_whisper_shared_counter.private.h"
+#include "yotta_whisper_stop.private.h"
 #include "../core/yotta_logger.private.h"
 #include "../core/yotta_debug.h"
 #include "../socket/yotta_tcp.h"
@@ -29,7 +30,8 @@ yotta_whisper_label_entries[YOTTA_WHISPER_LABELS_COUNT] =
     (yotta_whisper_recv_t) yotta_whisper_fetch_request_recv,
     (yotta_whisper_recv_t) yotta_whisper_push_master_recv,
     (yotta_whisper_recv_t) yotta_whisper_shared_counter_answer_recv,
-    (yotta_whisper_recv_t) yotta_whisper_shared_counter_request_recv
+    (yotta_whisper_recv_t) yotta_whisper_shared_counter_request_recv,
+    (yotta_whisper_recv_t) yotta_whisper_stop_recv
 };
 
 #ifdef YOTTA_DEBUG
@@ -77,42 +79,23 @@ yotta_whisper_queue_recv(yotta_whisper_queue_t * cmd_queue)
 #endif //YOTTA_DEBUG
         }
 
+        uint64_t label_cursor = 0;
         yotta_whisper_label_t label = 0;
 
-        ssize_t label_size = yotta_tcp_recv(&cmd_queue->tcp_queue.socket_event.socket, &label, sizeof(label));
+        uint64_t op = yotta_tcp_queue_recv(&cmd_queue->tcp_queue, sizeof(label), &label_cursor, &label);
 
-        if (label_size == sizeof(label))
+        if (op != 0)
         {
-            yotta_assert(label < YOTTA_WHISPER_LABELS_COUNT);
-            yotta_assert(yotta_whisper_label_entries[label] != 0);
-
-            cmd_queue->callback = yotta_whisper_label_entries[label];
-
-            yotta_assert(cmd_queue->callback != 0);
-
-            continue;
-        }
-        else if (label_size == 0)
-        {
-            // the socket has been closed properly on the other side
-
-            yotta_socket_event_unlisten((yotta_socket_event_t *) cmd_queue);
-            yotta_socket_event_release(cmd_queue);
-
+            // no incomming information available
             return;
         }
-        else if (label_size == -1)
-        {
-            int32_t errno_recv = errno;
 
-            if (errno_recv == EAGAIN)
-            {
-                // no incomming information available
-                break;
-            }
-        }
+        yotta_assert(label < YOTTA_WHISPER_LABELS_COUNT);
+        yotta_assert(yotta_whisper_label_entries[label] != 0);
 
-        yotta_crash_msg("receive error");
+        cmd_queue->callback = yotta_whisper_label_entries[label];
+
+        yotta_assert(cmd_queue->callback != 0);
     }
 }
 
@@ -123,6 +106,19 @@ yotta_whisper_queue_except(yotta_whisper_queue_t * cmd_queue)
     yotta_assert(cmd_queue != 0);
 
     yotta_logger_error("yotta_whisper_queue_except: received a TCP socket exception -> releasing");
+
+    yotta_socket_event_unlisten((yotta_socket_event_t *) cmd_queue);
+
+    yotta_socket_event_release(cmd_queue);
+}
+
+static
+void
+yotta_whisper_queue_connection_lost(yotta_whisper_queue_t * cmd_queue)
+{
+    yotta_assert(cmd_queue != 0);
+
+    yotta_logger_error("yotta_whisper_queue_connection_lost: -> releasing");
 
     yotta_socket_event_unlisten((yotta_socket_event_t *) cmd_queue);
 
@@ -145,6 +141,7 @@ yotta_whisper_queue_init(yotta_whisper_queue_t * cmd_queue)
     yotta_tcp_queue_init((yotta_tcp_queue_t *) cmd_queue);
     yotta_socket_event_set_recv(cmd_queue, yotta_whisper_queue_recv);
     yotta_socket_event_set_except(cmd_queue, yotta_whisper_queue_except);
+    yotta_socket_event_set_lost(cmd_queue, yotta_whisper_queue_connection_lost);
 
     cmd_queue->callback = 0;
 

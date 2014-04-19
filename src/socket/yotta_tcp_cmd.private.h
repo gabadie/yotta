@@ -62,7 +62,7 @@ yotta_tcp_cmd_s
  *
  * @param <cmd>: the socket event
  */
-#ifdef YOTTA_DEBUG
+#ifdef YOTTA_ASSERT
 #define yotta_tcp_cmd_init(cmd) \
     {\
         yotta_dirty_s((yotta_tcp_cmd_t *) (cmd)); \
@@ -72,9 +72,10 @@ yotta_tcp_cmd_s
     }
 
 #else
-#define yotta_tcp_cmd_init(cmd)
+#define yotta_tcp_cmd_init(cmd) \
+    yotta_dirty_s((yotta_tcp_cmd_t *) (cmd))
 
-#endif // YOTTA_DEBUG
+#endif // YOTTA_ASSERT
 
 /*
  * @infos: gets command's queue

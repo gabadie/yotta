@@ -15,10 +15,7 @@ yotta_sync_post(yotta_sync_t * sync)
     {
         yotta_semaphore_post((yotta_semaphore_t *) sync->sem);
 
-        if(!__sync_bool_compare_and_swap(&sync->sem, sync->sem, YOTTA_SYNC_TRIGGERED))
-        {
-            yotta_crash_msg("Semaphore post race issue");
-        }
+        sync->sem = YOTTA_SYNC_TRIGGERED;
     }
 }
 
@@ -68,6 +65,8 @@ yotta_sync_wait(yotta_sync_t * sync)
     }
 
     yotta_semaphore_wait((yotta_semaphore_t *) new_sem);
+
+    sync->sem = YOTTA_SYNC_TRIGGERED;
 
     yotta_sem_release(new_sem);
 

@@ -28,14 +28,27 @@ yotta_shared_counter_s
     // the ranges size
     yotta_counter_t range_size;
 
-    // the ranges status bitfield
-    size_t range_status;
+    union
+    {
+        /*
+         * the ranges status bitfield
+         *
+         *  if range_status == 0x0 -> no ranges available and no waiting semaphore
+         *  if range_status == 0x1 -> the range_start[0] is available
+         *  if range_status == 0x3 -> the range_start[0] and range_start[1] is available
+         */
+        size_t range_status;
+
+        /*
+         * the waiting semaphore when one or more thread are waiting
+         *
+         *  if waiting_semaphore > 0x3
+         */
+        yotta_semaphore_t * waiting_semaphore;
+    };
 
     // the minimum stock size before to trigger a new atomic range request
     yotta_counter_t stock_size;
-
-    // the waiting semaphore
-    yotta_semaphore_t * waiting_semaphore;
 }
 yotta_shared_counter_t;
 

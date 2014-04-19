@@ -14,10 +14,15 @@ yotta_socket_event_unlisten(yotta_socket_event_t * socket_event)
 
     yotta_mutex_lock(&thread->mutex);
     {
+        yotta_assert(thread->socket_event_count > 0);
+
         yotta_socket_event_t ** parent_ptr = &thread->socket_head;
 
         while (*parent_ptr != socket_event)
         {
+            /*
+             * Check if unable to find the socket event in its own socket thread.
+             */
             yotta_assert(*parent_ptr != 0);
 
             parent_ptr = &(*parent_ptr)->socket_next;
@@ -25,21 +30,22 @@ yotta_socket_event_unlisten(yotta_socket_event_t * socket_event)
 
         *parent_ptr = socket_event->socket_next;
 
-        if (thread->current_socket != 0)
+        /*
+         * the socket thread might be currently working excatly on this
+         * socket event. In this case, we have to change it's iterator
+         */
+        if (thread->current_socket == socket_event)
         {
-            /*
-             * the socket thread might be currently working on excatly on this
-             * socket event. In this case, we have to change it's iterator
-             */
-            if (thread->current_socket == socket_event)
-            {
-                thread->current_socket = socket_event->socket_next;
-            }
+            thread->current_socket = socket_event->socket_next;
         }
+
+        thread->socket_event_count--;
     }
     yotta_mutex_unlock(&thread->mutex);
 
-#ifdef YOTTA_DEBUG
+#ifdef YOTTA_ASSERT
     socket_event->socket_thread = 0;
-#endif // YOTTA_DEBUG
+#endif //YOTTA_ASSERT
+
+    yotta_assert(socket_event->socket_thread == 0);
 }

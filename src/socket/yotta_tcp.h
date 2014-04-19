@@ -3,6 +3,23 @@
 
 #include "yotta_socket.h"
 
+
+/*
+ * yotta_tcp_send's bitfield flags
+ *  - YOTTA_TCP_NOWAIT do not block the send event
+ *  - YOTTA_TCP_NOSIGNAL do not trigger SIGPIPE when connection lost
+ */
+#ifdef YOTTA_OSX
+#define YOTTA_TCP_NOWAIT MSG_DONTWAIT
+#define YOTTA_TCP_NOSIGNAL SO_NOSIGPIPE
+
+#else //YOTTA_OSX
+#define YOTTA_TCP_NOWAIT MSG_DONTWAIT
+#define YOTTA_TCP_NOSIGNAL MSG_NOSIGNAL
+
+#endif //YOTTA_OSX
+
+
 /*
  * @infos: init a yotta TCP socket server
  *
@@ -33,10 +50,25 @@
 
 
 /*
+ * @infos: paired to yotta TCP socket client
+ *
+ * @param <sock0>: the yotta TCP socket to initialize
+ * @param <sock1>: the other yotta TCP socket to initialize
+ *
+ * @returns:
+ *  == <0> if succeed
+ *  != <0> if failed
+ */
+#define yotta_tcp_pair(sock0, sock1) \
+    yotta_socket_pair((sock0), (sock1), AF_UNSPEC, SOCK_STREAM)
+
+
+/*
  * @infos: send data via a yotta TCP socket
  *
  * @param <sock>: the yotta socket used to send
  * @param <buf>: the buffer containing the data to send
+ * @param <len>: the length of the data to send
  * @param <len>: the length of the data to send
  *
  * @returns:
@@ -44,6 +76,9 @@
  */
 #define yotta_tcp_send(sock, buf, len) \
     send((sock)->fd, (buf), (len), 0)
+
+#define yotta_tcp_send_f(sock, buf, len, flags) \
+    send((sock)->fd, (buf), (len), (flags))
 
 /*
  * @infos: send all the data via a yotta TCP socket

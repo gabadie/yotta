@@ -7,7 +7,6 @@
 #include "core/yotta_logger.h"
 #include "core/yotta_memory.h"
 #include "core/yotta_return.h"
-#include "dictate/yotta_dictate_binary_send.h"
 #include "massive/yotta_context.h"
 #include "massive/yotta_dispatch.h"
 #include "massive/yotta_fetch.h"

@@ -36,7 +36,7 @@ yotta_push_package(yotta_addr_t master_addr, uint64_t buffer_size, void const * 
  * @assert <buffer> allocated by the yotta library
  */
 #define yotta_push_buffer(master_addr,buffer,sync_finished) \
-    return yotta_push_package(master_addr, yotta_memory_size(buffer), buffer, sync_finished)
+    yotta_push_package(master_addr, yotta_memory_size(buffer), buffer, sync_finished)
 
 
 #endif

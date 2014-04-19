@@ -11,50 +11,21 @@
 
 static
 void
-yotta_whisper_queue_release(yotta_whisper_queue_t * cmd_queue)
-{
-    yotta_assert(cmd_queue != 0);
-
-    yotta_whisper_queue_destroy(cmd_queue);
-
-    yotta_free(cmd_queue);
-}
-
-static
-void
 yotta_whisper_master_recv(yotta_whisper_master_t * master)
 {
-    yotta_assert(master != 0);
+    yotta_assert(master != NULL);
+    yotta_assert(master->vtable != NULL);
 
     yotta_logger_debug("yotta_whisper_master_recv: new slave connection");
 
-    yotta_socket_t slave_socket;
-
-    yotta_whisper_queue_t * cmd_queue = yotta_alloc_s(yotta_whisper_queue_t);
-
-    yotta_dirty_s(cmd_queue);
-
-    if (yotta_socket_accept(&master->socket, &slave_socket) != 0)
-    {
-        yotta_logger_debug("yotta_whisper_master_recv: connection has failed");
-        return;
-    }
-
-    yotta_whisper_queue_init(cmd_queue);
-    yotta_socket_event_set_release(cmd_queue, yotta_whisper_queue_release);
-
-    if (yotta_socket_thread_listen(master->socket_thread, (yotta_socket_event_t *) cmd_queue) != 0)
-    {
-        yotta_whisper_queue_destroy(cmd_queue);
-        yotta_free(cmd_queue);
-    }
+    (master->vtable->create_queue)(master);
 }
 
 static
 void
 yotta_whisper_master_except(yotta_whisper_master_t * master)
 {
-    yotta_assert(master != 0);
+    yotta_assert(master != NULL);
 
     yotta_logger_error("yotta_whisper_master_except: received a TCP socket exception -> releasing");
 
@@ -62,13 +33,18 @@ yotta_whisper_master_except(yotta_whisper_master_t * master)
 }
 
 yotta_return_t
-yotta_whisper_master_init(yotta_whisper_master_t * master, uint16_t listening_port)
+yotta_whisper_master_init(
+    yotta_whisper_master_t * master,
+    yotta_whisper_master_vtable_t const * vtable,
+    uint16_t listening_port)
 {
-    yotta_assert(master != 0);
+    yotta_assert(master != NULL);
+    yotta_assert(vtable != NULL);
+    yotta_assert(vtable->create_queue != NULL);
 
     yotta_dirty_s(master);
 
-    if (yotta_tcp_socket_server(&master->socket, listening_port) != 0)
+    if (yotta_tcp_socket_server(&master->socket_event.socket, listening_port) != 0)
     {
         return -1;
     }
@@ -78,9 +54,11 @@ yotta_whisper_master_init(yotta_whisper_master_t * master, uint16_t listening_po
     yotta_socket_event_set_recv(master, yotta_whisper_master_recv);
     yotta_socket_event_set_send(master, 0);
 
-#ifdef YOTTA_DEBUG
+#ifdef YOTTA_ASSERT
     yotta_socket_event_set_release(master, 0);
-#endif // YOTTA_DEBUG
+#endif //YOTTA_ASSERT
+
+    master->vtable = vtable;
 
     return 0;
 }
@@ -88,7 +66,7 @@ yotta_whisper_master_init(yotta_whisper_master_t * master, uint16_t listening_po
 yotta_return_t
 yotta_whisper_master_destroy(yotta_whisper_master_t * master)
 {
-    yotta_assert(master != 0);
+    yotta_assert(master != NULL);
 
     return yotta_socket_event_destroy(master);
 }
