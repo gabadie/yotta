@@ -49,22 +49,13 @@ yotta_whisper_stop_send(yotta_whisper_stop_cmd_t * cmd)
     yotta_assert(cmd != NULL);
     yotta_assert(cmd->abstract_cmd.queue != NULL);
 
-    if (cmd->header_cursor != sizeof(cmd->header))
-    {
-        // send push's header
-
-        uint64_t op = yotta_tcp_cmd_send(
-            (yotta_tcp_cmd_t *) cmd,
-            sizeof(cmd->header),
-            &cmd->header_cursor,
-            &cmd->header
-        );
-
-        if (op != 0)
-        {
-            return;
-        }
-    }
+    // streams stop's header
+    yotta_tcp_cmd_stream_unique(
+        (yotta_tcp_cmd_t *) cmd,
+        sizeof(cmd->header),
+        &cmd->header_cursor,
+        &cmd->header
+    );
 
     yotta_tcp_cmd_finish((yotta_tcp_cmd_t *) cmd);
     yotta_tcp_cmd_release(cmd);

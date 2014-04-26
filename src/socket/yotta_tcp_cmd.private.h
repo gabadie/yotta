@@ -103,6 +103,58 @@ uint64_t
 yotta_tcp_cmd_send(yotta_tcp_cmd_t * cmd, uint64_t buffer_size, uint64_t * buffer_cursor, void const * buffer);
 
 /*
+ * @plumbing: Use yotta_tcp_cmd_stream() instead.
+ */
+#define _yotta_tcp_cmd_stream(cmd, buffer_size, buffer_cursor, buffer) \
+    { \
+        if ( \
+            yotta_tcp_cmd_send( \
+                (yotta_tcp_cmd_t *) (cmd), \
+                (buffer_size), \
+                (buffer_cursor), \
+                (buffer) \
+            ) != 0 \
+        ) \
+        { \
+            return; \
+        } \
+    }
+
+/*
+ * Streams a command's output and automatically returns the command if the
+ * memory block is not sent completly. This shall only be called in command's
+ * send_event callback.
+ *
+ * @param <cmd>: the TCP command
+ * @param <buffer_size>: the buffer's size to send
+ * @param <buffer_cursor>: the buffer's sending cursor
+ * @param <buffer>: the buffer to send
+ */
+#define yotta_tcp_cmd_stream(cmd, buffer_size, buffer_cursor, buffer) \
+    if ((buffer_size) != *(buffer_cursor)) \
+    { \
+        _yotta_tcp_cmd_stream(cmd, buffer_size, buffer_cursor, buffer); \
+    }
+
+/*
+ * Same as yotta_tcp_cmd_stream(), but stream the last command's memory block
+ *
+ * @example:
+ *  yotta_tcp_cmd_stream(cmd, [block 0]);
+ *  yotta_tcp_cmd_stream(cmd, [block 1]);
+ *  yotta_tcp_cmd_stream(cmd, [block 2]);
+ *  yotta_tcp_cmd_stream_last(cmd, [block 3]);
+ */
+#define yotta_tcp_cmd_stream_last(cmd, buffer_size, buffer_cursor, buffer) \
+    _yotta_tcp_cmd_stream(cmd, buffer_size, buffer_cursor, buffer);
+
+/*
+ * Same as yotta_tcp_cmd_stream(), but stream the unique command's memory block
+ */
+#define yotta_tcp_cmd_stream_unique(cmd, buffer_size, buffer_cursor, buffer) \
+    _yotta_tcp_cmd_stream(cmd, buffer_size, buffer_cursor, buffer);
+
+/*
  * @threadsafe
  * @infos: finishes the command
  *

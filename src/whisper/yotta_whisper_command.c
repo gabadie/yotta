@@ -141,43 +141,21 @@ yotta_whisper_command_order_send(yotta_whisper_command_order_cmd_t * cmd)
     yotta_assert(cmd != 0);
     yotta_assert(cmd->abstract_cmd.queue != 0);
 
-    if (cmd->header_cursor != sizeof(cmd->header))
-    {
-        /*
-         * sends command's header
-         */
+    // Streams command's header
+    yotta_tcp_cmd_stream(
+        (yotta_tcp_cmd_t *) cmd,
+        sizeof(cmd->header),
+        &cmd->header_cursor,
+        &cmd->header
+    );
 
-        uint64_t op = yotta_tcp_cmd_send(
-            (yotta_tcp_cmd_t *) cmd,
-            sizeof(cmd->header),
-            &cmd->header_cursor,
-            &cmd->header
-        );
-
-        if (op != 0)
-        {
-            return;
-        }
-    }
-
-    if (cmd->header.param_size != 0)
-    {
-        /*
-         * sends command's parameter if one
-         */
-
-        uint64_t op = yotta_tcp_cmd_send(
-            (yotta_tcp_cmd_t *) cmd,
-            cmd->header.param_size,
-            &cmd->param_cursor,
-            cmd->param
-        );
-
-        if (op != 0)
-        {
-            return;
-        }
-    }
+    // sends command's parameter if one
+    yotta_tcp_cmd_stream_last(
+        (yotta_tcp_cmd_t *) cmd,
+        cmd->header.param_size,
+        &cmd->param_cursor,
+        cmd->param
+    );
 
     /*
      * We have finished to send the command order, then we post the sending
@@ -199,24 +177,13 @@ yotta_whisper_command_feedback_send(yotta_whisper_command_feedback_cmd_t * cmd)
     yotta_assert(cmd != 0);
     yotta_assert(cmd->abstract_cmd.queue != 0);
 
-    if (cmd->header_cursor != sizeof(cmd->header))
-    {
-        /*
-         * sends command feedback's header
-         */
-
-        uint64_t op = yotta_tcp_cmd_send(
-            (yotta_tcp_cmd_t *) cmd,
-            sizeof(cmd->header),
-            &cmd->header_cursor,
-            &cmd->header
-        );
-
-        if (op != 0)
-        {
-            return;
-        }
-    }
+    // Streams command feedback's header
+    yotta_tcp_cmd_stream_unique(
+        (yotta_tcp_cmd_t *) cmd,
+        sizeof(cmd->header),
+        &cmd->header_cursor,
+        &cmd->header
+    );
 
     /*
      * We have finished to send the command order, then we destroy the current

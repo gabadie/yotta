@@ -53,38 +53,21 @@ yotta_dictate_send_memory_block_send(yotta_dictate_send_memory_block_cmd_t * cmd
     yotta_assert(cmd != NULL);
     yotta_assert(cmd->abstract_cmd.queue != NULL);
 
-    if (cmd->header_cursor != sizeof(cmd->header))
-    {
-        // Send frame header
+    // Streams frame header
+    yotta_tcp_cmd_stream(
+        (yotta_tcp_cmd_t *) cmd,
+        sizeof(cmd->header),
+        &cmd->header_cursor,
+        &cmd->header
+    );
 
-        uint64_t op = yotta_tcp_cmd_send(
-            (yotta_tcp_cmd_t *) cmd,
-            sizeof(cmd->header),
-            &cmd->header_cursor,
-            &cmd->header
-        );
-
-        if (op != 0)
-        {
-            return;
-        }
-    }
-
-    {
-        // Send data
-
-        uint64_t op = yotta_tcp_cmd_send(
-            (yotta_tcp_cmd_t *) cmd,
-            cmd->header.data_size,
-            &cmd->data_cursor,
-            cmd->data
-        );
-
-        if (op != 0)
-        {
-            return;
-        }
-    }
+    // Streams data
+    yotta_tcp_cmd_stream_last(
+        (yotta_tcp_cmd_t *) cmd,
+        cmd->header.data_size,
+        &cmd->data_cursor,
+        cmd->data
+    );
 
     /*
      * We push the sync event and destroy this command

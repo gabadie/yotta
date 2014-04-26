@@ -73,21 +73,13 @@ yotta_whisper_shared_counter_request_send(yotta_whisper_shared_counter_request_c
     yotta_assert(cmd != 0);
     yotta_assert(cmd->abstract_cmd.queue != 0);
 
-    {
-        // send shared counter request's header
-
-        uint64_t op = yotta_tcp_cmd_send(
-            (yotta_tcp_cmd_t *) cmd,
-            sizeof(cmd->header),
-            &cmd->header_cursor,
-            &cmd->header
-        );
-
-        if (op != 0)
-        {
-            return;
-        }
-    }
+    // Streams shared counter request's header
+    yotta_tcp_cmd_stream_unique(
+        (yotta_tcp_cmd_t *) cmd,
+        sizeof(cmd->header),
+        &cmd->header_cursor,
+        &cmd->header
+    );
 
     yotta_tcp_cmd_finish((yotta_tcp_cmd_t *) cmd);
     yotta_tcp_cmd_release(cmd);
@@ -103,21 +95,13 @@ yotta_whisper_shared_counter_answer_send(yotta_whisper_shared_counter_answer_cmd
     yotta_assert(cmd != 0);
     yotta_assert(cmd->abstract_cmd.queue != 0);
 
-    {
-        // send shared counter answer's header
-
-        uint64_t op = yotta_tcp_cmd_send(
-            (yotta_tcp_cmd_t *) cmd,
-            sizeof(cmd->header),
-            &cmd->header_cursor,
-            &cmd->header
-        );
-
-        if (op != 0)
-        {
-            return;
-        }
-    }
+    // Streams shared counter answer's header
+    yotta_tcp_cmd_stream_unique(
+        (yotta_tcp_cmd_t *) cmd,
+        sizeof(cmd->header),
+        &cmd->header_cursor,
+        &cmd->header
+    );
 
     yotta_tcp_cmd_finish((yotta_tcp_cmd_t *) cmd);
     yotta_tcp_cmd_release(cmd);

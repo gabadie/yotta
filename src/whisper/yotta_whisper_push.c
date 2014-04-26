@@ -57,38 +57,21 @@ yotta_whisper_push_send(yotta_whisper_push_cmd_t * cmd)
     yotta_assert(cmd != 0);
     yotta_assert(cmd->abstract_cmd.queue != 0);
 
-    if (cmd->header_cursor != sizeof(cmd->header))
-    {
-        // send push's header
+    // Streams push's header
+    yotta_tcp_cmd_stream(
+        (yotta_tcp_cmd_t *) cmd,
+        sizeof(cmd->header),
+        &cmd->header_cursor,
+        &cmd->header
+    );
 
-        uint64_t op = yotta_tcp_cmd_send(
-            (yotta_tcp_cmd_t *) cmd,
-            sizeof(cmd->header),
-            &cmd->header_cursor,
-            &cmd->header
-        );
-
-        if (op != 0)
-        {
-            return;
-        }
-    }
-
-    {
-        // send push's data
-
-        uint64_t op = yotta_tcp_cmd_send(
-            (yotta_tcp_cmd_t *) cmd,
-            cmd->header.data_size,
-            &cmd->data_cursor,
-            cmd->data
-        );
-
-        if (op != 0)
-        {
-            return;
-        }
-    }
+    // Streams push's data
+    yotta_tcp_cmd_stream_last(
+        (yotta_tcp_cmd_t *) cmd,
+        cmd->header.data_size,
+        &cmd->data_cursor,
+        cmd->data
+    );
 
     /*
      * We push the sync event and destroy this command
