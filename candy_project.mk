@@ -5,7 +5,7 @@ ifeq ($(filter debug nightly,$(config)),)
     override config=release
 endif
 
-PROJECT_CFLAGS := -Wall -Wextra -std=gnu11 -m64
+PROJECT_CFLAGS := -Wall -Wextra -m64 -std=gnu99
 PROJECT_LDFLAGS := -lpthread
 
 # ------------------------------------------------------------ release configuration

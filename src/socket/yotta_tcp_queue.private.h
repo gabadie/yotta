@@ -8,7 +8,7 @@
 /*
  * @infos: overloads yotta_socket_event_t
  */
-typedef struct
+struct
 yotta_tcp_queue_s
 {
     // overloads yotta_socket_event_t
@@ -28,8 +28,7 @@ yotta_tcp_queue_s
      * guaranted.
      */
     yotta_tcp_cmd_t * queue_stack;
-}
-yotta_tcp_queue_t;
+};
 
 /*
  * @infos: inits TCP command queue
