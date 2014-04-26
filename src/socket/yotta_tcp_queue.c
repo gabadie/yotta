@@ -208,8 +208,9 @@ static
 void
 yotta_tcp_queue_finish_release(yotta_tcp_cmd_t * cmd)
 {
-    yotta_assert(cmd != 0);
+    yotta_assert(cmd != NULL);
 
+    yotta_tcp_cmd_destroy(cmd);
     yotta_free(cmd);
 }
 
@@ -239,6 +240,10 @@ yotta_tcp_queue_destroy(yotta_tcp_queue_t * cmd_queue)
         yotta_tcp_cmd_t * cmd = cmd_queue->queue_first;
 
         cmd_queue->queue_first = cmd->queue_next;
+
+#ifdef YOTTA_ASSERT
+        cmd->queue = NULL;
+#endif
 
         cmd->release_event(cmd);
     }

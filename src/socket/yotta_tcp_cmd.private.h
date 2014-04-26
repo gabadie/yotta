@@ -35,7 +35,11 @@ yotta_tcp_cmd_s
     // the send event entry point
     yotta_tcp_cmd_entry_t send_event;
 
-    // the release the tcp_cmd
+    /*
+     * Releases the tcp_cmd.
+     *
+     * @important: Must call yotta_tcp_cmd_destroy().
+     */
     yotta_tcp_cmd_entry_t release_event;
 
     // the next TCP command in the queue
@@ -66,7 +70,7 @@ yotta_tcp_cmd_s
 #define yotta_tcp_cmd_init(cmd) \
     {\
         yotta_dirty_s((yotta_tcp_cmd_t *) (cmd)); \
-        ((yotta_tcp_cmd_t *) (cmd))->queue = 0; \
+        ((yotta_tcp_cmd_t *) (cmd))->queue = NULL; \
         yotta_tcp_cmd_set_send(cmd, 0); \
         yotta_tcp_cmd_set_release(cmd, 0); \
     }
@@ -114,6 +118,25 @@ yotta_tcp_cmd_finish(yotta_tcp_cmd_t * cmd);
  */
 #define yotta_tcp_cmd_release(cmd) \
     ((yotta_tcp_cmd_t *) (cmd))->release_event((yotta_tcp_cmd_t *) (cmd))
+
+/*
+ * @infos: destroy the TCP command
+ *
+ * @param <cmd>: the command to destroy
+ */
+#ifdef YOTTA_ASSERT
+void
+yotta_tcp_cmd_destroy(yotta_tcp_cmd_t * cmd);
+
+#else
+# define yotta_tcp_cmd_destroy(cmd)
+    /*
+     * We do nothing to make sur that -Wunused-params detects that the command is
+     * beging freed right after.
+     */
+
+#endif //YOTTA_ASSERT
+
 
 
 #endif

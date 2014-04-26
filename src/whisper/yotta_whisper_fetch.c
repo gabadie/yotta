@@ -62,6 +62,9 @@ static
 void
 yotta_whisper_fetch_release(yotta_tcp_cmd_t * cmd)
 {
+    yotta_assert(cmd != NULL);
+
+    yotta_tcp_cmd_destroy(cmd);
     yotta_free(cmd);
 }
 
