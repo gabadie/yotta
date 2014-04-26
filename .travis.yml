@@ -8,7 +8,7 @@ compiler:
 #   candy_makefile/ uses python
 #   src_daemon/ is tested with pytest
 install:
-  - "sudo apt-get install python-2.7"
+  - "sudo apt-get install python"
   - "sudo apt-get install python-pip"
   - "sudo pip install pytest"
 
