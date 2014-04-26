@@ -116,6 +116,12 @@ yotta_dictate_binary_send(yotta_dictate_binary_cmd_t * cmd)
     yotta_tcp_cmd_release(cmd);
 }
 
+static
+yotta_tcp_cmd_vtable_t const
+yotta_dictate_binary_send_vtable = {
+    (yotta_tcp_cmd_entry_t) yotta_dictate_binary_release,
+    (yotta_tcp_cmd_entry_t) yotta_dictate_binary_send
+};
 
 uint64_t
 yotta_dictate_binary(
@@ -140,9 +146,7 @@ yotta_dictate_binary(
     yotta_dirty_s(cmd);
 
     // Initialize the command
-    yotta_tcp_cmd_init(cmd);
-    yotta_tcp_cmd_set_send(cmd, yotta_dictate_binary_send);
-    yotta_tcp_cmd_set_release(cmd, yotta_dictate_binary_release);
+    yotta_tcp_cmd_init(cmd, &yotta_dictate_binary_send_vtable);
 
     cmd->binary_file = fopen(executable_path, "rb");
 

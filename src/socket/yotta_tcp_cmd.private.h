@@ -26,6 +26,17 @@ yotta_tcp_queue_t;
  */
 typedef void (*yotta_tcp_cmd_entry_t)(yotta_tcp_cmd_t *);
 
+typedef struct
+yotta_tcp_cmd_vtable_s
+{
+    // the yotta_tcp_cmd_t's release function
+    yotta_tcp_cmd_entry_t release;
+
+    // Command's stream event called by the TCP queue's stream event
+    yotta_tcp_cmd_entry_t stream;
+}
+yotta_tcp_cmd_vtable_t;
+
 /*
  * @infos: defines a TCP command to be inherited
  */
@@ -33,14 +44,7 @@ struct
 yotta_tcp_cmd_s
 {
     // the send event entry point
-    yotta_tcp_cmd_entry_t send_event;
-
-    /*
-     * Releases the tcp_cmd.
-     *
-     * @important: Must call yotta_tcp_cmd_destroy().
-     */
-    yotta_tcp_cmd_entry_t release_event;
+    yotta_tcp_cmd_vtable_t const * const vtable;
 
     // the next TCP command in the queue
     yotta_tcp_cmd_t * queue_next;
@@ -50,34 +54,24 @@ yotta_tcp_cmd_s
 };
 
 /*
- * @infos: sets TCP command's event entries
- *
- * @param <cmd>: the tcp command
- * @param <function_ptr>: the function pointer
- */
-#define yotta_tcp_cmd_set_send(cmd,function_ptr) \
-    ((yotta_tcp_cmd_t *) (cmd))->send_event = (yotta_tcp_cmd_entry_t)(function_ptr)
-
-#define yotta_tcp_cmd_set_release(cmd,function_ptr) \
-    ((yotta_tcp_cmd_t *) (cmd))->release_event = (yotta_tcp_cmd_entry_t)(function_ptr)
-
-/*
  * @infos: inits the TCP command
  *
  * @param <cmd>: the socket event
  */
 #ifdef YOTTA_ASSERT
-#define yotta_tcp_cmd_init(cmd) \
+#define yotta_tcp_cmd_init(cmd, virtual_table) \
     {\
         yotta_dirty_s((yotta_tcp_cmd_t *) (cmd)); \
         ((yotta_tcp_cmd_t *) (cmd))->queue = NULL; \
-        yotta_tcp_cmd_set_send(cmd, 0); \
-        yotta_tcp_cmd_set_release(cmd, 0); \
+        yotta_vtable_set(cmd, virtual_table); \
     }
 
 #else
-#define yotta_tcp_cmd_init(cmd) \
-    yotta_dirty_s((yotta_tcp_cmd_t *) (cmd))
+#define yotta_tcp_cmd_init(cmd, virtual_table) \
+    { \
+        yotta_dirty_s((yotta_tcp_cmd_t *) (cmd)); \
+        yotta_vtable_set(cmd, virtual_table); \
+    }
 
 #endif // YOTTA_ASSERT
 
@@ -123,7 +117,7 @@ yotta_tcp_cmd_send(yotta_tcp_cmd_t * cmd, uint64_t buffer_size, uint64_t * buffe
 /*
  * Streams a command's output and automatically returns the command if the
  * memory block is not sent completly. This shall only be called in command's
- * send_event callback.
+ * stream virtual function (see yotta_tcp_cmd_vtable_t::stream).
  *
  * @param <cmd>: the TCP command
  * @param <buffer_size>: the buffer's size to send
@@ -169,7 +163,7 @@ yotta_tcp_cmd_finish(yotta_tcp_cmd_t * cmd);
  * @param <cmd>: the command to release
  */
 #define yotta_tcp_cmd_release(cmd) \
-    ((yotta_tcp_cmd_t *) (cmd))->release_event((yotta_tcp_cmd_t *) (cmd))
+    yotta_vcall((yotta_tcp_cmd_t *) cmd, yotta_tcp_cmd_vtable_t, release)
 
 /*
  * @infos: destroy the TCP command
