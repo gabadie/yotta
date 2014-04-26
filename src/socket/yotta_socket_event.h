@@ -6,20 +6,6 @@
 
 
 /*
- * @infos; forward declaration of yotta_socket_event_t
- */
-typedef struct
-yotta_socket_event_s
-yotta_socket_event_t;
-
-/*
- * @infos; forward declaration of yotta_socket_thread_t
- */
-typedef struct
-yotta_socket_thread_s
-yotta_socket_thread_t;
-
-/*
  * @infos: defines yotta socket event entry point function pointer type
  *
  * The socket event entry received 1 parameters:

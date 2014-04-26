@@ -9,7 +9,7 @@
 /*
  * @infos: defines a socket listener thread
  */
-typedef struct
+struct
 yotta_socket_thread_s
 {
     yotta_thread_t id;
@@ -18,7 +18,7 @@ yotta_socket_thread_s
     uint64_t socket_event_count;
     yotta_socket_event_t * socket_head;
     yotta_socket_event_t * current_socket;
-} yotta_socket_thread_t;
+};
 
 /*
  * @infos: inits and launches the sockets' thread
