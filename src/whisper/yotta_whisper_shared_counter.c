@@ -57,6 +57,9 @@ static
 void
 yotta_whisper_shared_counter_release(yotta_tcp_cmd_t * cmd)
 {
+    yotta_assert(cmd != NULL);
+
+    yotta_tcp_cmd_destroy(cmd);
     yotta_free(cmd);
 }
 
@@ -70,21 +73,13 @@ yotta_whisper_shared_counter_request_send(yotta_whisper_shared_counter_request_c
     yotta_assert(cmd != 0);
     yotta_assert(cmd->abstract_cmd.queue != 0);
 
-    {
-        // send shared counter request's header
-
-        uint64_t op = yotta_tcp_cmd_send(
-            (yotta_tcp_cmd_t *) cmd,
-            sizeof(cmd->header),
-            &cmd->header_cursor,
-            &cmd->header
-        );
-
-        if (op != 0)
-        {
-            return;
-        }
-    }
+    // Streams shared counter request's header
+    yotta_tcp_cmd_stream_unique(
+        (yotta_tcp_cmd_t *) cmd,
+        sizeof(cmd->header),
+        &cmd->header_cursor,
+        &cmd->header
+    );
 
     yotta_tcp_cmd_finish((yotta_tcp_cmd_t *) cmd);
     yotta_tcp_cmd_release(cmd);
@@ -100,25 +95,24 @@ yotta_whisper_shared_counter_answer_send(yotta_whisper_shared_counter_answer_cmd
     yotta_assert(cmd != 0);
     yotta_assert(cmd->abstract_cmd.queue != 0);
 
-    {
-        // send shared counter answer's header
-
-        uint64_t op = yotta_tcp_cmd_send(
-            (yotta_tcp_cmd_t *) cmd,
-            sizeof(cmd->header),
-            &cmd->header_cursor,
-            &cmd->header
-        );
-
-        if (op != 0)
-        {
-            return;
-        }
-    }
+    // Streams shared counter answer's header
+    yotta_tcp_cmd_stream_unique(
+        (yotta_tcp_cmd_t *) cmd,
+        sizeof(cmd->header),
+        &cmd->header_cursor,
+        &cmd->header
+    );
 
     yotta_tcp_cmd_finish((yotta_tcp_cmd_t *) cmd);
     yotta_tcp_cmd_release(cmd);
 }
+
+static
+yotta_tcp_cmd_vtable_t const
+yotta_whisper_shared_counter_answer_vtable = {
+    (yotta_tcp_cmd_entry_t) yotta_whisper_shared_counter_release,
+    (yotta_tcp_cmd_entry_t) yotta_whisper_shared_counter_answer_send
+};
 
 /*
  * @infos: YOTTA_WHISPER_SHARED_COUNTER_REQUEST's receive event
@@ -170,10 +164,7 @@ yotta_whisper_shared_counter_request_recv(
             yotta_alloc_s(yotta_whisper_shared_counter_answer_cmd_t);
 
         yotta_dirty_s(cmd);
-
-        yotta_tcp_cmd_init(cmd);
-        yotta_tcp_cmd_set_send(cmd, yotta_whisper_shared_counter_answer_send);
-        yotta_tcp_cmd_set_release(cmd, yotta_whisper_shared_counter_release);
+        yotta_tcp_cmd_init(cmd, &yotta_whisper_shared_counter_answer_vtable);
 
         cmd->header_cursor = 0;
         cmd->header.label = YOTTA_WHISPER_SHARED_COUNTER_ANSWER;
@@ -267,6 +258,13 @@ yotta_whisper_shared_counter_answer_recv(
     yotta_whisper_queue_finish(cmd_queue);
 }
 
+static
+yotta_tcp_cmd_vtable_t const
+yotta_whisper_shared_counter_request_vtable = {
+    (yotta_tcp_cmd_entry_t) yotta_whisper_shared_counter_release,
+    (yotta_tcp_cmd_entry_t) yotta_whisper_shared_counter_request_send
+};
+
 void
 yotta_whisper_shared_counter(
     yotta_whisper_queue_t * cmd_queue,
@@ -286,10 +284,7 @@ yotta_whisper_shared_counter(
         yotta_alloc_s(yotta_whisper_shared_counter_request_cmd_t);
 
     yotta_dirty_s(cmd);
-
-    yotta_tcp_cmd_init(cmd);
-    yotta_tcp_cmd_set_send(cmd, yotta_whisper_shared_counter_request_send);
-    yotta_tcp_cmd_set_release(cmd, yotta_whisper_shared_counter_release);
+    yotta_tcp_cmd_init(cmd, &yotta_whisper_shared_counter_request_vtable);
 
     cmd->header_cursor = 0;
     cmd->header.label = YOTTA_WHISPER_SHARED_COUNTER_REQUEST;

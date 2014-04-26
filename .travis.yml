@@ -1,0 +1,17 @@
+language: c
+
+# compilers wanted
+compiler:
+  - gcc
+
+# command to install dependencies
+#   candy_makefile/ uses python
+#   src_daemon/ is tested with pytest
+install:
+  - "sudo apt-get install python"
+  - "sudo apt-get install python-pip"
+  - "sudo pip install pytest"
+  - "sudo pip install -r python_requirements.txt"
+
+# command to run tests
+script: "make hook"

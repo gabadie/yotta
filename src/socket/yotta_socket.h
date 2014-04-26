@@ -2,6 +2,7 @@
 #define _YOTTA_SOCKET
 
 #include "yotta_socket_prefix.h"
+#include "yotta_socket_fwd.h"
 
 
 /*

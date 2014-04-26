@@ -32,6 +32,7 @@
 
 #include "core/yotta_return.h"
 #include "core/yotta_struct.h"
+#include "core/yotta_virtual.h"
 
 
 #endif

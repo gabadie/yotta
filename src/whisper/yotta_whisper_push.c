@@ -41,6 +41,9 @@ static
 void
 yotta_whisper_push_release(yotta_tcp_cmd_t * cmd)
 {
+    yotta_assert(cmd != NULL);
+
+    yotta_tcp_cmd_destroy(cmd);
     yotta_free(cmd);
 }
 
@@ -54,38 +57,21 @@ yotta_whisper_push_send(yotta_whisper_push_cmd_t * cmd)
     yotta_assert(cmd != 0);
     yotta_assert(cmd->abstract_cmd.queue != 0);
 
-    if (cmd->header_cursor != sizeof(cmd->header))
-    {
-        // send push's header
+    // Streams push's header
+    yotta_tcp_cmd_stream(
+        (yotta_tcp_cmd_t *) cmd,
+        sizeof(cmd->header),
+        &cmd->header_cursor,
+        &cmd->header
+    );
 
-        uint64_t op = yotta_tcp_cmd_send(
-            (yotta_tcp_cmd_t *) cmd,
-            sizeof(cmd->header),
-            &cmd->header_cursor,
-            &cmd->header
-        );
-
-        if (op != 0)
-        {
-            return;
-        }
-    }
-
-    {
-        // send push's data
-
-        uint64_t op = yotta_tcp_cmd_send(
-            (yotta_tcp_cmd_t *) cmd,
-            cmd->header.data_size,
-            &cmd->data_cursor,
-            cmd->data
-        );
-
-        if (op != 0)
-        {
-            return;
-        }
-    }
+    // Streams push's data
+    yotta_tcp_cmd_stream_last(
+        (yotta_tcp_cmd_t *) cmd,
+        cmd->header.data_size,
+        &cmd->data_cursor,
+        cmd->data
+    );
 
     /*
      * We push the sync event and destroy this command
@@ -166,6 +152,13 @@ yotta_whisper_push_master_recv(
     yotta_whisper_queue_finish(cmd_queue);
 }
 
+static
+yotta_tcp_cmd_vtable_t const
+yotta_whisper_push_vtable = {
+    (yotta_tcp_cmd_entry_t) yotta_whisper_push_release,
+    (yotta_tcp_cmd_entry_t) yotta_whisper_push_send
+};
+
 void
 yotta_whisper_push(
     yotta_whisper_queue_t * cmd_queue,
@@ -194,10 +187,7 @@ yotta_whisper_push(
     yotta_whisper_push_cmd_t * cmd = yotta_alloc_s(yotta_whisper_push_cmd_t);
 
     yotta_dirty_s(cmd);
-
-    yotta_tcp_cmd_init(cmd);
-    yotta_tcp_cmd_set_send(cmd, yotta_whisper_push_send);
-    yotta_tcp_cmd_set_release(cmd, yotta_whisper_push_release);
+    yotta_tcp_cmd_init(cmd, &yotta_whisper_push_vtable);
 
     cmd->header_cursor = 0;
     cmd->header.label = YOTTA_WHISPER_MEM_PUSH;

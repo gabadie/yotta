@@ -55,6 +55,7 @@ yotta_dictate_binary_release(yotta_tcp_cmd_t * cmd)
 {
     yotta_assert(cmd != NULL);
 
+    yotta_tcp_cmd_destroy(cmd);
     yotta_free(cmd);
 }
 
@@ -69,50 +70,36 @@ yotta_dictate_binary_send(yotta_dictate_binary_cmd_t * cmd)
     yotta_assert(cmd->abstract_cmd.queue != NULL);
     yotta_assert(cmd->binary_file != NULL);
 
-    if (cmd->header_cursor != sizeof(cmd->header))
-    {
-        // Send frame header
+    // Streams binary frame header
+    yotta_tcp_cmd_stream(
+        (yotta_tcp_cmd_t *) cmd,
+        sizeof(cmd->header),
+        &cmd->header_cursor,
+        &cmd->header
+    );
 
-        uint64_t op = yotta_tcp_cmd_send(
+    // Streams the whole binary content in severals passes
+    while (!feof(cmd->binary_file))
+    {
+        if (cmd->data_read == 0)
+        {
+            // Reads a new binary pass from the binary file
+            cmd->data_read = fread(cmd->data, 1, BINARY_BUFFER_SIZE, cmd->binary_file);
+            cmd->data_cursor = 0;
+        }
+
+        yotta_assert(cmd->data_read > 0);
+
+        // Streams the current pass
+        yotta_tcp_cmd_stream(
             (yotta_tcp_cmd_t *) cmd,
-            sizeof(cmd->header),
-            &cmd->header_cursor,
-            &cmd->header
+            cmd->data_read,
+            &cmd->data_cursor,
+            cmd->data
         );
 
-        if (op != 0)
-        {
-            return;
-        }
-    }
-
-    {
-        // Send data
-
-        while (!feof(cmd->binary_file))
-        {
-            if(cmd->data_read == 0)
-            {
-                cmd->data_read = fread(cmd->data, 1, BINARY_BUFFER_SIZE, cmd->binary_file);
-            }
-
-            yotta_assert(cmd->data_read > 0);
-
-            uint64_t op = yotta_tcp_cmd_send(
-                (yotta_tcp_cmd_t *) cmd,
-                cmd->data_read,
-                &cmd->data_cursor,
-                cmd->data
-            );
-
-            if (op != 0)
-            {
-                return;
-            }
-
-            cmd->data_cursor = 0;
-            cmd->data_read = 0;
-        }
+        // Ends the current pass
+        cmd->data_read = 0;
     }
 
     /*
@@ -129,6 +116,12 @@ yotta_dictate_binary_send(yotta_dictate_binary_cmd_t * cmd)
     yotta_tcp_cmd_release(cmd);
 }
 
+static
+yotta_tcp_cmd_vtable_t const
+yotta_dictate_binary_send_vtable = {
+    (yotta_tcp_cmd_entry_t) yotta_dictate_binary_release,
+    (yotta_tcp_cmd_entry_t) yotta_dictate_binary_send
+};
 
 uint64_t
 yotta_dictate_binary(
@@ -153,9 +146,7 @@ yotta_dictate_binary(
     yotta_dirty_s(cmd);
 
     // Initialize the command
-    yotta_tcp_cmd_init(cmd);
-    yotta_tcp_cmd_set_send(cmd, yotta_dictate_binary_send);
-    yotta_tcp_cmd_set_release(cmd, yotta_dictate_binary_release);
+    yotta_tcp_cmd_init(cmd, &yotta_dictate_binary_send_vtable);
 
     cmd->binary_file = fopen(executable_path, "rb");
 
@@ -168,7 +159,6 @@ yotta_dictate_binary(
     cmd->header_cursor = 0;
     cmd->header.label = YOTTA_DICTATE_LABEL_SLAVE_BINARY;
     cmd->header.data_size = yotta_file_size(cmd->binary_file);
-    cmd->data_cursor = 0;
     cmd->data_read = 0;
     cmd->sync_finished = sync_finished;
 

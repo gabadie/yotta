@@ -88,8 +88,23 @@ yotta_tcp_cmd_finish(yotta_tcp_cmd_t * cmd)
     while (1);
 
 #ifdef YOTTA_ASSERT
-    cmd->queue = 0;
+    cmd->queue = NULL;
 #endif //YOTTA_ASSERT
 
     yotta_assert(cmd->queue == 0);
 }
+
+#ifdef YOTTA_ASSERT
+
+void
+yotta_tcp_cmd_destroy(yotta_tcp_cmd_t * cmd)
+{
+    yotta_assert(cmd != NULL);
+
+    /*
+     * make sure that the command has been removed from a TCP queue
+     */
+    yotta_assert(cmd->queue == NULL);
+}
+
+#endif
