@@ -11,6 +11,7 @@ install:
   - "sudo apt-get install python"
   - "sudo apt-get install python-pip"
   - "sudo pip install pytest"
+  - "sudo pip install -r python_requirements.txt"
 
 # command to run tests
 script: "make hook"
