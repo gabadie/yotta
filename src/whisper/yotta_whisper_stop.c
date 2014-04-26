@@ -7,35 +7,15 @@
 
 
 /*
- * @infos: defines a stop command
- */
-typedef struct
-yotta_whisper_stop_cmd_s
-{
-    // the TCP command inheritance
-    yotta_tcp_cmd_t abstract_cmd;
-
-    // the header
-    uint64_t header_cursor;
-    struct
-    {
-        yotta_whisper_label_t label;
-    } __attribute__((packed))
-    header;
-}
-yotta_whisper_stop_cmd_t;
-
-
-/*
  * @infos: yotta_whisper_stop_cmd_t's release event
  */
 static
 void
-yotta_whisper_stop_release(yotta_whisper_stop_cmd_t * cmd)
+yotta_whisper_stop_release(yotta_tcp_cmd_t * cmd)
 {
     yotta_assert(cmd != NULL);
 
-    yotta_tcp_cmd_destroy((yotta_tcp_cmd_t *) cmd);
+    yotta_tcp_cmd_destroy(cmd);
     yotta_free(cmd);
 }
 
@@ -44,17 +24,23 @@ yotta_whisper_stop_release(yotta_whisper_stop_cmd_t * cmd)
  */
 static
 void
-yotta_whisper_stop_send(yotta_whisper_stop_cmd_t * cmd)
+yotta_whisper_stop_send(yotta_tcp_cmd_t * cmd)
 {
     yotta_assert(cmd != NULL);
-    yotta_assert(cmd->abstract_cmd.queue != NULL);
+    yotta_assert(cmd->queue != NULL);
 
-    // streams stop's header
+    static
+    yotta_whisper_label_t const label = YOTTA_WHISPER_STOP;
+    uint64_t label_cursor = 0;
+
+    yotta_assert(sizeof(label) == 1);
+
+    // Streams stop's label
     yotta_tcp_cmd_stream_unique(
         (yotta_tcp_cmd_t *) cmd,
-        sizeof(cmd->header),
-        &cmd->header_cursor,
-        &cmd->header
+        sizeof(label),
+        &label_cursor,
+        &label
     );
 
     yotta_tcp_cmd_finish((yotta_tcp_cmd_t *) cmd);
@@ -99,13 +85,10 @@ yotta_whisper_stop(
     /*
      * Creates the YOTTA_WHISPER_STOP command
      */
-    yotta_whisper_stop_cmd_t * cmd = yotta_alloc_s(yotta_whisper_stop_cmd_t);
+    yotta_tcp_cmd_t * cmd = yotta_alloc_s(yotta_tcp_cmd_t);
 
     yotta_dirty_s(cmd);
     yotta_tcp_cmd_init(cmd, &yotta_whisper_stop_vtable);
 
-    cmd->header_cursor = 0;
-    cmd->header.label = YOTTA_WHISPER_STOP;
-
-    yotta_tcp_queue_append((yotta_tcp_queue_t *) cmd_queue, (yotta_tcp_cmd_t *) cmd);
+    yotta_tcp_queue_append((yotta_tcp_queue_t *) cmd_queue, cmd);
 }
