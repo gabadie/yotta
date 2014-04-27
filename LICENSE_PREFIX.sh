@@ -44,5 +44,6 @@ python candy_makefile/utils/src_prefix.py -v c/c++ LICENSE_PREFIX src/*.{c,h}
 python candy_makefile/utils/src_prefix.py -v c/c++ LICENSE_PREFIX src/*/*.{c,h}
 python candy_makefile/utils/src_prefix.py -v c/c++ LICENSE_PREFIX tests/*.{c,h}
 python candy_makefile/utils/src_prefix.py -v flist LICENSE_PREFIX {demos,src,src_daemon,tests}/*.flist demos/*/*.flist
+python candy_makefile/utils/src_prefix.py -v makefile LICENSE_PREFIX makefile candy_project.mk
 python candy_makefile/utils/src_prefix.py -v python LICENSE_PREFIX src_daemon/*.py
 python candy_makefile/utils/src_prefix.py -v shell LICENSE_PREFIX tests/*.sh $0
