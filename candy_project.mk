@@ -1,31 +1,57 @@
 # ------------------------------------------------------------------------------ Yotta library's headers directory
 
+# ------------------------------------------------------------ configurations
+PROJECT_GCC_ENV := $(call env_preference, gcc-4.9 gcc-4.8 gcc-4.7 gcc-4.6 gcc)
+PROJECT_DEFAULT_CC := $(call env_preference, clang $(PROJECT_GCC_ENV))
+
+PROJECT_RELEASES := $(addprefix release-,$(call env_which,clang $(PROJECT_GCC_ENV)))
+PROJECT_CONFIGS := $(addsuffix -$(PROJECT_DEFAULT_CC),debug nightly) $(PROJECT_RELEASES)
+
+$(call trash_configs, $(PROJECT_CONFIGS))
+$(call hook_precommit_configs, debug-$(PROJECT_DEFAULT_CC) $(PROJECT_RELEASES))
+
+
 # ------------------------------------------------------------ default configuration
-ifeq ($(filter debug nightly,$(config)),)
-    override config=release
+ifneq ($(filter debug nightly,$(config)),)
+    override config:=$(config)-$(PROJECT_DEFAULT_CC)
 endif
 
+ifeq ($(filter $(PROJECT_CONFIGS),$(config)),)
+    override config:=$(firstword $(PROJECT_RELEASES))
+endif
+
+
+# ------------------------------------------------------------ gcc/clang configuration
+override CC:=$(PROJECT_DEFAULT_CC)
+
+ifeq ($(filter-out release-gcc%,$(config)),)
+    override CC:=$(PROJECT_GCC_ENV)
+endif
+
+ifeq ($(filter-out release-clang%,$(config)),)
+    override CC:=clang
+endif
+
+override LD:=$(CC)
+
+# ------------------------------------------------------------ default parameters
 PROJECT_CFLAGS := -Wall -Wextra -m64 -std=gnu99
 PROJECT_LDFLAGS := -lpthread
 
-# ------------------------------------------------------------ release configuration
-ifeq ($(config),release)
+# ------------------------------------------------------------ release parameters
+ifeq ($(filter-out release_%,$(config)),)
     PROJECT_CFLAGS += -O3 -Werror -mmmx -mavx
 endif
 
-# ------------------------------------------------------------ nightly configuration
+# ------------------------------------------------------------ nightly parameters
 ifeq ($(config),nightly)
     PROJECT_CFLAGS += -g
 endif
 
-# ------------------------------------------------------------ debug configuration
+# ------------------------------------------------------------ debug parameters
 ifeq ($(config),debug)
     PROJECT_CFLAGS += -g -DYOTTA_DEBUG
 endif
-
-
-$(call trash_configs, debug nightly release)
-$(call hook_precommit_configs, debug release)
 
 
 # ------------------------------------------------------------------------------ Yotta library's headers directory
