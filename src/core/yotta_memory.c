@@ -102,7 +102,7 @@ yotta_alloc(size_t size, size_t alignment)
     yotta_assert(memory->free_function != 0);
     yotta_assert(memory->size == size);
     yotta_assert(memory->coins == 1);
-    yotta_assert((((size_t) memory) & (alignment - 1)) == 0);
+    yotta_assert((((size_t) (memory + 1)) & (alignment - 1)) == 0);
 
 #ifdef YOTTA_DEBUG_DIRTY
     memset(memory + 1, 0xFE, size);
